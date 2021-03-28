@@ -54,7 +54,7 @@ oder dem Computer des Opfers einen Schlüssel zur Entschlüsselung der Daten zu
 bekommen, um Kenntnis über die tatsächliche Wahlentscheidung der Wählerin zu
 erlangen – sei es mit oder ohne Kooperation der Wählerin.
 
-## Blockchain-basierte Netzwerke zur Duchführung von Online-Wahlen
+## Blockchain-basierte Netzwerke zur Durchführung von Online-Wahlen
 
 Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist die Geheimhaltung der
 Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich zum Absender und Empfänger verfolgen.
