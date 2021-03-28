@@ -56,6 +56,5 @@ erlangen – sei es mit oder ohne Kooperation der Wählerin.
 
 ## Blockchain-basierte Netzwerke zur Duchführung von Online-Wahlen
 
-In einem konventionellen Blockchain-basierten Netzwerk ist die Geheimhaltung der
-Informationen nicht vorgesehen, weil jede der Transaktionen auf die Adressen (~Pubic Keys)
-der Wählerinnen zurückverfolgt werden könnte.
+Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist die Geheimhaltung der
+Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich zum Absender und Empfänger verfolgen.
