@@ -44,7 +44,7 @@ verhindern, wenn eine Wählerin nicht die Möglichkeit hat, zu beweisen, wie sie
 hat. Wäre sie dazu in der Lage, könnte ein Erpresser diesen Beleg fordern und sie wäre
 erpressbar. Eine Anforderung, die deswegen an elektronische Wahlsysteme gestellt
 wird, wird in der Literatur als „Coercion resistance“ - zu Deutsch etwa
-„Widerstandsfähigkeit gegen Erpressung“ bezeichnet. 12 Ein möglicher Erpresser darf
+„Widerstandsfähigkeit gegen Erpressung“ bezeichnet. Ein möglicher Erpresser darf
 außerdem auch ohne Kooperation der Wählerin keine Möglichkeit haben, eine
 Verbindung zwischen der Wählerin und ihrer Wahlentscheidung herstellen können
 dürfen. Um die Anforderungen betreffs der Geheimhaltung und Widerstandsfähigkeit zu
