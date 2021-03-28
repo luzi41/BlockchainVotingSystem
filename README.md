@@ -17,5 +17,5 @@ auf den Listen vertauscht würden, könnte ein Wähler unbeabsichtigt die falsch
 Wahl treffen.
 2. Wurde die Stimme so übermittelt und gespeichert, wie gewählt. Durch
 Manipulationen bei der Übermittlung oder Speicherung können bei einem Online-
-Wahlsystem
+Wahlsystem Stimmen verloren gehen, oder doppelt gespeichert werden.
 3. wurde die Stimme auch so gewertet wie gespeichert.
