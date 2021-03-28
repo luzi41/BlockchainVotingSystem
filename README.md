@@ -1,4 +1,4 @@
-# BlockainVotingSystem
+# BlockchainVotingSystem
 Eine der Anforderungen in Bezug auf die Integrität einer Online-Wahl ist, dass zum
 Schluss das Wahlergebnis überprüfbar sein muss. Die notwendige Geheimhaltung bei
 einer Wahl macht es jedoch schwer, ein Verfahren zu entwickeln, welches einerseits
