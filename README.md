@@ -53,3 +53,8 @@ Blockchain so zu verschlüsseln, dass ein Erpresser keine Möglichkeit hat, vom 
 oder dem Computer des Opfers einen Schlüssel zur Entschlüsselung der Daten zu
 bekommen, um Kenntnis über die tatsächliche Wahlentscheidung der Wählerin zu
 erlangen – sei es mit oder ohne Kooperation der Wählerin.
+
+In einem konventionellen Blockchain-basierten Netzwerk ist die Geheimhaltung der
+Informationen nicht vorgesehen. Die einfache Methode, Coins direkt an
+Kandidatenadressen zu senden, fällt aus, weil jeder der Transaktionen auf die Adressen
+der Wählerinnen zurückverfolgt werden könnte.
