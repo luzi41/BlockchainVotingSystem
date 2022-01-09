@@ -1,0 +1,778 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="de" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="note">
+                <source>note</source>
+                <target>HINWEIS</target>
+            </trans-unit>
+            <trans-unit id="tip">
+                <source>tip</source>
+                <target>TIPP</target>
+            </trans-unit>
+            <trans-unit id="not_available">
+                <source>not_available</source>
+                <target>Nicht verfügbar</target>
+            </trans-unit>
+            <trans-unit id="mit_license">
+                <source>mit_license</source>
+                <target>MIT-Lizenz</target>
+            </trans-unit>
+
+            <trans-unit id="action.show_post">
+                <source>action.show_post</source>
+                <target>Beitrag anzeigen</target>
+            </trans-unit>
+            <trans-unit id="action.create_candidate">
+                <source>action.create_candidate</source>
+                <target>Neuer Kandidat</target>
+            </trans-unit>
+            <trans-unit id="action.import_candidates">
+                <source>action.import_candidates</source>
+                <target>Kandidaten importieren</target>
+            </trans-unit>
+            <trans-unit id="action.submit">
+                <source>action.submit</source>
+                <target>Absenden</target>
+            </trans-unit>
+            <trans-unit id="action.check">
+                <source>action.check</source>
+                <target>Prüfen</target>
+            </trans-unit>
+            <trans-unit id="action.delete">
+                <source>action.delete</source>
+                <target>Löschen</target>
+            </trans-unit>            
+            <trans-unit id="action.show">
+                <source>action.show</source>
+                <target>Anzeigen</target>
+            </trans-unit>
+            <trans-unit id="action.show_code">
+                <source>action.show_code</source>
+                <target>Code anzeigen</target>
+            </trans-unit>
+            <trans-unit id="action.create_new">
+                <source>action.create_new</source>
+                <target>Neu</target>
+            </trans-unit>
+
+            <trans-unit id="action.create_party">
+                <source>action.create_party</source>
+                <target>Neue Partei</target>
+            </trans-unit>
+            <trans-unit id="action.import_parties">
+                <source>action.import_parties</source>
+                <target>Parteien importieren</target>
+            </trans-unit>
+            <trans-unit id="action.create_keys">
+                <source>action.create_keys</source>
+                <target>Schlüssel erzeugen</target>
+            </trans-unit>
+            <trans-unit id="action.edit">
+                <source>action.edit</source>
+                <target>Bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="action.edit_post">
+                <source>action.edit_post</source>
+                <target>Beitrag bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="action.save">
+                <source>action.save</source>
+                <target>Änderungen speichern</target>
+            </trans-unit>
+            <trans-unit id="action.delete_post">
+                <source>action.delete_post</source>
+                <target>Beitrag löschen</target>
+            </trans-unit>
+            <trans-unit id="action.create_post">
+                <source>action.create_post</source>
+                <target>Neuen Beitrag erstellen</target>
+            </trans-unit>
+            <trans-unit id="action.back_to_list">
+                <source>action.back_to_list</source>
+                <target>Zurück zur Beitragsliste</target>
+            </trans-unit>
+            <trans-unit id="action.publish_comment">
+                <source>action.publish_comment</source>
+                <target>Kommentar veröffentlichen</target>
+            </trans-unit>
+            <trans-unit id="action.next">
+                <source>action.next</source>
+                <target>Nächster Schritt -></target>
+            </trans-unit>              
+            <trans-unit id="action.sign_in">
+                <source>action.sign_in</source>
+                <target>Login</target>
+            </trans-unit>
+            <trans-unit id="action.register">
+                <source>action.register</source>
+                <target>Registrieren</target>
+            </trans-unit>            
+            <trans-unit id="action.browse_app">
+                <source>action.browse_app</source>
+                <target>Zum Frontend</target>
+            </trans-unit>
+            <trans-unit id="action.browse_admin">
+                <source>action.browse_admin</source>
+                <target>Zum Backend</target>
+            </trans-unit>
+            <trans-unit id="action.close">
+                <source>action.close</source>
+                <target>Schliessen</target>
+            </trans-unit>
+            <trans-unit id="action.edit_contents">
+                <source>action.edit_contents</source>
+                <target>Inhalt bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="action.import_voters">
+                <source>action.import_voters</source>
+                <target>Wähler importieren</target>
+            </trans-unit>
+            <trans-unit id="action.create_keya_nounce">
+                <source>action.create_keya_nounce</source>
+                <target>Schlüssel A und Passwort erzeugen</target>
+            </trans-unit>
+
+            <trans-unit id="admin.candidates">
+                <source>admin.candidates</source>
+                <target>Kandidaten</target>
+            </trans-unit>
+            <trans-unit id="admin.voters">
+                <source>admin.voters</source>
+                <target>Wähler</target>
+            </trans-unit>
+            <trans-unit id="admin.election">
+                <source>admin.election</source>
+                <target>Wahl</target>
+            </trans-unit>
+
+
+            <trans-unit id="Category">
+                <source>Category</source>
+                <target>Kategorie</target>
+            </trans-unit>
+
+            <trans-unit id="Day">
+                <source>Day</source>
+                <target>Tag</target>
+            </trans-unit>            
+
+            <trans-unit id="delete_post_modal.title">
+                <source>delete_post_modal.title</source>
+                <target>Bist du sicher, dass du diesen Beitrag löschen möchtest?</target>
+            </trans-unit>
+            <trans-unit id="delete_post_modal.body">
+                <source>delete_post_modal.body</source>
+                <target>Diese Aktion kann nicht rückgängig gemacht werden.</target>
+            </trans-unit>
+
+            <trans-unit id="error.no_election">
+                <source>error.no_election</source>
+                <target>Keine Wahl.</target>
+            </trans-unit>
+            <trans-unit id="error.no_elections">
+                <source>error.no_elections</source>
+                <target>Kein Wahlprojekt gefunden.</target>
+            </trans-unit>
+            <trans-unit id="error.wrong_credentials">
+                <source>error.wrong_credentials</source>
+                <target>Falsche Zugangsdaten!</target>
+            </trans-unit>
+             
+            <trans-unit id="info.app">
+                <source>info.app</source>
+                <target>Diese Anwendung ist ein Prototyp - nur zu Testzwecken gedacht.</target>
+            </trans-unit>
+            <trans-unit id="info.development">
+                <source>info.development</source>
+                <target><![CDATA[Wenn Sie sich an der Entwicklung beteiligen möchten, finden SIe das Github-Repository hier: <a target="_blank" href="https://github.com/luzi41/BlockchainVotingSystem">github.com/luzi41/BlockchainVotingSystem</a>]]></target>
+            </trans-unit>
+            <trans-unit id="info.not_determined">
+                <source>info.not_determined</source>
+                <target>Noch nicht festgelegt.</target>
+            </trans-unit>
+
+            <trans-unit id="yes">
+                <source>yes</source>
+                <target>Ja</target>
+            </trans-unit>
+
+            <trans-unit id="label.agree_terms">
+                <source>label.agree_terms</source>
+                <target><![CDATA[Nutzungsbedingungen akzeptieren]]></target>
+            </trans-unit>
+            <trans-unit id="label.ballot">
+                <source>label.ballot</source>
+                <target>Stimmzettel >></target>
+            </trans-unit>                 
+            <trans-unit id="label.delete_post">
+                <source>label.delete_post</source>
+                <target>Beitrag löschen</target>
+            </trans-unit>
+            <trans-unit id="label.cancel">
+                <source>label.cancel</source>
+                <target>Abbrechen</target>
+            </trans-unit>
+            <trans-unit id="label.elected">
+                <source>label.elected</source>
+                <target>Gewählt</target>
+            </trans-unit>
+            <trans-unit id="label.true">
+                <source>label.true</source>
+                <target>Ja</target>
+            </trans-unit>
+            <trans-unit id="label.false">
+                <source>label.false</source>
+                <target>Nein</target>
+            </trans-unit>              
+            <trans-unit id="label.key_c_s">
+                <source>label.key_c_s</source>
+                <target>KeyCs</target>
+            </trans-unit>            
+            <trans-unit id="label.parties">
+                <source>label.parties</source>
+                <target>Parteien</target>
+            </trans-unit>
+            <trans-unit id="label.create_post">
+                <source>label.create_post</source>
+                <target>Beitrag erstellen</target>
+            </trans-unit>
+            <trans-unit id="label.save_and_create_new">
+                <source>label.save_and_create_new</source>
+                <target>Speichern und neuen Beitrag erstellen</target>
+            </trans-unit>
+            <trans-unit id="label.title">
+                <source>label.title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="label.author">
+                <source>label.author</source>
+                <target>Autor</target>
+            </trans-unit>
+            <trans-unit id="label.author_email">
+                <source>label.author_email</source>
+                <target>Autor E-Mail</target>
+            </trans-unit>
+            <trans-unit id="label.username">
+                <source>label.username</source>
+                <target>Benutzername</target>
+            </trans-unit>
+            <trans-unit id="label.name">
+                <source>label.name</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id="label.nonce">
+                <source>label.nonce</source>
+                <target>Passwort</target>
+            </trans-unit>
+            <trans-unit id="label.credentials">
+                <source>label.credentials</source>
+                <target>Zugangsdaten</target>
+            </trans-unit>            
+            <trans-unit id="label.description">
+                <source>label.description</source>
+                <target>Beschreibung</target>
+            </trans-unit>                   
+            <trans-unit id="label.password">
+                <source>label.password</source>
+                <target>Passwort</target>
+            </trans-unit>
+            <trans-unit id="label.role">
+                <source>label.role</source>
+                <target>Rolle</target>
+            </trans-unit>
+            <trans-unit id="label.content">
+                <source>label.content</source>
+                <target>Inhalt</target>
+            </trans-unit>
+            <trans-unit id="label.summary">
+                <source>label.summary</source>
+                <target>Zusammenfassung</target>
+            </trans-unit>
+            <trans-unit id="label.published_at">
+                <source>label.published_at</source>
+                <target>Veröffentlicht am</target>
+            </trans-unit>
+            <trans-unit id="label.actions">
+                <source>label.actions</source>
+                <target>Aktionen</target>
+            </trans-unit>
+            <trans-unit id="label.additional_mandates">
+                <source>label.additional_mandates</source>
+                <target>Zusatzmandate</target>
+            </trans-unit>
+            <trans-unit id="label.asset_1">
+                <source>label.asset_1</source>
+                <target>Asset Kandidat/Option 1</target>
+            </trans-unit>                                
+            <trans-unit id="label.asset_2">
+                <source>label.asset_2</source>
+                <target>Asset Party/Option 2</target>
+            </trans-unit>
+            <trans-unit id="label.asset_use">
+                <source>label.asset_use</source>
+                <target>Assets benutzen </target>
+            </trans-unit>
+            <trans-unit id="label.choose_option">
+                <source>label.choose_option</source>
+                <target>Bitte wählen ...</target>
+            </trans-unit>              
+            <trans-unit id="label.date_end">
+                <source>label.date_end</source>
+                <target>Enddatum</target>
+            </trans-unit>
+            <trans-unit id="label.direct_mandates">
+                <source>label.direct_mandates</source>
+                <target>Direktmandate</target>
+            </trans-unit>
+            <trans-unit id="label.election_properties">
+                <source>label.election_properties</source>
+                <target>Wahleigenschaften/-Daten</target>
+            </trans-unit>
+            <trans-unit id="label.election_wallet">
+                <source>label.election_wallet</source>
+                <target>Wahlprojekt Wallet</target>
+            </trans-unit>
+            <trans-unit id="label.number_online_votes">
+                <source>label.number_online_votes</source>
+                <target>Anzahl Online-Stimmen</target>
+            </trans-unit>
+            <trans-unit id="label.open_election">
+                <source>label.open_election</source>
+                <target>Offene Wahlen</target>
+            </trans-unit>
+            <trans-unit id="label.percent">
+                <source>label.percent</source>
+                <target>Prozent (%)</target>
+            </trans-unit>
+            <trans-unit id="label.seat_distribution">
+                <source>label.seat_distribution</source>
+                <target>Sitzverteilung</target>
+            </trans-unit>            
+            <trans-unit id="label.number_of_votes">
+                <source>label.number_of_votes</source>
+                <target>Anzahl der Stimmen</target>
+            </trans-unit>
+            <trans-unit id="label.overhang_mandates">
+                <source>label.overhang_mandates</source>
+                <target>Überhangmandate</target>
+            </trans-unit>    
+            <trans-unit id="label.publisher">
+                <source>label.publisher</source>
+                <target>Herausgeber*in</target>
+            </trans-unit>                    
+            <trans-unit id="label.stream">
+                <source>label.stream</source>
+                <target>Blockchain Stream</target>
+            </trans-unit>
+            <trans-unit id="label.tags">
+                <source>label.tags</source>
+                <target>Tags</target>
+            </trans-unit>
+            <trans-unit id="label.total_number_of_votes_cast">
+                <source>label.total_number_of_votes_cast</source>
+                <target>Gesamtzahl der abgegebenen Stimmen</target>
+            </trans-unit>
+            <trans-unit id="label.transactions">
+                <source>label.transactions</source>
+                <target>Transaktionen</target>
+            </trans-unit>  
+            <trans-unit id="label.verify_the_votes_you_have_cast">
+                <source>label.verify_the_votes_you_have_cast</source>
+                <target>Verifizieren Sie Ihre abgegebenen Stimmen</target>
+            </trans-unit>
+            <trans-unit id="label.voter_migration">
+                <source>label.voter_migration</source>
+                <target>Wählerwanderung</target>
+            </trans-unit>             
+            <trans-unit id="label.votings">
+                <source>label.votings</source>
+                <target>Anzahl Stimmen</target>
+            </trans-unit>            
+            <trans-unit id="label.votes_cast">
+                <source>label.votes_cast</source>
+                <target>Abgegebene Stimmen</target>
+            </trans-unit>       
+            <trans-unit id="label.workflow">
+                <source>label.workflow</source>
+                <target>Arbeitsablauf</target>
+            </trans-unit> 
+            <trans-unit id="label.date_start">
+                <source>label.date_start</source>
+                <target>Startdatum</target>
+            </trans-unit>
+            <trans-unit id="label.ballot_text1">
+                <source>label.ballot_text1</source>
+                <target>Stimmzettel Text 1</target>
+            </trans-unit>
+            <trans-unit id="label.ballot_text2">
+                <source>label.ballot_text2</source>
+                <target>Stimmzettel Text 2</target>
+            </trans-unit>
+            <trans-unit id="label.candidate">
+                <source>label.candidate</source>
+                <target>Kandidat</target>
+            </trans-unit>
+            <trans-unit id="label.voters">
+                <source>label.voters</source>
+                <target>Wähler</target>
+            </trans-unit>
+            <trans-unit id="label.total_voters">
+                <source>label.total_voters</source>
+                <target>Wähler insgesamt</target>
+            </trans-unit>
+            <trans-unit id="label.total_voters_online">
+                <source>label.total_voters_online</source>
+                <target>Online Wähler insgesamt</target>
+            </trans-unit>
+            <trans-unit id="label.amount_voters">
+                <source>label.amount_voters</source>
+                <target>Registrierte Wähler insgesamt</target>
+            </trans-unit> 
+            <trans-unit id="label.candidates">
+                <source>label.candidates</source>
+                <target>Kandidaten</target>
+            </trans-unit>
+            <trans-unit id="label.constituency">
+                <source>label.constituency</source>
+                <target>Wahlkreis</target>
+            </trans-unit>            
+            <trans-unit id="label.constituencies">
+                <source>label.constituencies</source>
+                <target>Wahlkreise</target>
+            </trans-unit>
+            <trans-unit id="label.fullname">
+                <source>label.fullname</source>
+                <target>Vor- und Zuname</target>
+            </trans-unit>
+            <trans-unit id="label.general_data">
+                <source>label.general_data</source>
+                <target>Allgemeine Angaben</target>
+            </trans-unit>            
+            <trans-unit id="label.options">
+                <source>label.options</source>
+                <target>Optionen</target>
+            </trans-unit>  
+            <trans-unit id="label.option">
+                <source>label.option</source>
+                <target>Option</target>
+            </trans-unit>
+            <trans-unit id="label.party">
+                <source>label.party</source>
+                <target>Partei</target>
+            </trans-unit>          
+            <trans-unit id="label.results">
+                <source>label.results</source>
+                <target>Ergebnisse</target>
+            </trans-unit>
+            <trans-unit id="label.turnout">
+                <source>label.turnout</source>
+                <target>Wahlbeteiligung</target>
+            </trans-unit>
+            <trans-unit id="label.wallet">
+                <source>label.wallet</source>
+                <target>Wallet</target>
+            </trans-unit>
+
+            <trans-unit id="menu.admin">
+                <source>menu.admin</source>
+                <target>Backend</target>
+            </trans-unit>
+            <trans-unit id="menu.back_to_blog">
+                <source>menu.back_to_blog</source>
+                <target>Zurück zum Frontend</target>
+            </trans-unit>
+            <trans-unit id="menu.blockchain_explorer">
+                <source>menu.blockchain_explorer</source>
+                <target>Blockchain Explorer</target>
+            </trans-unit>
+            <trans-unit id="menu.constituencies">
+                <source>menu.constituencies</source>
+                <target>Wahlkreise</target>
+            </trans-unit> 
+            <trans-unit id="menu.homepage">
+                <source>menu.homepage</source>
+                <target>Homepage</target>
+            </trans-unit>
+            <trans-unit id="menu.parties">
+                <source>menu.parties</source>
+                <target>Parteien</target>
+            </trans-unit>
+            <trans-unit id="menu.post_list">
+                <source>menu.post_list</source>
+                <target>Beitragsliste</target>
+            </trans-unit>
+            <trans-unit id="menu.toggle_nav">
+                <source>menu.toggle_nav</source>
+                <target>Navigation ein-/ausblenden</target>
+            </trans-unit>
+            <trans-unit id="menu.user">
+                <source>menu.user</source>
+                <target>Account</target>
+            </trans-unit>
+            <trans-unit id="menu.logout">
+                <source>menu.logout</source>
+                <target>Logout</target>
+            </trans-unit>
+            <trans-unit id="menu.ballot">
+                <source>menu.ballot</source>
+                <target>Stimmzettel</target>
+            </trans-unit>
+            <trans-unit id="menu.candidates">
+                <source>menu.candidates</source>
+                <target>Kandidaten</target>
+            </trans-unit>
+            <trans-unit id="menu.voter">
+                <source>menu.voter</source>
+                <target>Account</target>
+            </trans-unit>
+            <trans-unit id="menu.info">
+                <source>menu.info</source>
+                <target>Informationen</target>
+            </trans-unit>
+            <trans-unit id="menu.election">
+                <source>menu.election</source>
+                <target>Wahl</target>
+            </trans-unit>
+            <trans-unit id="menu.results">
+                <source>menu.results</source>
+                <target>Ergebnisse</target>
+            </trans-unit>
+            <trans-unit id="menu.choose_language">
+                <source>menu.choose_language</source>
+                <target>Sprache wählen</target>
+            </trans-unit>
+            <trans-unit id="menu.choose_option">
+                <source>menu.choose_option</source>
+                <target>Bitte wählen Sie eine Option</target>
+            </trans-unit>              
+            <trans-unit id="rss.description">
+                <source>rss.description</source>
+                <target>Die neuesten Posts, die auf dem Symfony Blog veröffentlicht wurden.</target>
+            </trans-unit>
+            <trans-unit id="menu.rss">
+                <source>menu.rss</source>
+                <target>Blog Posts RSS</target>
+            </trans-unit>
+            <trans-unit id="menu.search">
+                <source>menu.search</source>
+                <target>Suchen</target>
+            </trans-unit>
+            <trans-unit id="menu.election_list">
+                <source>menu.election_list</source>
+                <target>Wahlen</target>
+            </trans-unit>
+
+            <trans-unit id="Minute">
+                <source>Minute</source>
+                <target>Minute</target>
+            </trans-unit>
+
+            <trans-unit id="no">
+                <source>no</source>
+                <target>No</target>
+            </trans-unit>
+
+            <trans-unit id="post.to_publish_a_comment">
+                <source>post.to_publish_a_comment</source>
+                <target>um einen Kommentar zu veröffentlichen</target>
+            </trans-unit>
+            <trans-unit id="post.num_comments">
+                <source>post.num_comments</source>
+                <target>{count, plural, one {# Kommentar} other {# Kommentare}}</target>
+            </trans-unit>
+            <trans-unit id="post.commented_on">
+                <source>post.commented_on</source>
+                <target>kommentierte</target>
+            </trans-unit>
+            <trans-unit id="post.no_comments">
+                <source>post.no_comments</source>
+                <target>Hinterlasse als Erste/r einen Kommentar zu diesem Beitrag.</target>
+            </trans-unit>
+            <trans-unit id="post.no_posts_found">
+                <source>post.no_posts_found</source>
+                <target>Keine Beiträge gefunden.</target>
+            </trans-unit>
+            <trans-unit id="post.created_successfully">
+                <source>post.created_successfully</source>
+                <target>Der Beitrag wurde erfolgreich erstellt!</target>
+            </trans-unit>
+            <trans-unit id="post.updated_successfully">
+                <source>post.updated_successfully</source>
+                <target>Der Beitrag wurde erfolgreich bearbeitet!</target>
+            </trans-unit>
+            <trans-unit id="post.deleted_successfully">
+                <source>post.deleted_successfully</source>
+                <target>Der Beitrag wurde erfolgreich gelöscht!</target>
+            </trans-unit>
+            <trans-unit id="post.search_for">
+                <source>post.search_for</source>
+                <target>Suchen nach...</target>
+            </trans-unit>
+
+            <trans-unit id="help.agree_terms">
+                <source>help.agree_terms</source>
+                <target><![CDATA[Ich akzeptiere die <a href="/terms">Allgemeinen Nutzungsbedingungen</a>. <br />]]></target>
+            </trans-unit>
+            <trans-unit id="help.app_description">
+                <source>help.app_description</source>
+                <target><![CDATA[Das ist ein <strong>BlockchainVotingSystem</strong>, das mit dem BVS Framework gebaut wurde.]]></target>
+            </trans-unit>
+            <trans-unit id="help.show_code">
+                <source>help.show_code</source>
+                <target><![CDATA[Klicke auf diesen Button um den Source Code von <strong>Controller</strong> und <strong>Template</strong> zu sehen der für das Rendern dieser Seite benutzt wird.]]></target>
+            </trans-unit>
+            <trans-unit id="help.browse_app">
+                <source>help.browse_app</source>
+                <target><![CDATA[Gehe zum <strong>Frontend</strong> des BlockchainVotingSystems.]]></target>
+            </trans-unit>
+            <trans-unit id="help.browse_admin">
+                <source>help.browse_admin</source>
+                <target><![CDATA[Gehe zum <strong>Backend</strong> des BlockchainVotingSystems.]]></target>
+            </trans-unit>
+            <trans-unit id="help.login_users">
+                <source>help.login_users</source>
+                <target>Versuche einen der folgenden Benutzer</target>
+            </trans-unit>
+            <trans-unit id="help.role_user">
+                <source>help.role_user</source>
+                <target>Normaler Benutzer</target>
+            </trans-unit>
+            <trans-unit id="help.role_admin">
+                <source>help.role_admin</source>
+                <target>Administrator</target>
+            </trans-unit>
+            <trans-unit id="help.reload_fixtures">
+                <source>help.reload_fixtures</source>
+                <target>Sie finden Ihre Login-Daten auf der Wahlbestätigung Ihre Wahlzettels</target>
+            </trans-unit>
+            <trans-unit id="help.add_user">
+                <source>help.add_user</source>
+                <target>Bitte ändern Sie Ihr Passwort beim ersten Login!</target>
+            </trans-unit>
+            <trans-unit id="help.more_information">
+                <source>help.more_information</source>
+                <target><![CDATA[Für mehr Informationen schaue in die offizielle BVS Dokumentation</a>.]]></target>
+            </trans-unit>
+
+           <trans-unit id="http_error.name">
+                <source>http_error.name</source>
+                <target>Fehler {status_code, number}</target>
+            </trans-unit>
+            <trans-unit id="http_error.description">
+                <source>http_error.description</source>
+                <target>Ein unbekannter Fehler (HTTP {status_code, number}) ist aufgetreten. Deine Anfrage konnte deswegen nicht ausgeführt werden.</target>
+            </trans-unit>
+            <trans-unit id="http_error.suggestion">
+                <source>http_error.suggestion</source>
+                <target><![CDATA[Versuche diese Seite in einigen Minuten erneut zu laden oder <a href="{url}">gehe zurück zur Homepage</a>.]]></target>
+            </trans-unit>
+            <trans-unit id="http_error_403.description">
+                <source>http_error_403.description</source>
+                <target>Du hast keine Berechtigung, auf diese Ressource zuzugreifen.</target>
+            </trans-unit>
+            <trans-unit id="http_error_403.suggestion">
+                <source>http_error_403.suggestion</source>
+                <target>Frage deinen Manager oder Systemadministrator, um dir Zugriff auf diese Ressource zu gewähren.</target>
+            </trans-unit>
+            <trans-unit id="http_error_404.description">
+                <source>http_error_404.description</source>
+                <target>Wir konnten die von dir angeforderte Seite nicht finden.</target>
+            </trans-unit>
+            <trans-unit id="http_error_404.suggestion">
+                <source>http_error_404.suggestion</source>
+                <target><![CDATA[Überprüfe Rechtschreibfehler in der URL oder <a href="{url}">gehe zurück zur Homepage</a>.]]></target>
+            </trans-unit>
+            <trans-unit id="http_error_500.description">
+                <source>http_error_500.description</source>
+                <target>Es gab einen internen Serverfehler.</target>
+            </trans-unit>
+            <trans-unit id="http_error_500.suggestion">
+                <source>http_error_500.suggestion</source>
+                <target><![CDATA[Versuche diese Seite in einigen Minuten erneut zu laden oder <a href="{url}">gehe zurück zur Homepage</a>.]]></target>
+            </trans-unit>
+
+            <trans-unit id="Hour">
+                <source>Hour</source>
+                <target>Stunde</target>
+            </trans-unit>
+            
+            <trans-unit id="rss.title">
+                <source>rss.title</source>
+                <target>Blog</target>
+            </trans-unit>
+            <trans-unit id="Month">
+                <source>Month</source>
+                <target>Monat</target>
+            </trans-unit>            
+
+            <trans-unit id="notification.comment_created">
+                <source>notification.comment_created</source>
+                <target>Dein Beitrag hat einen Kommentar erhalten!</target>
+            </trans-unit>
+            <trans-unit id="notification.comment_created.description">
+                <source>notification.comment_created.description</source>
+                <target><![CDATA[Dein Beitrag "{title}" hat einen Kommentar erhalten. Du kannst den Kommentar lesen, wenn du <a href="{link}">diesem Link</a> folgst.]]></target>
+            </trans-unit>
+
+            <trans-unit id="paginator.previous">
+                <source>paginator.previous</source>
+                <target>Vorherige</target>
+            </trans-unit>
+            <trans-unit id="paginator.next">
+                <source>paginator.next</source>
+                <target>Nächste</target>
+            </trans-unit>
+
+            <trans-unit id="title.homepage">
+                <source>title.homepage</source>
+                <target><![CDATA[Willkommen beim <strong>BlockchainVotingSystem</strong>]]></target>
+            </trans-unit>
+            <trans-unit id="title.source_code">
+                <source>title.source_code</source>
+                <target>Benutzter Source Code um diese Seite zu rendern.</target>
+            </trans-unit>
+            <trans-unit id="title.controller_code">
+                <source>title.controller_code</source>
+                <target>Controller Code</target>
+            </trans-unit>
+            <trans-unit id="title.twig_template_code">
+                <source>title.twig_template_code</source>
+                <target>Twig Template Code</target>
+            </trans-unit>
+            <trans-unit id="title.login">
+                <source>title.login</source>
+                <target>Sicherer Login</target>
+            </trans-unit>
+            <trans-unit id="title.post_list">
+                <source>title.post_list</source>
+                <target>Blog-Beiträge</target>
+            </trans-unit>
+            <trans-unit id="title.edit_post">
+                <source>title.edit_post</source>
+                <target>Bearbeite Beitrag #{id, number}</target>
+            </trans-unit>
+            <trans-unit id="title.add_comment">
+                <source>title.add_comment</source>
+                <target>Kommentar hinzufügen</target>
+            </trans-unit>
+            <trans-unit id="title.comment_error">
+                <source>title.comment_error</source>
+                <target>Beim Veröffentlichen deines Kommentares ist ein Fehler aufgetreten</target>
+            </trans-unit>
+            <trans-unit id="title.post_new">
+                <source>title.post_new</source>
+                <target>Beitrag erstellen</target>
+            </trans-unit>
+            <trans-unit id="title.voter">
+                <source>title.voter</source>
+                <target>Wähler</target>
+            </trans-unit>
+
+            <trans-unit id="Year">
+                <source>Year</source>
+                <target>Jahr</target>
+            </trans-unit>            
+        </body>
+    </file>
+</xliff>
