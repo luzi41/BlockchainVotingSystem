@@ -59,3 +59,7 @@ erlangen – sei es mit oder ohne Kooperation der Wählerin.
 Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist die Geheimhaltung der
 Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich bis zu den Addressen der Absenderinnen und Empfänger verfolgen.
 Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, da sie die Adressen der Teilnehmerinnen einer Transaktion geheim halten.
+
+## Entwicklung eines Prototyps
+
+Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird eine Webserver-basierte Anwendung entwickelt, mit der die Funktionalitäten für alle Rollen getestet werden können.
