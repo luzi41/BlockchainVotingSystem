@@ -58,4 +58,4 @@ erlangen – sei es mit oder ohne Kooperation der Wählerin.
 
 Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist die Geheimhaltung der
 Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich zum Absender und Empfänger verfolgen.
-Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, da sie die Adressen der Teilnehmer einer Transkation geheim bleiben.
+Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, da sie die Adressen der Teilnehmer einer Transaktion geheim halten.
