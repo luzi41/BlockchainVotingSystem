@@ -6,6 +6,8 @@ In this project we create a simple voting DApp and we deploy it on the Avalanche
 
 ### Prerequisites
 
+These dependencies have to be installes first for your OS:
+
 - node.js
 - npm
 
