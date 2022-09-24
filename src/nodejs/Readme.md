@@ -11,7 +11,7 @@ These dependencies have to be installes first for your OS:
 - node.js - https://nodejs.org/
 - npm - https://www.npmjs.com/
 
-To install the required dependencies go to the src/nodejs/ directory and run
+To install the further required dependencies go to the src/nodejs/ directory and run
 
 ```bash
 npm install
