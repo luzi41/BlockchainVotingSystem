@@ -26,9 +26,7 @@ Wählerinnen ihre Stimme abgeben können und dass jeder die gleiche Anzahl von
 Stimmen hat. Gleichzeitig muss die Anonymität der abgegebenen Stimmen gewahrt
 bleiben. Bei einem Peer-To-Peer-Netzwerk auf Basis des Bitcoin-Protokolls ist eine
 Authentifizierung nicht vorgesehen, jeder kann Teilnehmer in dem Netzwerk werden
-und alle Transaktionen beobachten. Die Eigenschaft des Netzwerks, über eine native Währung (Coins)
-zu verfügen, kann für ein Online-Wahlsystem ausgenutzt werden, um den Wählern ihre Stimmen zuzuteilen.
-Nur berechtigte Wähler bekommen Coins für die jeweilige Wahl.
+und alle Transaktionen beobachten. 
 
 ## Geheimhaltung und Mechanismus gegen Erpressungen
 Ein Online-Wahlsystem muss eine geheime Wahl garantieren. Da eine Online-Wahl
