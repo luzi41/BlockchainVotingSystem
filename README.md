@@ -61,3 +61,7 @@ Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssp
 ## Entwicklung eines Prototyps
 
 Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird eine Webserver-basierte Anwendung "BVS-Web" entwickelt, mit der die Funktionalitäten für alle Rollen getestet werden können. Als Basis dient dabei eine Node,js (Javascript) Laufzeit-Umgebung und das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+
+## Installation
+
+### Prerequitsites
