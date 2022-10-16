@@ -58,11 +58,11 @@ Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist
 Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich bis zu den Addressen der Absenderinnen und Empfänger verfolgen.
 Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, da sie die Adressen der Teilnehmerinnen einer Transaktion geheim halten.
 
-## Entwicklung eines Prototyps
+## Entwicklung von Prototypen
 
-Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird eine Webserver-basierte Anwendung "BVS-Web" entwickelt, mit der die Funktionalitäten für alle Rollen getestet werden können. Als Basis dient dabei eine Node,js (Javascript) Laufzeit-Umgebung und das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird eine Webserver-basierte Anwendung "BVS-Wahl" entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node,js (Javascript) Laufzeit-Umgebung und das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
 
-## Installation
+## Installation der Wahl-Applikation für Wählerinnen
 
 ### Prerequitsites
 - NodeJS >= 10.16 and npm >= 5.6 installed.
