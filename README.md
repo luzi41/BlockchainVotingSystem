@@ -65,3 +65,6 @@ Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funkti
 ## Installation
 
 ### Prerequitsites
+- NodeJS >= 10.16 and npm >= 5.6 installed.
+- Truffle, which can be installed globally with npm install -g truffle
+- Metamask extension added to the browser.
