@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import App from "./App";
 import ElectionJSON from "./build/contracts/Election.json";
 import VoteModal from "./VoteModal";
+import { prototype } from "@truffle/hdwallet-provider";
 
 // Election component for organising election details
 let Election = (props) => (
@@ -23,6 +24,19 @@ let Election = (props) => (
     </td>
 
     <td style={{ textAlign: "center" }}>{props.candidateComponent}</td>
+
+    <td style={{ textAlign: "center" }}>
+    {props.election.registered == 0 && !props.election.hasVoted ? (
+      <form method="get" action="/register">
+        <input type="hidden" name="account" value={props.election.account}></input>
+        <button>Register</button>
+      </form>
+    ) : (
+      <font size="2" color="green">
+      You are registered!
+    </font>      
+    )}
+    </td>
 
     <td style={{ textAlign: "center" }}>
       {!props.election.hasVoted ? (
@@ -44,7 +58,7 @@ let Candidates = (props) => (
   </font>
 );
 
-// ActiveElections component would fetch and display all the the elections deployed by the MainContract.sol
+// ActiveElections component would fetch and display all the elections deployed by the MainContract.sol
 class ActiveElections extends Component {
   constructor(props) {
     super(props);
@@ -93,8 +107,13 @@ class ActiveElections extends Component {
       // Address of each election contract
       electionDetails[i].electionAddress = elections[i];
 
+      // Voter
+      let Voter = await election.methods.voters(this.app.account[0]).call();
+
       // Boolean indicating whether the contract address has voted or not
-      electionDetails[i].hasVoted = await election.methods.voters(this.app.account[0]).call();
+      electionDetails[i].hasVoted = Voter.voted;
+
+      electionDetails[i].registered = Voter.weight;
 
       // Name of the election
       electionDetails[i].electionName = await election.methods.name().call();
@@ -142,6 +161,7 @@ class ActiveElections extends Component {
       // Simple container to store table with election data
       <div className="container">
         <div style={{ float: "right", marginBottom: "10px" }}>
+            
           <img
             style={{ width: "25px", marginRight: "20px", cursor: "pointer" }}
             onClick={this.loadData}
@@ -161,6 +181,7 @@ class ActiveElections extends Component {
               <th style={{ width: "120px" }}>Election ID</th>
               <th>Election Name</th>
               <th style={{ textAlign: "center" }}>Candiates</th>
+              <th style={{ textAlign: "center" }}>Register</th> 
               <th style={{ textAlign: "center" }}>Vote</th>
             </tr>
           </thead>
