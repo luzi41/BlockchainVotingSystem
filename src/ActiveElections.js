@@ -31,22 +31,11 @@ let Election = (props) => (
         <input type="hidden" name="account" value={props.election.account}></input>
         <button>Register</button>
       </form>
-    ) : (
-      <font size="2" color="green">
-      You are registered!
-    </font>      
-    )}
-    </td>
-
-    <td style={{ textAlign: "center" }}>
-      {!props.election.hasVoted ? (
-        // Vote Modal would be mounted if the user has not voted
-        <VoteModal election={props.election} candidates={props.candidates} />
-      ) : (
-        <font size="2" color="green">
-          You have voted!
-        </font>
-      )}
+    ) : ( <span></span>)}
+    {props.election.registered > 0  && !props.election.hasVoted ? (
+      // Vote Modal would be mounted if the user has not voted
+      <VoteModal election={props.election} candidates={props.candidates} />
+    ) : ( <span></span>)}
     </td>
   </tr>
 );
@@ -181,8 +170,8 @@ class ActiveElections extends Component {
               <th style={{ width: "120px" }}>Election ID</th>
               <th>Election Name</th>
               <th style={{ textAlign: "center" }}>Candiates</th>
-              <th style={{ textAlign: "center" }}>Register</th> 
-              <th style={{ textAlign: "center" }}>Vote</th>
+              <th style={{ textAlign: "center" }}>Actions</th> 
+              
             </tr>
           </thead>
 
