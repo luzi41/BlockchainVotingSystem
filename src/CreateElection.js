@@ -24,7 +24,8 @@ class CreateElection extends Component {
   async init() {
     this.app = new App();
     await this.app.init();
-  }
+  
+    }
 
   componentDidMount() {
     this.init();
@@ -64,7 +65,7 @@ class CreateElection extends Component {
     // Making transaction to the MainContract instance, for creating a new election
     await this.app.mainInstance.createElection(
       [electionDetails.electionname, electionDetails.description],
-      electionDetails.candidates,
+      electionDetails.candidates, 
       { from: this.app.account[0] }
     );
 
@@ -88,7 +89,7 @@ class CreateElection extends Component {
               onChange={this.onChangeElectionName}
             />
           </div>
-
+          
           <div className="form-group">
             <label>Description</label>
             <textarea
