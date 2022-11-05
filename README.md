@@ -1,11 +1,6 @@
 # BlockchainVotingSystem
-Eine der Anforderungen in Bezug auf die Integrität einer Online-Wahl ist, dass zum
-Schluss das Wahlergebnis überprüfbar sein muss. Die notwendige Geheimhaltung bei
-einer Wahl macht es jedoch schwer, ein Verfahren zu entwickeln, welches einerseits
-einfach für Wählerinnen und Wahlbeobachter zu handhaben ist und andererseits
-gewährleistet, dass einzelne Stimmen und das Wahlergebnis insgesamt überprüfbar
-sind. Diese Anforderung wird in der Fachliteratur als End-To-End Verifiability,
-abgekürzt E2E-V bezeichnet.
+
+One of the requirements with regard to the integrity of an online election is that the election result must be checked in the end. However, the necessary confidentiality in the event of a choice makes it difficult to develop a procedure that is easy to handle on the one hand for voters and voting observers and on the other hand ensures that individual voices and the election result can be checked as a whole. This requirement is called End-To-End Verifiability (E2E-V).
 
 End-To-End Verifiability wird in der englischen
 Fachliteratur auf eine kurze Formel gebracht:
