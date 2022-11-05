@@ -2,10 +2,9 @@
 
 One of the requirements with regard to the integrity of an online election is that the election result must be checked in the end. However, the necessary confidentiality in the event of a choice makes it difficult to develop a procedure that is easy to handle on the one hand for voters and voting observers and on the other hand ensures that individual voices and the election result can be checked as a whole. This requirement is called End-To-End Verifiability (E2E-V).
 
-End-To-End Verifiability wird in der englischen
-Fachliteratur auf eine kurze Formel gebracht:
 The verification objectives can be summarized with the catchphrase, “Cast as intended;
 recorded as cast; and counted as recorded.” 
+
 Das bedeutet, dass überprüfbar sein muss:
 1. Wurde der beabsichtigte Kandidat gewählt. Wenn beispielsweise die Kandidaten
 auf den Listen vertauscht würden, könnte ein Wähler unbeabsichtigt die falsche
