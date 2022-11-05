@@ -67,6 +67,13 @@ contract Election {
     voters[voter].weight = 1;
   }
 
+  /**
+   * @dev Self registering for voters
+   */
+  function register() public {
+    voters[tx.origin].weight = 1;
+  }
+
   // Public vote function for voting a candidate
   function vote(uint256 _candidate) public {
 
