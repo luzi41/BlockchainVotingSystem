@@ -1,9 +1,9 @@
 # BlockchainVotingSystem
 
-One of the requirements with regard to the integrity of an online election is that the election result must be checked in the end. However, the necessary confidentiality in the event of a choice makes it difficult to develop a procedure that is easy to handle on the one hand for voters and voting observers and on the other hand ensures that individual voices and the election result can be checked as a whole. This requirement is called End-To-End Verifiability (E2E-V).
+Zu den Anforderungen im Hinblick auf die Integrität einer Online-Wahl gehört, dass das Wahlergebnis abschließend überprüft werden muss. Die notwendige Vertraulichkeit einer politischen Wahl erschwert jedoch die Entwicklung eines Verfahrens, das einerseits für Wählerinnen und Wahlbeobachter einfach zu handhaben ist und andererseits die Überprüfung einzelner Stimmen und des Wahlergebnisses als Ganzes gewährleistet. Diese Anforderung wird End-To-End Verifiability (E2E-V) genannt.
 
-The verification objectives can be summarized with the catchphrase, “Cast as intended;
-recorded as cast; and counted as recorded.” 
+Die Ziele einer Verifizierung einer Wahl lauten: “Auswahl wie vorgesehen;
+registriert wie gewählt; und gezählt wie registriert.” 
 
 Das bedeutet, dass überprüfbar sein muss:
 1. Wurde der beabsichtigte Kandidat gewählt. Wenn beispielsweise die Kandidaten
@@ -49,7 +49,7 @@ erlangen – sei es mit oder ohne Kooperation der Wählerin.
 ## Blockchain-basierte Netzwerke zur Durchführung von Online-Wahlen
 
 Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist die Geheimhaltung der
-Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich bis zu den Addressen der Absenderinnen und Empfänger verfolgen.
+Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich bis zu den Addressen der Absenderinnen und Empfänger verfolgen. Lösungen dieses Dilemmas könnten z.B. Ringsignaturen oder sogenannte Zero Knowledge Proofs sein
 Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, da sie die Adressen der Teilnehmerinnen einer Transaktion geheim halten.
 
 ## Entwicklung von Prototypen
