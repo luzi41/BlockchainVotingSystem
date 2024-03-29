@@ -37,11 +37,11 @@ Welche Merkmale muss eine geeignete Blockchainlösung bieten, um alle Anforderun
 
 #### Vergleich Blockchaineigenschaften
 
-|                   | Bitcoin  | Ethereum | Multichain |
-|-------------------|----------|----------|------------|
-| Authentifizierung |     -    |     -    |  bedingt
-| Anonymität        |     -    |     -    | -
-| Chancengleichheit |     -    |     -    | -
+|                   | Bitcoin  | Ethereum | Multichain             | Secret
+|-------------------|----------|----------|------------------------|-------
+| Authentifizierung |     -    | Token    |  bedingt: Permission   | Token
+| Anonymität        |     -    |     -    | -                      | ja
+| Chancengleichheit |     -    |     -    | -                      | -
 
 ## Entwicklung von Prototypen
 
