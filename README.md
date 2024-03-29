@@ -35,6 +35,12 @@ Welche Merkmale muss eine geeignete Blockchainlösung bieten, um alle Anforderun
 #### Chancengleichheit
 - Jeder verfügt potentiell über die gleichen Informationen
 
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Row 1    | Cell 2   | Cell 3   |
+| Row 2    | Cell 5   | Cell 6   |
+| Row 3    | Cell 8   | Cell 9   |
+
 ## Entwicklung von Prototypen
 
 Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Backend das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
