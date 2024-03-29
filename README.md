@@ -52,9 +52,9 @@ Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist
 Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich bis zu den Addressen der Absenderinnen und Empfänger verfolgen. Lösungen dieses Dilemmas könnten z.B. Ringsignaturen oder sogenannte Zero Knowledge Proofs sein.
 Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, in dem sie die Adressen der Teilnehmerinnen einer Transaktion verschleiern. Zero Knowlegde Proofs können die Gültigkeit einer Identität beweisen ohne die Daten der Identifizierung offen zu legen.
 
-### Untersuchung verschiedener Blockchain-Netzwerke auf ihre Eignung
+### Untersuchung verschiedener Arten von Blockchain-Netzwerken auf ihre Eignung
 
-Braucht ein blockchain-basiertes Voting System Smart Contracts?
+Braucht ein blockchain-basiertes Voting System Smart Contracts? Ohne Smart Contracts können Wahlen nur in sehr einfacher Form abgebildet werden. Es braucht dann zumindest Blockchains mit Erlaubnissystem und Colored Coins bzw. Assets um Dinge wie Veröffenlichung der Wahlergebnisse erst nach der Stimmabgabe, Stimmabgabezeitraum, Authentifizierung, Ausschluss für mehrfaches Wählen etc. abzubilden. Eine Wahl mittels einfacher Blockchains könnte wohl auch kein Wahlgeheimnis schützen, dazu müssten Absender und Empfänger wie bei ZCash oder Monero verschleiert werden. Eine geeignete Blockchain müsste in der Lage sein gleichzeitig eine sichere Authentifizierung wie bei permissioned (erlaubnisbasierte) Blockchains zu ermöglichen und gleichzeitig die Identität des Senders verschleiern. Multichain (Multichain.com) ist eine erlaubnisbasierte Blockchain, die dazu in der Lage wäre, nur authentifizierte Accounts für Wahltransaktionen zuzulassen. Um das Wahlgeheimnis zu wahren, müssten die authentifizierten Wahlberechtigten einen anonymen Account bekommen, was wahrscheinlich nur über einen zentralisierten Service möglich ist, in der zuerst den Wahlberechtigten ein sogenanntes "Token" übermittelt wird, mittels dessen sie sich einen Account generieren können, der auch die "Stimmen" in Form von nativen oder sogenannten Colored Coins (Fungible Assets) enthält.
 
 ## Entwicklung von Prototypen
 
