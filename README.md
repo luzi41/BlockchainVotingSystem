@@ -35,11 +35,13 @@ Welche Merkmale muss eine geeignete Blockchainlösung bieten, um alle Anforderun
 #### Chancengleichheit
 - Jeder verfügt potentiell über die gleichen Informationen
 
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| Row 1    | Cell 2   | Cell 3   |
-| Row 2    | Cell 5   | Cell 6   |
-| Row 3    | Cell 8   | Cell 9   |
+#### Vergleich Blockchaineigenschaften
+
+|                   | Bitcoin  | Ethereum | Multichain |
+|-------------------|----------|----------|------------|
+| Authentifizierung |     -    |     -    |  bedingt
+| Anonymität        |     -    |     -    | -
+| Chancengleichheit |     -    |     -    | -
 
 ## Entwicklung von Prototypen
 
