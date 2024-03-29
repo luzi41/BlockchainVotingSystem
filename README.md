@@ -52,6 +52,10 @@ Bei konventionellen Kryptowährungen, wie zum Beispiel dem Bitcoin-Netzwerk, ist
 Informationen und der Metadaten nicht vorgesehen. Jede Transaktion läßt sich bis zu den Addressen der Absenderinnen und Empfänger verfolgen. Lösungen dieses Dilemmas könnten z.B. Ringsignaturen oder sogenannte Zero Knowledge Proofs sein.
 Techniken wie zum Beispiel Ring-Signaturen ermöglichen den Schutz der Privatssphäre, in dem sie die Adressen der Teilnehmerinnen einer Transaktion verschleiern. Zero Knowlegde Proofs können die Gültigkeit einer Identität beweisen ohne die Daten der Identifizierung offen zu legen.
 
+### Untersuchung verschiedener Blockchain-Netzwerke auf ihre Eignung
+
+Braucht ein blockchain-basiertes Voting System Smart Contracts?
+
 ## Entwicklung von Prototypen
 
 Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Backend das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
