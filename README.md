@@ -39,9 +39,11 @@ Welche Merkmale muss eine geeignete Blockchainlösung bieten, um alle Anforderun
 
 |                   | Bitcoin  | Ethereum | Multichain             | Secret
 |-------------------|----------|----------|------------------------|-------
-| Authentifizierung |     -    | Token    |  bedingt: Permission   | Token
+| Authentifizierung |     -    |     -    |  bedingt: Permission   | -
 | Anonymität        |     -    |     -    | -                      | ja
-| Chancengleichheit |     -    |     -    | -                      | -
+| Smart Contract    |     -    |     ja   |  Smart Filter          | ja
+| Oracle            |     -    |     ja   | -                      | ?
+
 
 ## Entwicklung von Prototypen
 
