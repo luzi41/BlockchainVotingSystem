@@ -57,4 +57,3 @@ Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funkti
 - Metamask extension added to the browser.
 - Fractal ID (DID)
 
-<img src="./images/DID_Registry_FractalID.png" />
