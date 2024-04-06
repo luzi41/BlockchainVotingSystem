@@ -10,9 +10,9 @@ Die Ziele einer Verifizierung einer Wahl lauten:
 - gezählt wie registriert.” 
 
 Das bedeutet, dass überprüfbar sein muss:
-1. Wurde der beabsichtigte Kandidat gewählt. Wenn beispielsweise die Kandidaten auf den Listen vertauscht würden, könnte ein Wähler unbeabsichtigt die falsche Wahl treffen.
-2. Wurde die Stimme so übermittelt und gespeichert, wie gewählt. Durch Manipulationen bei der Übermittlung oder Speicherung können bei einem Online-Wahlsystem Stimmen verloren gehen, oder doppelt gespeichert werden.
-3. wurde die Stimme auch so gewertet wie gespeichert.
+1. Wurde der beabsichtigte Kandidat gewählt? Wenn beispielsweise die Kandidaten auf den Listen vertauscht würden, könnte ein Wähler unbeabsichtigt die falsche Wahl treffen.
+2. Wurde die Stimme so übermittelt und gespeichert, wie gewählt? Durch Manipulationen bei der Übermittlung oder Speicherung können bei einem Online-Wahlsystem Stimmen verloren gehen, oder doppelt gespeichert werden.
+3. wurde die Stimme auch so gewertet wie gespeichert?
 
 ### Authentifizierung und Anonymität
 Für eine demokratische Wahl muss auch gewährleistet werden, dass nur berechtigte Wählerinnen ihre Stimme abgeben können und dass jeder die gleiche Anzahl von Stimmen hat. Gleichzeitig muss die Anonymität der abgegebenen Stimmen gewahrt bleiben. Bei einem Peer-To-Peer-Netzwerk auf Basis des Bitcoin-Protokolls ist eine Authentifizierung nicht vorgesehen, jeder kann Teilnehmer in dem Netzwerk werden und alle Transaktionen beobachten. 
@@ -33,21 +33,21 @@ Welche Features muss eine geeignete Blockchainlösung bieten, um alle Anforderun
 - Permissions?
 - Oracles?
 - Dezentrale Identität (DID)?
-
+- Non Fungible Token?
 
 #### Vergleich Blockchaineigenschaften
 
-|              |  Bitcoin  | Ethereum | Multichain  | Secret | Avalanche |
-|--------------|-----------|----------|-------------|--------|-----------|
-| Permissions  |     -     |    -     | Permissions |  -     |   -       |
-| Anonymität   |     -     |    -     | -           |  ja    |   -       |
-| SC           |     -     |   ja     | Smart Filter|  ja    |  ja       |
-| DID          |     -     |   ja     | -           |  ja    |  ja       |
-
+|              |  Bitcoin  | Ethereum | Multichain   | Secret | Avalanche |
+|--------------|-----------|----------|--------------|--------|-----------|
+| Permissions  |     -     |    -     | ja           |  -     |   -       |
+| Anonymität   |     -     |    -     | -            |  ja    |   -       |
+| SC           |     -     |   ja     | Smart Filter |  ja    |  ja       |
+| DID          |     -     |   -      | -            |  -     |  -        |
+| NFT          |     -     |   ja     | -            |  ja    |  ja       |
 
 ## Entwicklung von Prototypen
 
-Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Backend das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp (V1) wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Backend das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
 
 ## Installation der Wahl-Applikation für Wählerinnen
 
@@ -55,4 +55,7 @@ Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funkti
 - NodeJS >= 10.16 and npm >= 5.6 installed.
 - Truffle, which can be installed globally with npm install -g truffle
 - Metamask extension added to the browser.
-- Fractal ID (DID)
+
+#### Nodejs
+#### Truffle
+#### Metamask
