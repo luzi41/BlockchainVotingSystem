@@ -29,33 +29,25 @@ hat. Wäre sie dazu in der Lage, könnte ein Erpresser diesen Beleg fordern und 
 ### Untersuchung verschiedener Arten von Blockchain-Netzwerken auf ihre Eignung
 Welche Features muss eine geeignete Blockchainlösung bieten, um alle Anforderungen für eine politische Wahl zu erfüllen:
 - Assets bzw. Colored Coins?
-- Smart Contract (SC)?
-- Permissions?
-- Oracles?
-- Dezentrale Identität (DID)?
-- Non Fungible Token?
+- Smart Contract (SC)
+- Anonymisierung
 
 #### Vergleich Blockchaineigenschaften
 
 |              |  Bitcoin  | Ethereum | Multichain   | Secret | Avalanche |
 |--------------|-----------|----------|--------------|--------|-----------|
-| Permissions  |     -     |    -     | ja           |  -     |   -       |
 | Anonymität   |     -     |    -     | -            |  ja    |   -       |
 | SC           |     -     |   ja     | Smart Filter |  ja    |  ja       |
-| DID          |     -     |   -      | -            |  -     |  -        |
-| NFT          |     -     |   ja     | -            |  ja    |  ja       |
 
 ## Entwicklung von Prototypen
 
-Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp (V1) wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Backend das Testnet von Avalanche, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp (V1) wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Backend das Testnet von SUI, einem Blockchain-Projekt, das wie Ethereum dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
 
 ## Installation der Wahl-Applikation für Wählerinnen
 
 ### Prerequitsites
 - NodeJS >= 10.16 and npm >= 5.6 installed.
-- Truffle, which can be installed globally with npm install -g truffle
-- Metamask extension added to the browser.
+- sui wALLET extension added to the browser.
 
 #### Nodejs
-#### Truffle
-#### Metamask
+#### SUI Wallet
