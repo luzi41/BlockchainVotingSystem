@@ -52,3 +52,7 @@ Token-Hash = SHA-256(Token)
         nonce: ...
     }
 ```
+
+Abbildung 2: Anwendungsfall BVS Registrierung zur Wahl
+
+![UML Sequenzdiagramm BVS](./images/Anwendungsfall_Registrierung.png)
