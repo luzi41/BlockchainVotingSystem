@@ -33,3 +33,5 @@ hat. Wäre sie dazu in der Lage, könnte ein Erpresser diesen Beleg fordern und 
 ## Entwicklung von Prototypen
 
 Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erstes wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+
+![UML Sequenzdiagramm BVS](./images/WahlSequenz.png)
