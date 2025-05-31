@@ -38,3 +38,7 @@ Dazu werden ein Registrierungsservice mit Verbindung zum Melderegister/Wahlamt u
 Abbildung 1: Sequenzdiagramm BVS Wahl
 
 ![UML Sequenzdiagramm BVS](./images/WahlSequenz.png)
+
+### Registrierungsservice
+
+Der Registrierungsservice besteht zunächst der Einfachheit halber aus einer einfachen Website mit Anbindung an eine MySQL-Datenbank.
