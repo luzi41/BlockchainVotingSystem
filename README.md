@@ -11,7 +11,7 @@ Ein sicheres, datenschutzkonformes und nachvollziehbares Online-Wahlsystem für 
 ### Authentifizierung und Anonymität
 Für eine demokratische Wahl muss gewährleistet werden, dass nur berechtigte Wählerinnen ihre Stimme abgeben können und dass jeder Berechtigte die gleiche Anzahl von Stimmen hat. Gleichzeitig muss die Anonymität der abgegebenen Stimmen gewahrt bleiben. 
 
-Zu den Anforderungen im Hinblick auf die Integrität einer Online-Wahl gehört, dass das Wahlergebnis abschließend überprüft werden muss. Die notwendige Vertraulichkeit einer politischen Wahl erschwert jedoch die Entwicklung eines Verfahrens, das einerseits für Wählerinnen und Wahlbeobachter einfach zu handhaben ist und andererseits die Überprüfung einzelner Stimmen und des Wahlergebnisses als Ganzes gewährleistet. Diese Anforderung wird End-To-End Verifiability (E2E-V) genannt.
+Zu den Anforderungen im Hinblick auf die Integrität einer Online-Wahl gehört, dass das Wahlergebnis abschließend überprüft werden muss. Diese Anforderung wird End-To-End Verifiability (E2E-V) genannt.
 
 Die Ziele einer Verifizierung einer Wahl lauten: 
 - Auswahl wie vorgesehen;
@@ -32,4 +32,4 @@ hat. Wäre sie dazu in der Lage, könnte ein Erpresser diesen Beleg fordern und 
 
 ## Entwicklung von Prototypen
 
-Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erster Prototyp (V1) wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erstes wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
