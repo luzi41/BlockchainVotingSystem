@@ -36,15 +36,25 @@ hat. Wäre sie dazu in der Lage, könnte ein Erpresser diesen Beleg fordern und 
 Plattformen: Web & Mobile
 
 Funktionen:
+- Authentifizierung
+- Anzeige des Wahlzettels
+- Stimmabgabe und Verschlüsselung
+- Bestätigung (anonymisiert)
 
-    - Authentifizierung
-
-    - Anzeige des Wahlzettels
-
-    - Stimmabgabe
-
-    - Bestätigung (anonymisiert)
-
+## B. Backend
+- Microservice-Architektur, containerisiert (z.B. Docker/Kubernetes)
+- Wichtige Services:
+    - <b>Registrierungsservice</b>: Prüft Wahlberechtigung und erstellt verschlüsseltes Token für Wahlsystem
+    - <b>Wählerauthentifizierung</b>: Bindet z.B. eID, Personalausweis mit Online-Funktion oder ELSTER-Zertifikat ein
+    - <b>Stimmabgabe-Service</b>: Nimmt Stimme entgegen
+    - <b>Blockchain-Service</b>: Persistiert Wahlereignisse (Registrierung, Token-Ausgabe, Stimmabgabe, Speichern der verschlüsselten Stimme
+    - <b>Zähldienst</b>: Führt nach Wahlschluss automatisiert die Auszählung durch
+    - <b>Meldedienst</b>: Übermittelt Ergebnis mit Prüfsummen an den Wahlleiter
+  
+## C. Blockchain-Komponente
+- <b>Permissioned Blockchain</b> (z.B. Hyperledger Fabric oder Quorum)
+- <b>Knoten</b>: Wahlkommission, Parteien, neutrale Beobachter
+- <b>Einträge</b>: Registrierungen (Hash), Stimmabgaben (anonym, nur Token + Zeitstempel), Zähl-Ergebnisse, Ereignisprotokolle
 
 ## Entwicklung von Prototypen
 
