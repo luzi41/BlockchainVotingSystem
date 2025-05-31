@@ -1,0 +1,40 @@
+@startuml
+actor Wähler
+participant "Registrierungsservice" as RS
+participant "Blockchain-Service" as BC
+participant "Frontend\nWahlclient" as FE
+participant "Wahlkommision" as VoteAPI
+
+== Registrierung ==
+
+Wähler -> RS : Authentifiziere (z.B. eID)
+RS -> RS : Prüfe Wahlberechtigung
+RS -> RS : Generiere Token
+RS -> Wähler : Übermittle Token (z.B. QR-Code)
+RS -> BC : Schreibe Hash(Token) in Blockchain\n(Typ: REGISTRATION)
+
+== Stimmabgabe ==
+
+Wähler -> FE : Öffne Wahlclient und gebe Token ein
+FE -> FE : Verschlüssele Stimme lokal
+FE -> BC : Sende Token + verschlüsselte Stimme
+
+BC -> BC : Prüfe, ob Token-Hash registriert ist
+BC -> BC : Prüfe, ob Token schon verwendet wurde
+alt Token gültig & nicht verwendet
+    BC -> BC : Speichere Stimme
+    BC -> BC : Schreibe Hash(Token) in Blockchain\n(Typ: VOTE_CAST)
+    BC -> FE : Bestätige gültige Stimmabgabe
+else Ungültiger oder bereits verwendeter Token
+    BC -> FE : Fehler: Ungültiger oder verbrauchter Token
+end
+
+== Auszählung ==
+
+VoteAPI -> BC : Anforderung verschlüsselte Stimmen
+BC -> VoteAPI : Senden verschlüsselter Stimmen
+VoteAPI -> VoteAPI : Entschlüsselung Stimmen
+VoteAPI -> VoteAPI : Auszählung Stimmen
+VoteAPI -> FE : Übermittlung Ergebnis
+
+@enduml
