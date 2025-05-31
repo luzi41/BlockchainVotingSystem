@@ -1,0 +1,16 @@
+@startuml
+left to right direction
+actor Voter as v
+
+package Registrierungsservice {
+  usecase (Nachweis der Identität) << Authentisieren >>    as UC1
+  usecase (Prüfung der Identität)  << Authentifizierung >> as UC2
+  usecase (Zugang gewähren)        << Autorisierung >>     as UC3
+  usecase (Zugang verweigern)      << No Autorisierung >>     as UC4
+}
+
+v --> UC1
+UC1 <-- UC2
+UC2 <.. UC3
+UC2 <.. UC4
+@enduml
