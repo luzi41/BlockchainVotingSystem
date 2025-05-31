@@ -68,3 +68,12 @@ Das Frontend (FE) ist ein einfaches, aber funktionales React + ethers.js UI-Fron
     Abruf und Anzeige der Wahlergebnisse
     
 In der Produktiv-Version gibt es natürlich verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc.
+
+#### ⚙️ Voraussetzungen
+
+bash
+```
+    $ npx create-react-app quorum-vote-ui
+    $ cd quorum-vote-ui
+    $ npm install ethers
+```
