@@ -36,5 +36,6 @@ BC -> VoteAPI : Senden verschlüsselter Stimmen
 VoteAPI -> VoteAPI : Entschlüsselung Stimmen
 VoteAPI -> VoteAPI : Auszählung Stimmen
 VoteAPI -> FE : Übermittlung Ergebnis
+Wähler -> FE : Abruf Ergebnis
 
 @enduml
