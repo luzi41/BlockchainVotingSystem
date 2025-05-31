@@ -56,14 +56,48 @@ Funktionen:
 - <b>Knoten</b>: Wahlkommission, Parteien, neutrale Beobachter
 - <b>Einträge</b>: Registrierungen (Hash), Stimmabgaben (anonym, nur Token + Zeitstempel), Zähl-Ergebnisse, Ereignisprotokolle
 
-## Entwicklung von Prototypen
+## 3. Wahlprozess (End-to-End)
+1. Registrierung
 
-Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erstes wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
-Dazu werden ein Registrierungsservice mit Verbindung zum Melderegister/Wahlamt und ein Wahlleiter (bzw. Wahlkommission) benötigt.
+    Nutzer authentifiziert sich mit amtlichem Ausweisdokument
+
+    Prüfung durch Registrierungsservice (Anbindung an Melderegister)
+
+    Token-Ausgabe an den Nutzer (wird später zur Stimmabgabe benötigt)
+
+    Registrierung auf Blockchain protokolliert (nur Hash des Tokens)
+
+2. Stimmabgabe
+
+    Nutzer meldet sich mit Token im Frontend an
+
+    Stimme wird lokal im Browser verschlüsselt (Ende-zu-Ende)
+
+    Stimme (anonym) und Token (signiert) werden ans Backend gesendet
+
+    Token wird entwertet (keine Mehrfachabgabe möglich)
+
+    Blockchain: Eintrag mit Zeitstempel, Token-Hash, Transaktions-ID
+
+3. Auszählung & Ergebnisübermittlung
+
+    Nach Wahlschluss: Stimmen werden durch den Zähldienst aggregiert
+
+    Validierung gegen Blockchain (nur gültige, nicht doppelte Tokens)
+
+    Ergebnis + Blockchain-Verweis an Wahlleiter übermittelt
+
+    Ergebnisse öffentlich einsehbar über ein Dashboard (verifiziert über Blockchain)
+   
 
 Abbildung 1: Sequenzdiagramm BVS Wahl
 
 ![UML Sequenzdiagramm BVS](./images/WahlSequenz.png)
+
+## Entwicklung von Prototypen
+
+Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erstes wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
+Dazu werden ein Registrierungsservice mit Verbindung zum Melderegister/Wahlamt und ein Wahlleiter (bzw. Wahlkommission) benötigt.
 
 ### Registrierungsservice
 
