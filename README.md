@@ -56,3 +56,15 @@ Token-Hash = SHA-256(Token)
 Abbildung 2: Anwendungsfall BVS Registrierung zur Wahl
 
 ![UML Sequenzdiagramm BVS](./images/Anwendungsfall_Registrierung.png)
+
+### UI-Frontend für Quorum mit React + ether.js.
+
+Das Frontend (FE) ist ein einfaches, aber funktionales React + ethers.js UI-Frontend zur Interaktion mit den Smart Contracts auf Quorum. Es ermöglicht in der Testversion:
+
+    Registrierung eines Token-Hashes (Admin)
+
+    Abgabe einer verschlüsselten Stimme
+
+    Abruf und Anzeige der Wahlergebnisse
+    
+In der Produktiv-Version gibt es natürlich verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc.
