@@ -1,3 +1,6 @@
+// npx hardhat run scripts/deploy-and-use.js --network quorum
+
+
 const hre = require("hardhat");
 const ethers = hre.ethers;
 
