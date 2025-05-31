@@ -1,4 +1,5 @@
 @startuml
+
 actor Wähler
 participant "Registrierungsservice" as RS
 participant "Blockchain-Service" as BC
