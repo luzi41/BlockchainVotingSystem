@@ -42,3 +42,13 @@ Abbildung 1: Sequenzdiagramm BVS Wahl
 ### Registrierungsservice
 
 Der Registrierungsservice besteht zunächst der Einfachheit halber aus MySQL-Datenbank und Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend, die einen Token-Hash in die Blockchain schreibt.
+
+```
+Token-Hash = SHA-256(Token)
+    Blockchain-Eintrag: {
+        type: "REGISTRATION",
+        hash: <Token-Hash>,
+        timestamp: <Zeit>,
+        nonce: ...
+    }
+```
