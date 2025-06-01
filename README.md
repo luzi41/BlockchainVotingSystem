@@ -123,7 +123,7 @@ Dadurch wird die Geheimhaltung bei der Wahl gewährleistet, denn es ist nahezu u
 Abbildung 2: Anwendungsfall BVS Registrierung zur Wahl
 ![UML Sequenzdiagramm BVS](./images/Anwendungsfall_Registrierung.png)
 
-Dieser Token wird gebraucht, wenn der Wähler seine Stimme abgibt. Dazu nutz er die Wahlapp (Mobil oder Desktop-Rechner, UI-Frontend).
+Dieser Token wird gebraucht, wenn der Wähler seine Stimme abgibt. Dazu nutzt er die Wahlapp (Mobil oder Desktop-Rechner, UI-Frontend).
 
 ### UI-Frontend für Quorum mit React + ether.js.
 
