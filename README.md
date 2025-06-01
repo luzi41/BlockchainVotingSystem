@@ -132,6 +132,8 @@ Der Token wird wieder gebraucht, wenn der Wähler seine Stimme abgibt. Dann wird
 
 ### Wahlvorgang / Stimmabgabe
 
+### Auszählung / Veröffentlichung des Wahlergebnisses
+
 
 
 
