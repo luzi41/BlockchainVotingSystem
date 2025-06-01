@@ -99,9 +99,9 @@ Abbildung 1: Sequenzdiagramm BVS Wahl
 Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erstes wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
 Dazu werden ein Registrierungsservice mit Verbindung zum Melderegister/Wahlamt und ein Wahlleiter (bzw. Wahlkommission) benötigt.
 
-### Registrierungsservice
+### Registrierungsservice als Website
 
-Der Registrierungsservice besteht zunächst der Einfachheit halber aus MySQL-Datenbank und Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend, die einen Token-Hash in die Blockchain schreibt.
+Der Registrierungsservice besteht zunächst der Einfachheit halber aus MySQL-Datenbank und Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend, die einen Token-Hash in die Blockchain schreibt. Nach der erfolgreichen Authentifizierung und Registrierung als Online-Wähler erhält der Wähler einen Token z.B. als QR-Code. Ein Hash dieses Tokens wird in der Blockchain gespeichert. 
 
 ```
 Token-Hash = SHA-256(Token)
@@ -113,27 +113,28 @@ Token-Hash = SHA-256(Token)
     }
 ```
 
-Abbildung 2: Anwendungsfall BVS Registrierung zur Wahl
 
+
+Dadurch wird die Geheimhaltung bei der Wahl gewährleistet, denn es ist nahezu unmöglich, diesen Token-Hash zum Token zurück zu entwickeln und mit einem bestimmten Wähler zu verbinden. 
+
+
+
+
+Abbildung 2: Anwendungsfall BVS Registrierung zur Wahl
 ![UML Sequenzdiagramm BVS](./images/Anwendungsfall_Registrierung.png)
+
+Dieser Token wird gebraucht, wenn der Wähler seine Stimme abgibt. Dazu nutz er die Wahlapp (Mobil oder Desktop-Rechner, UI-Frontend).
 
 ### UI-Frontend für Quorum mit React + ether.js.
 
 Das Frontend (FE) ist ein einfaches, aber funktionales React + ethers.js UI-Frontend zur Interaktion mit den Smart Contracts auf Quorum. Es ermöglicht in der Testversion:
 
-    Registrierung eines Token-Hashes (Admin)
-
-    Abgabe einer verschlüsselten Stimme
-
-    Abruf und Anzeige der Wahlergebnisse
+- Prüfung eines Token-Hashes auf Gültigkeit
+- Abgabe einer verschlüsselten Stimme
+- Abruf und Anzeige der Wahlergebnisse
     
 In der Produktiv-Version gibt es natürlich verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc.
 
-#### ⚙️ Voraussetzungen
 
-bash
-```
-    $ npx create-react-app quorum-vote-ui
-    $ cd quorum-vote-ui
-    $ npm install ethers
-```
+
+
