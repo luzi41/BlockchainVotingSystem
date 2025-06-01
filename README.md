@@ -128,11 +128,7 @@ Token-Hash = SHA-256(Token)
 
 Dadurch wird die Geheimhaltung bei der Wahl gewährleistet, denn es ist nahezu unmöglich, diesen Token-Hash zum Token zurück zu entwickeln und mit einem bestimmten Wähler zu verbinden. 
 
-
-Abbildung 2: Anwendungsfall BVS Registrierung zur Wahl
-![UML Sequenzdiagramm BVS](./images/Anwendungsfall_Registrierung.png)
-
-Dieser Token wird gebraucht, wenn der Wähler seine Stimme abgibt. Dann wird wieder ein Hash des Tokens erzeugt und mit dem gespeichertem Hash in der Blockchain verglichen.
+Der Token wird wieder gebraucht, wenn der Wähler seine Stimme abgibt. Dann wird wieder ein Hash des Tokens erzeugt und mit dem gespeichertem Hash in der Blockchain verglichen.
 
 ### Wahlvorgang / Stimmabgabe
 
