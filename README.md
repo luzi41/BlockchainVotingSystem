@@ -154,6 +154,20 @@ Der Token wird wieder gebraucht, wenn der Wähler seine Stimme abgibt. Dann wird
 
 ### Wahlvorgang / Stimmabgabe
 
+Stimmabgabe-Transaktion (VOTE):
+
+    {
+      "type": "VOTE",
+      "encrypted_vote": "g2k14ab2==...==q9xz",  // Base64-encoded ciphertext
+      "token_hash": "a4c67f2f82e14361df61d6fe7ef7cd228b3d3d2e8bc048ef278d4fa4a9b2e13c",
+      "timestamp": "2025-09-22T11:03:12Z",
+      "signature": "0xa91bc9a...47d",  // Optional (z. B. für Node-Signatur)
+      "metadata": {
+        "submitted_by": "vote-node-4"
+      }
+    }
+
+
 ### Auszählung / Veröffentlichung des Wahlergebnisses
 
 # Installation
