@@ -307,3 +307,39 @@ curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/j
 
 Navigiere zu http://localhost:3000/results
 
+8. 🔄 Alles automatisch starten (Startscript)
+
+Erstelle ein Shell-Skript start-all.sh:
+
+    #!/bin/bash
+
+# 1. Quorum-Netzwerk starten
+    cd quorum-dev-quickstart && npm run start &
+
+# 2. Contract deployen
+    cd ../election-system && npx hardhat run scripts/deploy.js --network quorum
+
+# 3. API starten
+    cd api && node index.js &
+
+# 4. Frontend starten
+    cd ../frontend && npm start
+
+Ausführbar machen:
+
+    chmod +x start-all.sh
+
+Starten:
+
+    ./start-all.sh
+
+✅ Zusammenfassung
+
+    Komponente	        Befehl / Zugriff
+    -----------------------------------------------------------
+    Netzwerk	        npm run start in quorum-dev-quickstart
+    Contract Deploy	    npx hardhat run ...
+    API	                node api/index.js
+    Frontend	        npm start im frontend/-Verzeichnis
+    Ergebnisse	        http://localhost:3000/results
+    Voting	            http://localhost:3000/
