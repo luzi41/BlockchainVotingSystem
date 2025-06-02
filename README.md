@@ -110,6 +110,19 @@ Das Frontend (FE) ist ein einfaches, aber funktionales React + ethers.js UI-Fron
     
 In der Produktiv-Version gibt es natürlich verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc.
 
+### Dateistruktur
+
+    frontend/
+    ├── src/
+    │   ├── components/
+    |   |   |── RegistrationForm.js
+    │   │   ├── VoteForm.js
+    │   │   ├── Results.js
+    │   ├── App.js
+    │   ├── index.js
+    ├── package.json
+
+
 ### Registrierungsservice 
 
 Der Registrierungsservice besteht zunächst der Einfachheit halber aus MySQL-Datenbank und Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend, die einen Token-Hash in die Blockchain schreibt. Nach der erfolgreichen Authentifizierung und Registrierung als Online-Wähler erhält der Wähler einen Token z.B. als QR-Code. Ein Hash dieses Tokens wird in der Blockchain gespeichert. 
