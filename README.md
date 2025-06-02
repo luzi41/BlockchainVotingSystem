@@ -156,6 +156,92 @@ Der Token wird wieder gebraucht, wenn der Wähler seine Stimme abgibt. Dann wird
 
 ### Auszählung / Veröffentlichung des Wahlergebnisses
 
+# Installation
+🔧 Voraussetzungen
+
+Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
+
+    Node.js (LTS)
+
+    npm
+
+    Git
+
+    Docker & Docker Compose
+
+    MetaMask Browser Extension
+
+1. 📦 Quorum-Netzwerk aufsetzen
+1.1 Repository klonen
+   
+       git clone https://github.com/ConsenSys/quorum-dev-quickstart.git
+       cd quorum-dev-quickstart
+
+1.2 Abhängigkeiten installieren & Netzwerk generieren
+
+    npm install
+    npm run build
+
+1.3 Netzwerk starten (z.B. mit Raft)
+
+    npm run start
+
+⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
+2. 🛠 Smart Contract deployen
+2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
+
+    mkdir election-system && cd election-system
+    npx hardhat
+
+Antworten:
+
+    Typ: "Create a basic sample project"
+
+    Sprache: "JavaScript"
+
+    Weitere: Standard/Yes
+
+2.2 Vertrag Election.sol erstellen
+
+Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein (siehe vorherige Nachricht).
+2.3 Kompilieren
+
+    npx hardhat compile
+
+2.4 Konfiguration anpassen (hardhat.config.js)
+
+    module.exports = {
+      solidity: "0.8.20",
+      networks: {
+        quorum: {
+          url: "http://localhost:8545",
+          accounts: {
+            mnemonic: "test test test test test test test test test test test junk"
+          }
+        }
+      }
+    };
+
+    💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore.
+
+2.5 Deploy-Script schreiben (scripts/deploy.js)
+
+    async function main() {
+      const Election = await ethers.getContractFactory("Election");
+      const election = await Election.deploy();
+      await election.deployed();
+      console.log(`Contract deployed to: ${election.address}`);
+      require("fs").writeFileSync("deployment-address.txt", election.address);
+    }
+    main().catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
+
+2.6 Contract deployen
+
+    npx hardhat run scripts/deploy.js --network quorum
+
 
 
 
