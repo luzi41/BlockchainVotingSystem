@@ -185,6 +185,8 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 1.3 Netzwerk starten (z.B. mit Raft)
 
     npm run start
+    cd quorum-test-network
+    ./run.sh
 
 ⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
 2. 🛠 Smart Contract deployen
