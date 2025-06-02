@@ -176,7 +176,42 @@ Stimmabgabe-Transaktion (VOTE):
 - encrypted_vote enthält die mit dem öffentlichen Schlüssel verschlüsselte Stimme (z. B. "Partei X")
 
 
-### Auszählung / Veröffentlichung des Wahlergebnisses
+### Auszählung / Veröffentlichung des Wahlergebnisses (TALLY)
+
+Nach Wahlschluss erstellt ein Zähldienst ein signiertes Ergebnis.
+Beispiel-Transaktion:
+
+    {
+      "type": "TALLY",
+      "results": {
+        "Partei A": 142345,
+        "Partei B": 130222,
+        "Partei C": 53421
+      },
+      "counted_votes": 325988,
+      "timestamp": "2025-09-23T18:00:00Z",
+      "signature": "0xd4cf34d...aa1"
+    }
+
+- Optional könnten auch Merkle-Roots der gezählten Stimmen beigefügt werden
+- Die Entschlüsselung der Stimmen erfolgt lokal, nicht on-chain
+
+✅ Blockchain-Validierungslogik (vereinfacht)
+
+    def validate_vote_submission(token_hash, blockchain):
+        # Prüfe, ob der Token-Hash registriert wurde
+        registered = any(tx for tx in blockchain if tx["type"] == "REGISTRATION" and tx["token_hash"] == token_hash)
+
+        # Prüfe, ob für diesen Hash bereits gewählt wurde
+        already_voted = any(tx for tx in blockchain if tx["type"] == "VOTE" and tx["token_hash"] == token_hash)
+
+        if not registered:
+            raise Exception("Unbekannter Token")
+        if already_voted:
+            raise Exception("Token bereits verwendet")
+
+        return True
+
 
 # Installation
 🔧 Voraussetzungen
