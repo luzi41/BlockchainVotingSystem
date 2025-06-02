@@ -99,6 +99,15 @@ Abbildung 1: Sequenzdiagramm BVS Wahl
 Für das BVS werden verschiedene Applikationen benötigt, die jeweils die Funktionalitäten für die jeweiligen Rollen bei einer Wahl abdecken. Als erstes wird ein Web3-basiertes Frontend entwickelt, mit der die Funktionalitäten für die Rolle Wähler/-in getestet werden kann. Als Basis dient dabei eine Node.js (Javascript) Laufzeit-Umgebung mit React-Frontend und als Blockchain-Backend "Quorum", auf Basis von Ethereum. das dApps (Verteilte Anwendungen) und SmartContracts unterstützt.
 Dazu werden ein Registrierungsservice mit Verbindung zum Melderegister/Wahlamt und ein Wahlleiter (bzw. Wahlkommission) benötigt.
 
+## 🗳️ Smart Contract: Election.sol (contracts/Election.sol)
+
+Dieser Solidity-Vertrag ermöglicht:
+
+- Registrierung von Kandidaten und Wählern durch den Admin
+- Starten und Beenden der Wahl
+- Abgabe von Stimmen durch registrierte Wähler
+- Ermittlung des Wahlsiegers nach Beendigung der Wahl
+
 
 ## UI-Frontend für Quorum mit React + ether.js.
 
