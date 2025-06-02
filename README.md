@@ -154,6 +154,8 @@ Der Token wird wieder gebraucht, wenn der Wähler seine Stimme abgibt. Dann wird
 
 ### Wahlvorgang / Stimmabgabe
 
+(UI-Frontend)
+
 Stimmabgabe-Transaktion (VOTE):
 
     {
