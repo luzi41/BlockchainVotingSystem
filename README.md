@@ -168,6 +168,12 @@ Stimmabgabe-Transaktion (VOTE):
     }
 
 
+
+- Nur eine VOTE-Transaktion pro token_hash ist erlaubt → Verhinderung von Mehrfachabgaben
+
+- encrypted_vote enthält die mit dem öffentlichen Schlüssel verschlüsselte Stimme (z. B. "Partei X")
+
+
 ### Auszählung / Veröffentlichung des Wahlergebnisses
 
 # Installation
