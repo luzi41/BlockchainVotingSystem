@@ -242,6 +242,68 @@ Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein (sieh
 
     npx hardhat run scripts/deploy.js --network quorum
 
+3. 🌐 Backend-API starten
+3.1 API vorbereiten
 
+Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speichere das ABI:
 
+cp artifacts/contracts/Election.sol/Election.json api/Election.json
+
+Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
+3.2 API starten
+
+    cd api
+    npm install express ethers
+    node index.js
+
+4. 🖥 Frontend starten
+4.1 React-App erstellen
+
+    npx create-react-app frontend
+    cd frontend
+    npm install react-router-dom ethers
+
+4.2 Komponenten einfügen
+
+Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter src/ ein.
+
+4.3 ABI kopieren
+
+    cp ../artifacts/contracts/Election.sol/Election.json src/
+
+4.4 Frontend starten
+
+    npm start
+
+5. 🗳 Admin-Konfiguration & Wahlprozess
+5.1 Wähler & Kandidaten registrieren
+
+Verwende die API:
+
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}'
+
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
+
+curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}'
+
+5.2 Wahl starten
+
+    curl -X POST http://localhost:3001/startVoting
+
+6. 🧑‍💻 Abstimmung durchführen
+
+    Öffne das React-Frontend im Browser (http://localhost:3000)
+
+    MetaMask verbinden
+
+    Kandidat auswählen & abstimmen
+
+7. 🏁 Wahl beenden & Ergebnisse anzeigen
+7.1 Wahl beenden
+
+    curl -X POST http://localhost:3001/endVoting
+
+7.2 Ergebnisse im Browser sehen
+
+Navigiere zu http://localhost:3000/results
 
