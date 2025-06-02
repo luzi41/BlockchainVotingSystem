@@ -229,6 +229,7 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
     MetaMask Browser Extension
 
 1. 📦 Quorum-Netzwerk aufsetzen
+
 1.1 Repository klonen
    
        git clone https://github.com/ConsenSys/quorum-dev-quickstart.git
