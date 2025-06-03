@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
+import { BrowserProvider, Contract } from "ethers";
 
 const ethers = require("ethers");
-const contractAddress = "0x..."; // Adresse des deployten Contracts
+const contractAddress = "0x2FB52Ef60fb8f38c6e3B9c1160868969773C8223"; // Adresse des deployten Contracts
 
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
@@ -11,12 +12,18 @@ function VoteForm() {
 
   useEffect(() => {
     async function fetchCandidates() {
-      if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(contractAddress, Election.abi, provider);
-        const candidatesList = await contract.getCandidates();
-        setCandidates(candidatesList);
-      }
+        try {
+          if (window.ethereum) {
+         // const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const provider = new BrowserProvider(window.ethereum);
+            const contract = new ethers.Contract(contractAddress, Election.abi, provider);
+            const candidatesList = await contract.getCandidates();
+            setCandidates(candidatesList);
+          }
+       }
+        catch (error) {
+            console.error("Fehler beim Abrufen der Kandidaten:", error);
+        }        
     }
     fetchCandidates();
   }, []);
@@ -24,7 +31,8 @@ function VoteForm() {
   const vote = async () => {
     if (!window.ethereum) return alert("MetaMask erforderlich!");
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new BrowserProvider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, Election.abi, signer);
@@ -34,7 +42,7 @@ function VoteForm() {
       await tx.wait();
       setStatus("✅ Stimme erfolgreich abgegeben!");
     } catch (err) {
-      setStatus("❌ Fehler: " + err.message);
+      setStatus("❌ Fehler: " + err.message );
     }
   };
 
