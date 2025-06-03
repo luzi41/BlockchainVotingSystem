@@ -312,7 +312,7 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 ### 3.2 API starten
 
     cd api
-    npm install express ethers
+    npm install express ethers@°5.7.2 // Neuere Versionen funktionieren nicht.
     cd ..
     node index.js
 
