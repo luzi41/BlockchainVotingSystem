@@ -324,7 +324,7 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
 4.2 Komponenten einfügen
 
-Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter src/ ein.
+Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter src/components ein.
 
 4.3 ABI kopieren
 
