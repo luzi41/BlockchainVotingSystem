@@ -267,7 +267,9 @@ Antworten:
 
 2.2 Vertrag Election.sol erstellen
 
-Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein (siehe vorherige Nachricht).
+Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI) und füge den Smart Contract ein.
+
+
 2.3 Kompilieren
 
     npx hardhat compile
