@@ -304,6 +304,7 @@ Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speic
 cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
 Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
+
 3.2 API starten
 
     cd api
