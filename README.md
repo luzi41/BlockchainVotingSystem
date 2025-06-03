@@ -328,7 +328,7 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 4.3 ABI kopieren
 
-    cp ../artifacts/contracts/Election.sol/Election.json src/
+    cp  R ../artifacts src/
 
 4.4 Frontend starten
 
