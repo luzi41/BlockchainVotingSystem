@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { BrowserProvider, Contract } from "ethers";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
+
 const ethers = require("ethers");
 
 const contractAddress = "0x..."; // Adresse des deployten Contracts
@@ -11,7 +13,7 @@ function Results() {
   useEffect(() => {
     async function fetchResults() {
       if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const provider = new BrowserProvider(window.ethereum);
         const contract = new ethers.Contract(contractAddress, Election.abi, provider);
         try {
           const [winnerName, winnerVoteCount] = await contract.getWinner();
