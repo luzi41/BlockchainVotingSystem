@@ -247,11 +247,15 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
     ./run.sh
 
 ⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
+
 2. 🛠 Smart Contract deployen
+
 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
 
     mkdir election-system && cd election-system
-    npx hardhat
+    npm init
+    npm install --save-dev hardhat
+    npx hardhat init
 
 Antworten:
 
