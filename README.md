@@ -290,23 +290,11 @@ Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI
 
     💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore.
 
-2.5 Deploy-Script schreiben (scripts/deploy.js)
-
-    async function main() {
-      const Election = await ethers.getContractFactory("Election");
-      const election = await Election.deploy();
-      await election.deployed();
-      console.log(`Contract deployed to: ${election.address}`);
-      require("fs").writeFileSync("deployment-address.txt", election.address);
-    }
-    main().catch((error) => {
-      console.error(error);
-      process.exitCode = 1;
-    });
+2.5 Deploy-Script schreiben (scripts/deployElection.js)
 
 2.6 Contract deployen
 
-    npx hardhat run scripts/deploy.js --network quorum
+    npx hardhat run scripts/deployElection.js --network quorum
 
 3. 🌐 Backend-API starten
 3.1 API vorbereiten
