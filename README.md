@@ -296,7 +296,10 @@ Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI
 
     npx hardhat run scripts/deployElection.js --network quorum
 
+Die Contract-Adreese in der Datei deployment.address.txt speichern.
+
 3. 🌐 Backend-API starten
+   
 3.1 API vorbereiten
 
 Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speichere das ABI:
