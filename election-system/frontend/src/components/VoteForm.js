@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ethers } from "ethers";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 
+const ethers = require("ethers");
 const contractAddress = "0x..."; // Adresse des deployten Contracts
 
 function VoteForm() {
