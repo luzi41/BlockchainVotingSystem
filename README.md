@@ -228,19 +228,19 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
     MetaMask Browser Extension
 
-1. 📦 Quorum-Netzwerk aufsetzen
+## 1. 📦 Quorum-Netzwerk aufsetzen
 
-1.1 Repository klonen
+### 1.1 Repository klonen
    
        git clone https://github.com/ConsenSys/quorum-dev-quickstart.git
        cd quorum-dev-quickstart
 
-1.2 Abhängigkeiten installieren & Netzwerk generieren
+### 1.2 Abhängigkeiten installieren & Netzwerk generieren
 
     npm install
     npm run build
 
-1.3 Netzwerk starten (z.B. mit Raft)
+### 1.3 Netzwerk starten (z.B. mit Raft)
 
     npm run start
     cd quorum-test-network
@@ -248,9 +248,9 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
 
-2. 🛠 Smart Contract deployen
+## 2. 🛠 Smart Contract deployen
 
-2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
+## 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
 
     mkdir election-system && cd election-system
     npm init
@@ -265,16 +265,16 @@ Antworten:
 
     Weitere: Standard/Yes
 
-2.2 Vertrag Election.sol erstellen
+### 2.2 Vertrag Election.sol erstellen
 
 Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI) und füge den Smart Contract ein.
 
 
-2.3 Kompilieren
+### 2.3 Kompilieren
 
     npx hardhat compile
 
-2.4 Konfiguration anpassen (hardhat.config.js)
+### 2.4 Konfiguration anpassen (hardhat.config.js)
 
     module.exports = {
       solidity: "0.8.20",
@@ -290,18 +290,18 @@ Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI
 
     💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore.
 
-2.5 Deploy-Script schreiben (scripts/deployElection.js)
+### 2.5 Deploy-Script schreiben (siehe scripts/deployElection.js)
 
-2.6 Contract deployen
+### 2.6 Contract deployen
 
     npx hardhat run scripts/deployElection.js --network quorum
 
 Die Contract-Adreese in der Datei deployment.address.txt speichern.
 
 
-3. Backend-API
+## 3. Backend-API
 
-3.1 API vorbereiten
+### 3.1 API vorbereiten
 
 Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speichere das ABI:
 
@@ -309,33 +309,34 @@ cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
 Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
-3.2 API starten
+### 3.2 API starten
 
     cd api
     npm install express ethers
     node index.js
 
-4. 🖥 Frontend starten
-4.1 React-App erstellen
+# 4. 🖥 Frontend starten
+### 4.1 React-App erstellen
 
     npx create-react-app frontend
     cd frontend
     npm install react-router-dom ethers
 
-4.2 Komponenten einfügen
+### 4.2 Komponenten einfügen
 
 Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter src/components ein.
 
-4.3 ABI kopieren
+### 4.3 ABI kopieren
 
     cp  R ../artifacts src/
 
-4.4 Frontend starten
+### 4.4 Frontend starten
 
     npm start
 
-5. 🗳 Admin-Konfiguration & Wahlprozess
-5.1 Wähler & Kandidaten registrieren
+## 5. 🗳 Admin-Konfiguration & Wahlprozess
+
+### 5.1 Wähler & Kandidaten registrieren
 
 Verwende die API:
 
@@ -345,11 +346,11 @@ curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: applicati
 
 curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}'
 
-5.2 Wahl starten
+### 5.2 Wahl starten
 
     curl -X POST http://localhost:3001/startVoting
 
-6. 🧑‍💻 Abstimmung durchführen
+## 6. 🧑‍💻 Abstimmung durchführen
 
     Öffne das React-Frontend im Browser (http://localhost:3000)
 
@@ -357,12 +358,13 @@ curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/j
 
     Kandidat auswählen & abstimmen
 
-7. 🏁 Wahl beenden & Ergebnisse anzeigen
-7.1 Wahl beenden
+## 7. 🏁 Wahl beenden & Ergebnisse anzeigen
+
+### 7.1 Wahl beenden
 
     curl -X POST http://localhost:3001/endVoting
 
-7.2 Ergebnisse im Browser sehen
+### 7.2 Ergebnisse im Browser sehen
 
 Navigiere zu http://localhost:3000/results
 
@@ -372,16 +374,16 @@ Erstelle ein Shell-Skript start-all.sh:
 
     #!/bin/bash
 
-# 1. Quorum-Netzwerk starten
+#### 1. Quorum-Netzwerk starten
     cd quorum-dev-quickstart && npm run start &
 
-# 2. Contract deployen
+#### 2. Contract deployen
     cd ../election-system && npx hardhat run scripts/deploy.js --network quorum
 
-# 3. API starten
+#### 3. API starten
     cd api && node index.js &
 
-# 4. Frontend starten
+#### 4. Frontend starten
     cd ../frontend && npm start
 
 Ausführbar machen:
