@@ -267,11 +267,12 @@ Antworten:
 
 ### 2.2 Vertrag Election.sol erstellen
 
-Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI) und füge den Smart Contract ein.
+Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
 
 
 ### 2.3 Kompilieren
 
+    cd contracts/Election.sol
     npx hardhat compile
 
 ### 2.4 Konfiguration anpassen (hardhat.config.js)
@@ -288,7 +289,7 @@ Erstelle die Datei contracts/Election.sol (Zeichencodierung: Umwandeln nach ASCI
       }
     };
 
-    💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore.
+    💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
 
 ### 2.5 Deploy-Script schreiben (siehe scripts/deployElection.js)
 
