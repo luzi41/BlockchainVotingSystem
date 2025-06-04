@@ -8,7 +8,7 @@ module.exports = {
       chainId: 1337,
       // test accounts only, all good ;)
       accounts: [
-        "0x8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7"
+        "0x8bbb...."
       ]  
     }
 };
