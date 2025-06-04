@@ -312,7 +312,7 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 ### 3.2 API starten
 
     cd api
-    npm install express ethers@°5.7.2 // Neuere Versionen funktionieren nicht.
+    npm install express ethers
     cd ..
     node index.js
 
@@ -400,8 +400,14 @@ Starten:
     Komponente	            Befehl / Zugriff
     -----------------------------------------------------------
     Netzwerk	            npm run start in quorum-dev-quickstart
-    Contract Deploy	            npx hardhat run ...
+    Contract Deploy	        npx hardhat run ...
     API	                    node api/index.js
     Frontend	            npm start im frontend/-Verzeichnis
     Ergebnisse	            http://localhost:3000/results
     Voting	                    http://localhost:3000/
+
+Mögliche Felerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
+
+- Falscher Zeichensatz,
+- alte Keys in den Scriptdateien,
+- etc,;
