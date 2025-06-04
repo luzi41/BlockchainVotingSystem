@@ -19,17 +19,17 @@ contract Election {
     mapping(address => Voter) public voters;
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Nur der Admin kann diese Funktion ausführen.");
+        require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen.");
         _;
     }
 
     modifier onlyDuringVoting() {
-        require(votingOpen, "Die Wahl ist nicht geöffnet.");
+        require(votingOpen, unicode"Die Wahl ist nicht geöffnet.");
         _;
     }
 
     modifier onlyAfterVoting() {
-        require(!votingOpen, "Die Wahl ist noch geöffnet.");
+        require(!votingOpen, unicode"Die Wahl ist noch geöffnet.");
         _;
     }
 
@@ -42,7 +42,7 @@ contract Election {
     }
 
     function registerVoter(address _voter) public onlyAdmin {
-        require(!voters[_voter].registered, "Wähler ist bereits registriert.");
+        require(!voters[_voter].registered, unicode"Wähler ist bereits registriert.");
         voters[_voter] = Voter({registered: true, hasVoted: false});
     }
 
@@ -57,9 +57,9 @@ contract Election {
 
     function vote(uint _candidateIndex) public onlyDuringVoting {
         Voter storage sender = voters[msg.sender];
-        require(sender.registered, "Nicht registrierter Wähler.");
-        require(!sender.hasVoted, "Wähler hat bereits abgestimmt.");
-        require(_candidateIndex < candidates.length, "Ungültiger Kandidat.");
+        require(sender.registered, unicode"Nicht registrierter Wähler.");
+        require(!sender.hasVoted, unicode"Wähler hat bereits abgestimmt.");
+        require(_candidateIndex < candidates.length, unicode"Ungültiger Kandidat.");
 
         sender.hasVoted = true;
         candidates[_candidateIndex].voteCount += 1;
