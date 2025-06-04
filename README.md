@@ -278,7 +278,7 @@ Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
 ### 2.4 Konfiguration anpassen (hardhat.config.js)
 
     module.exports = {
-      solidity: "0.8.20",
+      solidity: "0.8.28",
       networks: {
         quorum: {
           url: "http://localhost:8545",
