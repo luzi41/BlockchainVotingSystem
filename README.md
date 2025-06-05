@@ -229,20 +229,12 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
     MetaMask Browser Extension
 
 ## 1. 📦 Quorum-Netzwerk aufsetzen
-
-### 1.1 Repository klonen
    
-       git clone https://github.com/ConsenSys/quorum-dev-quickstart.git
-       cd quorum-dev-quickstart
+       mkdir election-system && cd election-system
+       npx quorum-dev-quickstart
 
-### 1.2 Abhängigkeiten installieren & Netzwerk generieren
+### 1.1 Netzwerk starten (z.B. mit Raft)
 
-    npm install
-    npm run build
-
-### 1.3 Netzwerk starten (z.B. mit Raft)
-
-    npm run start
     cd quorum-test-network
     ./run.sh
 
@@ -252,7 +244,6 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
 
-    mkdir election-system && cd election-system
     npm init
     npm install --save-dev hardhat
     npx hardhat init
