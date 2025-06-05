@@ -5,6 +5,12 @@ contract ElectionRegistry {
     mapping(bytes32 => bool) public registeredTokens;
     mapping(bytes32 => bool) public usedTokens;
 
+/*
+    struct Voter {
+        bool registered;
+        bool hasVoted;
+    }
+*/
     address public admin;
 
     constructor() {
