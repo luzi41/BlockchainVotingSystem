@@ -3,12 +3,12 @@ import { BrowserProvider, Contract } from "ethers";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 import contractAddress from "../deployment-address.txt"
 const ethers = require("ethers");
-// const contractAddress = "0x38Fef9ccf..."; // Adresse des deployten Contracts
+const contractAddress = "0x00f..."; // Adresse des deployten Contracts
 
 function Results() {
   const [winner, setWinner] = useState("");
   const [votes, setVotes] = useState(0);
-  const [totalVotes, setTotalVotes] = useState(0); // Contract muss erneut kompiliert werden.
+  const [totalVotes, setTotalVotes] = useState(0); 
 
   useEffect(() => {
     async function fetchResults() {
