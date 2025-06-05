@@ -26,7 +26,7 @@ function Results() {
           
         } catch (err) {
           setStatus("❌ Fehler: " , err);
-          console.error("Fehler beim Abrufen der Ergebnisse:", err);
+          console.error("Fehler beim Abrufen der Ergebnisse: ", err);
         }
       }
     }
