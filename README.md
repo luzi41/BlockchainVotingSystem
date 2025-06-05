@@ -230,7 +230,7 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 1. 📦 Quorum-Netzwerk aufsetzen
    
-       mkdir election-system
+       mkdir election-system && cd election-system
        npx quorum-dev-quickstart
 
 ### 1.1 Netzwerk starten (z.B. mit Raft)
@@ -244,7 +244,6 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
 
-    mkdir election-system && cd election-system
     npm init
     npm install --save-dev hardhat
     npx hardhat init
