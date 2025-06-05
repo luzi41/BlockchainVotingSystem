@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 import { BrowserProvider, Contract } from "ethers";
 import contractAddress from "../deployment-address.txt"
-console.log(contractAddress);
+
 const ethers = require("ethers");
 //const contractAddress = "0x38Fef9c...."; // Adresse des deployten Contracts
 
