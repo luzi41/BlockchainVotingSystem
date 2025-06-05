@@ -347,7 +347,7 @@ curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: applicati
 
 curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
 
-curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}'
+curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}' // Normale neue Ethereum Adressen mit Metamask erstellt.
 
 ### 5.2 Wahl starten
 
