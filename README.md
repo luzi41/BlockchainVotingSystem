@@ -297,7 +297,7 @@ Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
 
     npx hardhat run scripts/deployElection.js --network quorum
 
-Die Contract-Adreese in der Datei deployment.address.txt speichern.
+Die Contract-Adreese in der Datei deployment-address.txt speichern.
 
 
 ## 3. Backend-API
