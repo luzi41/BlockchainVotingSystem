@@ -42,8 +42,11 @@ function Results() {
     <div>
       <h2>Wahlergebnisse</h2>
       <table>
+        <thead><tr><th>Kandidat</th><th>Stimmen</th></tr></thead>
         {candidates.map((candidate, index) => (
-          <tr><td>{candidate.name}</td><td>{candidate.voteCount}</td></tr>
+          <tbody>
+            <tr><td>{candidate.name}</td><td>{candidate.voteCount}</td></tr>
+          </tbody>
         ))}
       </table>
       <p>Sieger: {winner}</p>
