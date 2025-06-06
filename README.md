@@ -213,7 +213,7 @@ Beispiel-Transaktion:
         return True
 
 
-# Installation (Prototyp V 0.1)
+# Installation (Prototyp)
 🔧 Voraussetzungen
 
 Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
