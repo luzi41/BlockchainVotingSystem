@@ -28,3 +28,14 @@ Ausführbar machen:
 Starten:
 
     ./start-all.sh
+
+✅ Zusammenfassung
+
+    Komponente	            Befehl / Zugriff
+    -----------------------------------------------------------
+    Netzwerk	            npm run start in quorum-dev-quickstart
+    Contract Deploy	        npx hardhat run ...
+    API	                    node api/index.js
+    Frontend	            npm start im frontend/-Verzeichnis
+    Ergebnisse	            http://localhost:3000/results
+    Voting	                    http://localhost:3000/
