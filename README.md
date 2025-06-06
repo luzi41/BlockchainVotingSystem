@@ -314,7 +314,6 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
     npx create-react-app frontend
     cd frontend
     npm install react-router-dom ethers
-    ln -s ../api/deployment-address.txt ./src/deployment-address.txt
 
 ### 4.2 Komponenten einfügen
 
@@ -322,7 +321,7 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ### 4.3 ABI kopieren
 
-    cp  R ../artifacts src/
+    cp  -R ../artifacts src/
 
 ### 4.4 Frontend starten
 

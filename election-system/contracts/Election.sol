@@ -16,10 +16,11 @@ contract Election {
     }
 
     Candidate[] public candidates;
+
     mapping(address => Voter) public voters;
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen.");
+        require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen!");
         _;
     }
 
@@ -68,11 +69,14 @@ contract Election {
     function getWinner() public view onlyAfterVoting returns (string memory winnerName, uint winnerVoteCount) {
         uint winningVoteCount = 0;
         uint winningIndex = 0;
+
         for (uint i = 0; i < candidates.length; i++) {
+            
             if (candidates[i].voteCount > winningVoteCount) {
                 winningVoteCount = candidates[i].voteCount;
                 winningIndex = i;
             }
+
         }
         winnerName = candidates[winningIndex].name;
         winnerVoteCount = candidates[winningIndex].voteCount;
@@ -81,4 +85,15 @@ contract Election {
     function getCandidates() public view returns (Candidate[] memory) {
         return candidates;
     }
+
+    function getTotalVotes() public view returns (uint totalVotes)
+    {
+        for (uint i = 0; i < candidates.length; i++) {
+
+            totalVotes = totalVotes + candidates[i].voteCount;
+        }
+
+        return totalVotes;
+    }
+	
 }
