@@ -7,6 +7,7 @@ const ethers = require("ethers");
 const contractAddress = "0x00..."; // Adresse des deployten Contracts
 
 function Results() {
+  const [candidates, setCandidates] = useState([]);
   const [winner, setWinner] = useState("");
   const [votes, setVotes] = useState(0);
   const [status, setStatus] = useState("");
@@ -17,12 +18,13 @@ function Results() {
       if (window.ethereum) {
         const provider = new BrowserProvider(window.ethereum);
         const contract = new ethers.Contract(contractAddress, Election.abi, provider);
-
+        
         try {
           const [winnerName, winnerVoteCount] = await contract.getWinner();
-          //const total = await contract.getTotalVotes();
+          const candidatesList = await contract.getCandidates();
+          setCandidates(candidatesList);
           setWinner(winnerName);
-          setVotes(winnerVoteCount);
+          setVotes(winnerVoteCount);    
           
         } catch (err) {
           setStatus("❌ Fehler: " , err);
@@ -36,6 +38,11 @@ function Results() {
   return (
     <div>
       <h2>Wahlergebnisse</h2>
+      <table>
+        {candidates.map((candidate, index) => (
+          <tr><td>{candidate.name}</td><td>{candidate.voteCount}</td></tr>
+        ))}
+      </table>
       <p>Sieger: {winner}</p>
       <p>Stimmen: {votes}</p>
       
