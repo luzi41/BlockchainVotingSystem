@@ -19,6 +19,7 @@ function App() {
       </nav>
       <Routes>
         <Route path="/" element={<Start />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/vote" element={<VoteForm />} />
         <Route path="/results" element={<Results />} />
       </Routes>
