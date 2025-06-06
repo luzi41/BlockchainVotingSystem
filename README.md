@@ -321,7 +321,7 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ### 4.3 ABI kopieren
 
-    cp  R ../artifacts src/
+    cp  -R ../artifacts src/
 
 ### 4.4 Frontend starten
 
