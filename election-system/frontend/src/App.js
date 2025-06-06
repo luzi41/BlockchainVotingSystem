@@ -12,6 +12,7 @@ function App() {
       <nav>
         <ul>
           <li><Link to="/">Start</Link></li>
+          <li><Link to="/register">Registrieren</Link></li>
           <li><Link to="/vote">Abstimmen</Link></li>
           <li><Link to="/results">Ergebnisse</Link></li>
         </ul>
