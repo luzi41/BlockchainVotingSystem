@@ -1,6 +1,4 @@
-8. 🔄 Alles automatisch starten (Startscript)
-
-Erstelle ein Shell-Skript start-all.sh:
+Erstelle ein Shell-Skript start-all.sh: (noch nicht fertig)
 
     #!/bin/bash
 
