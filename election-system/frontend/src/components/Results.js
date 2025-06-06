@@ -30,7 +30,7 @@ function Results() {
           setTotalVotes(total);
           
         } catch (err) {
-          setStatus("❌ Fehler: " , err);
+          // setStatus("❌ Fehler: " , err);
           console.error("Fehler beim Abrufen der Ergebnisse: ", err);
         }
       }
