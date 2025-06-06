@@ -24,9 +24,11 @@ function Results() {
           const candidatesList = await contract.getCandidates();
           setCandidates(candidatesList);
           setWinner(winnerName);
-          setVotes(winnerVoteCount);    
+          setVotes(winnerVoteCount);
+          
           const total = await contract.getTotalVotes();
           setTotalVotes(total);
+          
         } catch (err) {
           setStatus("❌ Fehler: " , err);
           console.error("Fehler beim Abrufen der Ergebnisse: ", err);
