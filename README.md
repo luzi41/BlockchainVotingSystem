@@ -361,17 +361,7 @@ curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/j
 
 Navigiere zu http://localhost:3000/results
 
-
-✅ Zusammenfassung
-
-    Komponente	            Befehl / Zugriff
-    -----------------------------------------------------------
-    Netzwerk	            npm run start in quorum-dev-quickstart
-    Contract Deploy	        npx hardhat run ...
-    API	                    node api/index.js
-    Frontend	            npm start im frontend/-Verzeichnis
-    Ergebnisse	            http://localhost:3000/results
-    Voting	                    http://localhost:3000/
+## 8. Fehlerquellen
 
 Mögliche Felerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
 
