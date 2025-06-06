@@ -4,7 +4,7 @@ import Election from "../artifacts/contracts/Election.sol/Election.json";
 
 const ethers = require("ethers");
 
-const contractAddress = "0x00..."; // Adresse des deployten Contracts
+const contractAddress = "0x00fFD3548725459255f1e78A61A07f1539Db0271"; // Adresse des deployten Contracts
 
 function Results() {
   const [candidates, setCandidates] = useState([]);
@@ -25,7 +25,8 @@ function Results() {
           setCandidates(candidatesList);
           setWinner(winnerName);
           setVotes(winnerVoteCount);    
-          
+          const total = await contract.getTotalVotes();
+          setTotalVotes(total);
         } catch (err) {
           setStatus("❌ Fehler: " , err);
           console.error("Fehler beim Abrufen der Ergebnisse: ", err);
@@ -44,7 +45,7 @@ function Results() {
         ))}
       </table>
       <p>Sieger: {winner}</p>
-      <p>Stimmen: {votes}</p>
+      <p>Stimmen: {votes} von {totalVotes}</p>
       
       <p>{status}</p>
     </div>
