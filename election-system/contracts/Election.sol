@@ -96,15 +96,4 @@ contract Election {
         return totalVotes;
     }
 	
-	// https://medium.com/coinmonks/solidity-tutorial-returning-structs-from-public-functions-e78e48efb378
-	function getResults() public view returns (Candidate[], uint[]) {
-		strint[] memory name = new string[](candidates.length);
-        uint[]   memory voteCount = new uint[](candidates.length);
-		for (uint i = 0; i < candidates.length; i++) {
-			Candidate storage candidate = candidates[i];
-			name[i] = candidate.name;
-			voteCount[i] = candidate.voteCount;
-		}
-		return (name, voteCount	);
-	}
 }
