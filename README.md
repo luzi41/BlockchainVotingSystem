@@ -240,9 +240,14 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
     	1. Hyperledger Besu
     	2. GoQuorum
 
-### Antworten:
+     2
 
-    2
+    Do you wish to enable support for logging with Loki, Splunk or ELK (Elasticsearch, Logstash & Kibana)? Default: [1]
+	    1. Loki
+	    2. Splunk
+	    3. ELK
+    3
+
     Weitere: Standard
 
 ### 1.1 Netzwerk starten (z.B. mit Raft)
