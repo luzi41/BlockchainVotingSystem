@@ -244,9 +244,9 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
 
-    npm init
-    npm install --save-dev hardhat
-    npx hardhat init
+    election-system$ npm init
+    election-system$ npm install --save-dev hardhat
+    election-system$ npx hardhat init
 
 Antworten:
 
