@@ -261,7 +261,7 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 2. 🛠 Smart Contract deployen
 
-## 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
+## 2.1 Projektstruktur anlegen (⚠️ wenn noch nicht vorhanden)
 
     npm init
     npm install --save-dev hardhat
@@ -275,12 +275,8 @@ Antworten:
 
     Weitere: Standard/Yes
 
-### 2.2 Vertrag Election.sol erstellen
 
-Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
-
-
-### 2.3 Kompilieren
+### 2.3 SmartContract kompilieren
 
     cd contracts
     npx hardhat compile
