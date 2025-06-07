@@ -330,9 +330,11 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 # 4. 🖥 Frontend starten
 ### 4.1 React-App erstellen
 
+- Öffne ein neues Terminalfenster:
+
     npx create-react-app frontend
-    cd frontend
-    npm install react-router-dom ethers
+    cd [project-root]/frontend
+    npm install
 
 ### 4.2 Komponenten einfügen
 
