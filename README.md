@@ -305,7 +305,6 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
     cd api
     npm install express ethers
-    cd ..
     node index.js
 
 # 4. 🖥 Frontend starten
