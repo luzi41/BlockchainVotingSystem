@@ -364,7 +364,7 @@ Navigiere zu http://localhost:3000/results
 
 ## 8. Fehlerquellen
 
-Mögliche Felerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
+Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
 
 - Falscher Zeichensatz,
 - alte Keys in den Scriptdateien,
