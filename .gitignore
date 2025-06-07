@@ -16,6 +16,12 @@ election-system/typechain-types
 election-system/coverage
 election-system/coverage.json
 
+# Test contracts
+election-system/contracs/ElectionRegister.sol
+election-system/contracs/VoteLedger.sol
+election-system/contracs/Tally.sol
+
+
 # Hardhat Ignition default folder for deployments against a local node
 election-system/ignition/deployments/chain-31337
 
