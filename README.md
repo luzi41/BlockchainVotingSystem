@@ -232,6 +232,14 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
    
        mkdir election-system && cd election-system
        npx quorum-dev-quickstart
+       
+fragen:
+    Which Ethereum client would you like to run? Default: [1]
+    	1. Hyperledger Besu
+    	2. GoQuorum
+
+Answer 2
+Other: Default.
 
 ### 1.1 Netzwerk starten (z.B. mit Raft)
 
