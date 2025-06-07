@@ -351,15 +351,17 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ### 5.1 Wähler & Kandidaten registrieren
 
-Verwende die API:
+- Öffne ein neues Terminalfenster:
 
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}'
+- Verwende die API:
 
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
-
-    curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}' // Normale neue Ethereum Adressen mit Metamask erstellt.
-
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{
+	    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}'
+	
+	    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
+	
+	    curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}' // Normale neue Ethereum Adressen mit Metamask erstellt.
+	
+	    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{
 
 ### 5.2 Wahl starten
 
