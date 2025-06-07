@@ -304,7 +304,7 @@ Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
 
 ### 2.6 Contract deployen
 
-    npx hardhat run scripts/deployElection.js --network quorum
+    cd .. && npx hardhat run scripts/deployElection.js --network quorum > deplayment-address.txt
 
 Die Contract-Adreese in der Datei deployment-address.txt speichern.
 
@@ -316,6 +316,8 @@ Die Contract-Adreese in der Datei deployment-address.txt speichern.
 Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speichere das ABI:
 
 cp artifacts/contracts/Election.sol/Election.json api/Election.json
+
+cp deployment-address.txt api/
 
 Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
