@@ -332,9 +332,8 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
 - Öffne ein neues Terminalfenster:
 
-    npx create-react-app frontend
-    cd [project-root]/frontend
-    npm install
+	    cd [project-root]/frontend
+	    npm install
 
 ### 4.2 Komponenten einfügen
 
