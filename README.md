@@ -230,8 +230,8 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 1. 📦 Quorum-Netzwerk aufsetzen
    
-       clone https://github.com/luzi41/BlockchainVotingSystem.git
-       cd BlockchainVotingSystem/election-system
+// clone https://github.com/luzi41/BlockchainVotingSystem.git && cd BlockchainVotingSystem
+       cd election-system
        npx quorum-dev-quickstart
        
 ### Fragen:
