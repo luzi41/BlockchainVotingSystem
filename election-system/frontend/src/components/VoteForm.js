@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 import { BrowserProvider, Contract } from "ethers";
-import { CONTRACT_ADDRESSES, PROVIDER_URL } from "../config";
+import { CONTRACT_ADDRESSES} from "../config";
 
 const ethers = require("ethers");
 
@@ -12,7 +12,6 @@ function VoteForm() {
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [status, setStatus] = useState("");
   const [tokenInput, setTokenInput] = useState("");
-  const [hash, setHash] = useState("");
 
   useEffect(() => {
     async function fetchCandidates() {
