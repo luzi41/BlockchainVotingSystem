@@ -6,8 +6,6 @@ import { BrowserProvider, Contract } from "ethers";
 import { CONTRACT_ADDRESSES, PROVIDER_URL } from "../config";
 
 const ethers = require("ethers");
-//const contractAddress = "0x00fFD3548725459255f1e78A61A07f1539Db0271"; // Adresse des deployten Contracts
-
 
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
