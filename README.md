@@ -245,6 +245,7 @@ Other: Default.
 
     cd quorum-test-network
     ./run.sh
+    cd ..
 
 ⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
 
