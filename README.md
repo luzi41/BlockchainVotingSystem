@@ -334,6 +334,8 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
 	    cd [project-root]/frontend
 	    npm install
+  
+- in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
 ### 4.2 Komponenten einfügen
 
