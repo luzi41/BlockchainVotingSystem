@@ -371,7 +371,7 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ## 6. 🧑‍💻 Abstimmung durchführen
 
-    Öffne das React-Frontend im Browser (http://localhost:3000)
+    Öffne das React-Frontend im Browser (http://localhost:3002)
 
     MetaMask verbinden
 
