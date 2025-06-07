@@ -36,6 +36,14 @@ nav ul li a {
   text-decoration: none;  
 }
 
+nav ul li.title {
+  float: right;
+  color: white;
+  text-align: right;
+  padding-right: 30px;
+  padding-top: 16px;
+}
+
 div {
   padding: 15px;
 }

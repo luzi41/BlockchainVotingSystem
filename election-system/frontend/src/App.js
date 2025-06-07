@@ -15,7 +15,9 @@ function App() {
           <li><Link to="/register">Registrieren</Link></li>
           <li><Link to="/vote">Abstimmen</Link></li>
           <li><Link to="/results">Ergebnisse</Link></li>
+          <li class="title">Blockchain Voting System 0.4</li>
         </ul>
+        
       </nav>
       <Routes>
         <Route path="/" element={<Start />} />
