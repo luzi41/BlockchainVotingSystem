@@ -4,25 +4,26 @@
 election-system/frontend/node_modules
 
 # Hardhat files
-/election-system//cache
-/election-system//artifacts
+election-system/cache
+election-system/artifacts
+election-system/hardhat.config.js
 
 # TypeChain files
-/election-system//typechain
-/election-system//typechain-types
+election-system/typechain
+election-system/typechain-types
 
 # solidity-coverage files
-/election-system//coverage
-/election-system//coverage.json
+election-system/coverage
+election-system/coverage.json
 
 # Hardhat Ignition default folder for deployments against a local node
-/election-system/ignition/deployments/chain-31337
+election-system/ignition/deployments/chain-31337
 
 # testing
-/election-system/frontend/coverage
-/election-system/frontend/npm-debug.log*
+election-system/frontend/coverage
+election-system/frontend/npm-debug.log*
 
 # production
-/election-system/frontend/build
-/election-system/frontend/cache
-/election-system/frontend/npm-debug.log*
+election-system/frontend/build
+election-system/frontend/cache
+election-system/frontend/npm-debug.log*
