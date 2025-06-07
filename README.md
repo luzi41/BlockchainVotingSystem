@@ -385,7 +385,7 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ### 7.2 Ergebnisse im Browser sehen
 
-Navigiere zu http://localhost:3000/results
+Navigiere zu http://localhost:3002/results
 
 ## 8. Fehlerquellen
 
