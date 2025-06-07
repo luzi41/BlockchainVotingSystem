@@ -1,9 +1,9 @@
 // Token-Eingabe fehlt noch (auch SmartContract)
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
-import { BrowserProvider, Contract } from "ethers";
-import { CONTRACT_ADDRESSES} from "../config";
+import { BrowserProvider } from "ethers";
+import { CONTRACT_ADDRESSES } from "../config";
 
 const ethers = require("ethers");
 
@@ -42,9 +42,9 @@ function VoteForm() {
       const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
       const tx = await contract.vote(selectedCandidate, ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
       await tx.wait();
-      setStatus("✅ Stimme erfolgreich abgegeben!");
+      setStatus("✅ Stimme erfolgreich abgegeben! Hash: " + ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
     } catch (err) {
-      setStatus("❌ Fehler: " + err.message + " Hash: ");
+        setStatus("❌ Fehler: " + err.message + " Hash: " + ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
     }
   };
 

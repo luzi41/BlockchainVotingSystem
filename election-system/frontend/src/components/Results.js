@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserProvider, Contract } from "ethers";
+
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 import { CONTRACT_ADDRESSES, PROVIDER_URL } from "../config";
 
@@ -28,6 +29,7 @@ function Results() {
           setVotes(winnerVoteCount);    
           const total = await contract.getTotalVotes();
           setTotalVotes(total);
+          
         } catch (err) {
           setStatus("❌ Fehler: " , err);
           console.error("Fehler beim Abrufen der Ergebnisse: ", err);
