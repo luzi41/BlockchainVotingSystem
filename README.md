@@ -275,7 +275,7 @@ Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
 
 ### 2.3 Kompilieren
 
-    cd contracts/Election.sol
+    cd contracts
     npx hardhat compile
 
 ### 2.4 Konfiguration anpassen (hardhat.config.js)
