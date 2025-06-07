@@ -4,8 +4,8 @@ const fs = require("fs");
 const app = express();
 app.use(express.json());
 
-const keystore = fs.readFileSync("quorum-test-network/config/nodes/member1/accountKeystore", "utf8");
-const password = fs.readFileSync("quorum-test-network/config/nodes/member1/accountPassword", "utf8").trim();
+const keystore = fs.readFileSync("../quorum-test-network/config/nodes/member1/accountKeystore", "utf8");
+const password = fs.readFileSync("../quorum-test-network/config/nodes/member1/accountPassword", "utf8").trim();
 const contractAddress = fs.readFileSync("deployment-address.txt", "utf8").trim(); // Adresse speichern nach Deployment
 const abi = require("./Election.json").abi;
 

@@ -230,19 +230,38 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
 ## 1. 📦 Quorum-Netzwerk aufsetzen
    
-       mkdir election-system && cd election-system
+	git clone https://github.com/luzi41/BlockchainVotingSystem.git && cd BlockchainVotingSystem // ⚠️ wenn Struktur noch nicht vorhanden
+       
+       cd election-system
        npx quorum-dev-quickstart
+       
+### Fragen:
+
+    Which Ethereum client would you like to run? Default: [1]
+    	1. Hyperledger Besu
+    	2. GoQuorum
+
+     2
+
+    Do you wish to enable support for logging with Loki, Splunk or ELK (Elasticsearch, Logstash & Kibana)? Default: [1]
+	    1. Loki
+	    2. Splunk
+	    3. ELK
+    3
+
+    Weitere: Standard
 
 ### 1.1 Netzwerk starten (z.B. mit Raft)
 
     cd quorum-test-network
     ./run.sh
+    cd ..
 
 ⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
 
 ## 2. 🛠 Smart Contract deployen
 
-## 2.1 Projektstruktur anlegen (wenn noch nicht vorhanden)
+## 2.1 Projektstruktur anlegen (⚠️ wenn noch nicht vorhanden)
 
     election-system$ npm init
     election-system$ npm install --save-dev hardhat
@@ -256,14 +275,10 @@ Antworten:
 
     Weitere: Standard/Yes
 
-### 2.2 Vertrag Election.sol erstellen
 
-Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
+### 2.3 SmartContract kompilieren
 
-
-### 2.3 Kompilieren
-
-    cd contracts/Election.sol
+    cd contracts
     npx hardhat compile
 
 ### 2.4 Konfiguration anpassen (hardhat.config.js)
@@ -286,7 +301,7 @@ Erstelle die Datei contracts/Election.sol und füge den Smart Contract ein.
 
 ### 2.6 Contract deployen
 
-    npx hardhat run scripts/deployElection.js --network quorum
+    cd .. && npx hardhat run scripts/deployElection.js --network quorum > deplayment-address.txt
 
 Die Contract-Adreese in der Datei deployment-address.txt speichern.
 
@@ -299,6 +314,8 @@ Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speic
 
 cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
+cp deployment-address.txt api/
+
 Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 
 ### 3.2 API starten
@@ -310,9 +327,12 @@ Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
 # 4. 🖥 Frontend starten
 ### 4.1 React-App erstellen
 
-    npx create-react-app frontend
-    cd frontend
-    npm install react-router-dom ethers
+- Öffne ein neues Terminalfenster:
+
+	    cd [project-root]/frontend
+	    npm install
+  
+- in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
 ### 4.2 Komponenten einfügen
 
@@ -330,15 +350,17 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ### 5.1 Wähler & Kandidaten registrieren
 
-Verwende die API:
+- Öffne ein neues Terminalfenster:
 
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}'
+- Verwende die API:
 
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
-
-    curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}' // Normale neue Ethereum Adressen mit Metamask erstellt.
-
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{
+	    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}'
+	
+	    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
+	
+	    curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}' // Normale neue Ethereum Adressen mit Metamask erstellt.
+	
+	    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"SecretToken123"}'
 
 ### 5.2 Wahl starten
 
@@ -346,7 +368,7 @@ Verwende die API:
 
 ## 6. 🧑‍💻 Abstimmung durchführen
 
-    Öffne das React-Frontend im Browser (http://localhost:3000)
+    Öffne das React-Frontend im Browser (http://localhost:3002)
 
     MetaMask verbinden
 
@@ -360,11 +382,11 @@ Verwende die API:
 
 ### 7.2 Ergebnisse im Browser sehen
 
-Navigiere zu http://localhost:3000/results
+Navigiere zu http://localhost:3002/results
 
 ## 8. Fehlerquellen
 
-Mögliche Felerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
+Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
 
 - Falscher Zeichensatz,
 - alte Keys in den Scriptdateien,

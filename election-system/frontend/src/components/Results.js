@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { BrowserProvider, Contract } from "ethers";
+import { BrowserProvider} from "ethers";
 
 import Election from "../artifacts/contracts/Election.sol/Election.json";
-import { CONTRACT_ADDRESSES, PROVIDER_URL } from "../config";
+import { CONTRACT_ADDRESSES} from "../config";
 
 const ethers = require("ethers");
 
