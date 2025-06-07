@@ -2,6 +2,9 @@
 pragma solidity ^0.8.28;
 
 contract Election {
+    mapping(bytes32 => bool) public registeredTokens;
+    mapping(bytes32 => bool) public usedTokens;
+
     address public admin;
     bool public votingOpen;
 
@@ -37,10 +40,27 @@ contract Election {
     constructor() {
         admin = msg.sender;
     }
+  
 
     function registerCandidate(string memory _name) public onlyAdmin {
         candidates.push(Candidate({name: _name, voteCount: 0}));
     }
+
+    function registerToken(string memory _token) public onlyAdmin {
+        
+        require(!registeredTokens[keccak256(abi.encodePacked(_token))], "Token already registered");
+        registeredTokens[keccak256(abi.encodePacked(_token))] = true;
+    }
+
+    function isTokenValid(string memory _token) public view returns (bool) {
+        return registeredTokens[keccak256(abi.encodePacked(_token))] && !usedTokens[keccak256(abi.encodePacked(_token))];
+    }
+
+    function markTokenUsed(string memory _token) public onlyAdmin {
+        require(registeredTokens[keccak256(abi.encodePacked(_token))], "Token not registered");
+        require(!usedTokens[keccak256(abi.encodePacked(_token))], "Token already used");
+        usedTokens[keccak256(abi.encodePacked(_token))] = true;
+    }    
 
     function registerVoter(address _voter) public onlyAdmin {
         require(!voters[_voter].registered, unicode"Wähler ist bereits registriert.");
@@ -56,11 +76,12 @@ contract Election {
         votingOpen = false;
     }
 
-    function vote(uint _candidateIndex) public onlyDuringVoting {
+    function vote(uint _candidateIndex, bytes32 _tokenhash) public onlyDuringVoting {
         Voter storage sender = voters[msg.sender];
         require(sender.registered, unicode"Nicht registrierter Wähler.");
         require(!sender.hasVoted, unicode"Wähler hat bereits abgestimmt.");
         require(_candidateIndex < candidates.length, unicode"Ungültiger Kandidat.");
+        // require(isTokenValid(_tokenhash), "Invalid or used token");
 
         sender.hasVoted = true;
         candidates[_candidateIndex].voteCount += 1;
@@ -86,7 +107,7 @@ contract Election {
         return candidates;
     }
 
-    function getTotalVotes() public view returns (uint totalVotes)
+    function getTotalVotes() public view onlyAfterVoting returns (uint totalVotes)
     {
         for (uint i = 0; i < candidates.length; i++) {
 
@@ -95,5 +116,5 @@ contract Election {
 
         return totalVotes;
     }
-	
+
 }
