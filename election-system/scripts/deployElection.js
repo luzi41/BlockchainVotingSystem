@@ -15,7 +15,7 @@ async function main() {
   const Election = await hre.ethers.getContractFactory("Election", admin);
   const election = await Election.deploy();
   //await election.deployed();
-  console.log("✅ Election deployed at:", election.target);
+  console.log(election.target);
   
 }
 
