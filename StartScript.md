@@ -10,12 +10,14 @@
     
     MetaMask Browser Extension
 
-# git clone https://github.com/luzi41/BlockchainVotingSystem.git
+# Repository klonen
+    
+    git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
 # Erstelle ein Shell-Skript start-all.sh: (noch nicht fertig)
 
     #!/bin/bash
-    mkdir election-system && 
+     
     cd election-system &&
     npx quorum-dev-quickstart &&
     cd quorum-test-network && 
