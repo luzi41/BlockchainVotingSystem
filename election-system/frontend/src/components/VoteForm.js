@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+// Token-Eingabe fehlt noch (auch SmartContract)
+
+import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
-import { BrowserProvider, Contract } from "ethers";
+import { BrowserProvider } from "ethers";
+import { CONTRACT_ADDRESSES } from "../config";
 
 const ethers = require("ethers");
-const contractAddress = "0x00f..."; // Adresse des deployten Contracts
-
 
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [status, setStatus] = useState("");
+  const [tokenInput, setTokenInput] = useState("");
 
   useEffect(() => {
     async function fetchCandidates() {
@@ -17,7 +19,7 @@ function VoteForm() {
         try {
           if (window.ethereum) {
             const provider = new BrowserProvider(window.ethereum);
-            const contract = new ethers.Contract(contractAddress, Election.abi, provider);
+            const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
             const candidatesList = await contract.getCandidates();
             setCandidates(candidatesList);
           }
@@ -37,12 +39,12 @@ function VoteForm() {
       const provider = new BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, Election.abi, signer);
-      const tx = await contract.vote(selectedCandidate);
+      const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
+      const tx = await contract.vote(selectedCandidate, ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
       await tx.wait();
-      setStatus("✅ Stimme erfolgreich abgegeben!");
+      setStatus("✅ Stimme erfolgreich abgegeben! Hash: " + ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
     } catch (err) {
-      setStatus("❌ Fehler: " + err.message );
+        setStatus("❌ Fehler: " + err.message + " Hash: " + ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
     }
   };
 
@@ -57,7 +59,8 @@ function VoteForm() {
           </option>
         ))}
       </select>
-      <button onClick={vote}>Abstimmen</button>
+      <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)}></input>
+      <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
       <p>{status}</p>
     </div>
   );

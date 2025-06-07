@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BrowserProvider, Contract } from "ethers";
+
 import Election from "../artifacts/contracts/Election.sol/Election.json";
+import { CONTRACT_ADDRESSES, PROVIDER_URL } from "../config";
 
 const ethers = require("ethers");
 
-const contractAddress = "0x00fFD3548725459255f1e78A61A07f1539Db0271"; // Adresse des deployten Contracts
+//const contractAddress = "0x00fFD3548725459255f1e78A61A07f1539Db0271"; // Adresse des deployten Contracts
 
 function Results() {
   const [candidates, setCandidates] = useState([]);
@@ -17,20 +19,19 @@ function Results() {
     async function fetchResults() {
       if (window.ethereum) {
         const provider = new BrowserProvider(window.ethereum);
-        const contract = new ethers.Contract(contractAddress, Election.abi, provider);
+        const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
         
         try {
           const [winnerName, winnerVoteCount] = await contract.getWinner();
           const candidatesList = await contract.getCandidates();
           setCandidates(candidatesList);
           setWinner(winnerName);
-          setVotes(winnerVoteCount);
-          
+          setVotes(winnerVoteCount);    
           const total = await contract.getTotalVotes();
           setTotalVotes(total);
           
         } catch (err) {
-          // setStatus("❌ Fehler: " , err);
+          setStatus("❌ Fehler: " , err);
           console.error("Fehler beim Abrufen der Ergebnisse: ", err);
         }
       }
@@ -45,7 +46,9 @@ function Results() {
         <thead><tr><th>Kandidat</th><th>Stimmen</th></tr></thead>
         {candidates.map((candidate, index) => (
           <tbody>
-            <tr><td>{candidate.name}</td><td>{candidate.voteCount}</td></tr>
+          <tr>
+              <td class="key">{candidate.name}</td><td class="value">{candidate.voteCount}</td>
+          </tr>
           </tbody>
         ))}
       </table>
