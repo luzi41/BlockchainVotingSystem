@@ -291,17 +291,17 @@ im Verzeichnis election-system
 
 require("@nomicfoundation/hardhat-toolbox");
 
-module.exports = {
-solidity: "0.8.28",
-  networks: {
-    quorum: {
-      url: "http://localhost:8545",
-      accounts: {
-        "0x8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7"
-      }
-    }
-  }
-};
+	module.exports = {
+	solidity: "0.8.28",
+	  networks: {
+	    quorum: {
+	      url: "http://localhost:8545",
+	      accounts: {
+	        "0x8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7"
+	      }
+	    }
+	  }
+	};
 
 
 
