@@ -46,6 +46,9 @@ contract Election {
         candidates.push(Candidate({name: _name, voteCount: 0}));
     }
 
+
+    // Neu zum Test
+
     function registerToken(string memory _token) public onlyAdmin {
         
         require(!registeredTokens[keccak256(abi.encodePacked(_token))], "Token already registered");
@@ -76,14 +79,15 @@ contract Election {
         votingOpen = false;
     }
 
-    function vote(uint _candidateIndex, bytes32 _tokenhash) public onlyDuringVoting {
+    function vote(uint _candidateIndex, string memory _token) public onlyDuringVoting {
         Voter storage sender = voters[msg.sender];
         require(sender.registered, unicode"Nicht registrierter Wähler.");
         require(!sender.hasVoted, unicode"Wähler hat bereits abgestimmt.");
         require(_candidateIndex < candidates.length, unicode"Ungültiger Kandidat.");
-        // require(isTokenValid(_tokenhash), "Invalid or used token");
+        require(isTokenValid(_token), "Invalid or used token");
 
         sender.hasVoted = true;
+        markTokenUsed(_token);
         candidates[_candidateIndex].voteCount += 1;
     }
 
