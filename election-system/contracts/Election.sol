@@ -7,6 +7,7 @@ contract Election {
 
     address public admin;
     bool public votingOpen;
+    bool public electionBegin;
 
     struct Candidate {
         string name;
@@ -119,8 +120,25 @@ contract Election {
 
             totalVotes = totalVotes + candidates[i].voteCount;
         }
-
         return totalVotes;
+    }
+
+    function getElectionStatus() public view returns (string memory status)
+    {
+        if (electionBegin == true)
+        {
+            if (votingOpen == true)
+            {
+                status = unicode"Die Wahl ist geöffnet.";
+            }
+            else {
+                status = unicode"Die Wahl ist geschlossen.";
+            }
+
+        }
+        else {
+            status = unicode"Die Wahl hat noch nicht begonnen.";
+        }
     }
 
 }
