@@ -301,7 +301,7 @@ Antworten:
 
 ### 2.6 Contract deployen
 
-    cd .. && npx hardhat run scripts/deployElection.js --network quorum > deplayment-address.txt
+    cd .. && npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
 
 Die Contract-Adreese in der Datei deployment-address.txt speichern.
 
