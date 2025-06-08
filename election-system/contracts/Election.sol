@@ -8,6 +8,7 @@ contract Election {
     address public admin;
     bool public votingOpen;
     bool public electionBegin;
+    string public electionTitle = "Wahl 2025";
 
     struct Candidate {
         string name;
@@ -142,4 +143,8 @@ contract Election {
         }
     }
 
+    function getElectionTitle() public view returns (string memory title)
+    {
+        title = electionTitle;
+    }
 }
