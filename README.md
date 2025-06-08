@@ -263,9 +263,11 @@ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit
 
 ## 4.2.1 Hardhat Projekt installieren und initialisieren (wenn noch nicht vorhanden!)
 
-    election-system$ npm init
-    election-system$ npm install --save-dev hardhat
-    election-system$ npx hardhat init
+im Verzeichnis election-system
+
+    npm init
+     npm install --save-dev hardhat
+     npx hardhat init
 
 Antworten:
 
@@ -278,10 +280,14 @@ Antworten:
 
 ### 4.2.3 SmartContract kompilieren
 
+im Verzeichnis election-system
+
     cd contracts
     npx hardhat compile
 
 ### 4.2.4 Konfiguration anpassen (hardhat.config.js)
+
+im Verzeichnis election-system
 
     module.exports = {
       solidity: "0.8.28",
@@ -299,7 +305,9 @@ Antworten:
 
 ### 4.2.5 Contract deployen
 
-    election-system$ npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
+im Verzeichnis election-system
+
+     npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
 
 
 ## 4.3. Backend-API
@@ -307,14 +315,17 @@ Antworten:
 ### 4.3.1 API vorbereiten
 
 Speichere das ABI:
+im Verzeichnis election-system
 
-	election-system$ cp artifacts/contracts/Election.sol/Election.json api/Election.json
+    cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
 Stelle sicher, dass in api/deployment-address.txt die richtige Contract-Adresse steht.
 
 ### 4.3.2 API starten
 
-    election-system$ cd api
+im Verzeichnis election-system
+
+    cd api
     election-system/api$ npm install express ethers // wenn noch nicht geschehen
     election-system/api$ node index.js
 
@@ -322,12 +333,12 @@ Stelle sicher, dass in api/deployment-address.txt die richtige Contract-Adresse 
 
 ### 4.4.1 React-App erstellen
 
-- Öffne ein neues Terminalfenster und wechsele in das Projektverzeichnis:
-
-            election-system$ cd frontend
-	    election-system/frontend $npm install
+Öffne ein neues Terminalfenster im Verzeichnis election-system:
   
-- in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
+     cd frontend
+     election-system/frontend $npm install
+  
+in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
 ### 4.4.2 Komponenten einfügen
 
@@ -335,9 +346,13 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
 ### 4.4.3 ABI kopieren
 
+im Verzeichnis election-system/frontend
+
     cp  -R ../artifacts src/
 
 ### 4.4.4 Frontend starten
+
+im Verzeichnis election-system/frontend    
 
     npm start
 
