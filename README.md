@@ -289,8 +289,8 @@ im Verzeichnis election-system
 im Verzeichnis election-system
 💡 Den Account ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
 
-require("@nomicfoundation/hardhat-toolbox");
 
+	require("@nomicfoundation/hardhat-toolbox");
 	module.exports = {
 	solidity: "0.8.28",
 	  networks: {
