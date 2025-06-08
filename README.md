@@ -261,7 +261,7 @@ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit
 
 ## 4.2. 🛠 Smart Contract deployen
 
-## 4.2.1 Projektstruktur anlegen (⚠️ wenn noch nicht vorhanden)
+## 4.2.1 Hardhat Projekt nstallieren und initialisieren
 
     election-system$ npm init
     election-system$ npm install --save-dev hardhat
