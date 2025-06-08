@@ -331,12 +331,12 @@ im Verzeichnis election-system
 
 ## 4.4. 🖥 Frontend starten
 
-### 4.4.1 React-App erstellen
+### 4.4.1 React-App erstellen, falls noch nicht geschehen
 
 Öffne ein neues Terminalfenster im Verzeichnis election-system:
   
      cd frontend
-     election-system/frontend $npm install
+     $npm install
   
 in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
