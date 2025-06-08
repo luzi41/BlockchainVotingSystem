@@ -44,7 +44,6 @@ function App() {
 
       <div>
         <h1>Wahl 2xxx</h1>
-        <p>{status}</p>
       </div>
 
       <Routes>
