@@ -42,8 +42,10 @@ function App() {
         </ul>
       </nav>
 
-      <h1>Wahl 2xxx</h1>
-      <div>{status}</div>
+      <div>
+        <h1>Wahl 2xxx</h1>
+        <p>{status}</p>
+      </div>
 
       <Routes>
         <Route path="/" element={<Start />} />
