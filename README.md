@@ -265,25 +265,24 @@ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit
 
 im Verzeichnis election-system
 
-    npm init
-     npm install --save-dev hardhat
-     npx hardhat init
+npm init
+npm install --save-dev hardhat
+npx hardhat init
 
 Antworten:
 
-    Typ: "Create a basic sample project"
+Typ: "Create a basic sample project"
 
-    Sprache: "JavaScript"
+Sprache: "JavaScript"
 
-    Weitere: Standard/Yes
+Weitere: Standard/Yes
 
 
 ### 4.2.3 SmartContract kompilieren
 
 im Verzeichnis election-system
 
-    cd contracts
-    npx hardhat compile
+    cd contracts && npx hardhat compile
 
 ### 4.2.4 Konfiguration anpassen (hardhat.config.js)
 
@@ -328,9 +327,9 @@ Stelle sicher, dass in api/deployment-address.txt die richtige Contract-Adresse 
 
 im Verzeichnis election-system
 
-    cd api
-     npm install express ethers // wenn noch nicht geschehen
-     node index.js
+cd api
+npm install express ethers // wenn noch nicht geschehen
+node index.js
 
 ## 4.4. 🖥 Frontend starten
 
@@ -338,8 +337,7 @@ im Verzeichnis election-system
 
 Öffne ein neues Terminalfenster im Verzeichnis election-system:
   
-     cd frontend
-     $npm install
+     cd frontend && $npm install
   
 in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
