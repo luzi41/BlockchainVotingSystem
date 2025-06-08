@@ -288,20 +288,23 @@ im Verzeichnis election-system
 ### 4.2.4 Konfiguration anpassen (hardhat.config.js)
 
 im Verzeichnis election-system
+💡 Den Account ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
 
-    module.exports = {
-      solidity: "0.8.28",
-      networks: {
-        quorum: {
-          url: "http://localhost:8545",
-          accounts: {
-            mnemonic: "test test test test test test test test test test test junk"
-          }
-        }
+require("@nomicfoundation/hardhat-toolbox");
+
+module.exports = {
+solidity: "0.8.28",
+  networks: {
+    quorum: {
+      url: "http://localhost:8545",
+      accounts: {
+        "0x8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7"
       }
-    };
+    }
+  }
+};
 
-    💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
+
 
 ### 4.2.5 Contract deployen
 
@@ -364,29 +367,27 @@ im Verzeichnis election-system/frontend
 
 - Verwende die API:
 
-		curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}' &&
-		curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}' &&
-		curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly"}' &&
-		curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Denise"}' &&
-		curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Emily"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken4"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken5"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
-		curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}' &&
-		curl -X POST http://localhost:3001/startVoting 
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Denise"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Emily"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken4"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken5"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}' &&
+      curl -X POST http://localhost:3001/startVoting 
 
 
 ## 4.6. 🧑‍💻 Abstimmung durchführen
 
-    Öffne das React-Frontend im Browser (http://localhost:3002)
-
-    MetaMask verbinden
-
-    Kandidat auswählen & abstimmen
+- Öffne das React-Frontend im Browser (http://localhost:3002)
+- MetaMask verbinden
+- Kandidat auswählen & abstimmen
 
 ## 4.7. 🏁 Wahl beenden & Ergebnisse anzeigen
 
