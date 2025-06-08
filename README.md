@@ -213,7 +213,7 @@ Beispiel-Transaktion:
         return True
 
 
-# Installation (Prototyp)
+# 4 Installation (Prototyp)
 🔧 Voraussetzungen
 
 Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
@@ -228,12 +228,12 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
 
     MetaMask Browser Extension
 
-## 1. 📦 Quorum-Netzwerk aufsetzen
+## 4.1. 📦 Quorum-Netzwerk aufsetzen
    
-	git clone https://github.com/luzi41/BlockchainVotingSystem.git && cd BlockchainVotingSystem // ⚠️ wenn Struktur noch nicht vorhanden
+	$ git clone https://github.com/luzi41/BlockchainVotingSystem.git && cd BlockchainVotingSystem // ⚠️ wenn Struktur noch nicht vorhanden
        
-       cd election-system
-       npx quorum-dev-quickstart
+        $ cd election-system
+        $ npx quorum-dev-quickstart
        
 ### Fragen:
 
@@ -257,11 +257,11 @@ Bevor du beginnst, stelle sicher, dass folgende Tools installiert sind:
     ./run.sh
     cd ..
 
-⚠️ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
+Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit mehreren Nodes erzeugt.
 
-## 2. 🛠 Smart Contract deployen
+## 4.2. 🛠 Smart Contract deployen
 
-## 2.1 Projektstruktur anlegen (⚠️ wenn noch nicht vorhanden)
+## 4.2.1 Projektstruktur anlegen (⚠️ wenn noch nicht vorhanden)
 
     election-system$ npm init
     election-system$ npm install --save-dev hardhat
@@ -276,12 +276,12 @@ Antworten:
     Weitere: Standard/Yes
 
 
-### 2.3 SmartContract kompilieren
+### 4.2.3 SmartContract kompilieren
 
     cd contracts
     npx hardhat compile
 
-### 2.4 Konfiguration anpassen (hardhat.config.js)
+### 4.2.4 Konfiguration anpassen (hardhat.config.js)
 
     module.exports = {
       solidity: "0.8.28",
@@ -297,58 +297,53 @@ Antworten:
 
     💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
 
-### 2.5 Deploy-Script schreiben (siehe scripts/deployElection.js)
+### 4.2.5 Contract deployen
 
-### 2.6 Contract deployen
-
-    cd .. && npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
-
-Die Contract-Adreese in der Datei deployment-address.txt speichern.
+    election-system$ npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
 
 
-## 3. Backend-API
+## 4.3. Backend-API
 
-### 3.1 API vorbereiten
+### 4.3.1 API vorbereiten
 
-Erstelle ein Verzeichnis api/, kopiere die Datei index.js (siehe oben) und speichere das ABI:
+Speichere das ABI:
 
-cp artifacts/contracts/Election.sol/Election.json api/Election.json
+	election-system$ cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
-cp deployment-address.txt api/
+Stelle sicher, dass in api/deployment-address.txt die richtige Contract-Adresse steht.
 
-Stelle sicher, dass in deployment-address.txt die Contract-Adresse steht.
+### 4.3.2 API starten
 
-### 3.2 API starten
+    election-system$ cd api
+    election-system/api$ npm install express ethers // wenn noch nicht geschehen
+    election-system/api$ node index.js
 
-    cd api
-    npm install express ethers
-    node index.js
+## 4.4. 🖥 Frontend starten
 
-# 4. 🖥 Frontend starten
-### 4.1 React-App erstellen
+### 4.4.1 React-App erstellen
 
-- Öffne ein neues Terminalfenster:
+- Öffne ein neues Terminalfenster und wechsele in das Projektverzeichnis:
 
-	    cd [project-root]/frontend
-	    npm install
+            election-system$ cd frontend
+	    election-system/frontend $npm install
   
 - in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
-### 4.2 Komponenten einfügen
+### 4.4.2 Komponenten einfügen
 
 Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter src/components ein.
 
-### 4.3 ABI kopieren
+### 4.4.3 ABI kopieren
 
     cp  -R ../artifacts src/
 
-### 4.4 Frontend starten
+### 4.4.4 Frontend starten
 
     npm start
 
-## 5. 🗳 Admin-Konfiguration & Wahlprozess
+## 4.5. 🗳 Admin-Konfiguration & Wahlprozess
 
-### 5.1 Wähler & Kandidaten registrieren
+### 4.5.1 Wähler & Kandidaten registrieren
 
 - Öffne ein neues Terminalfenster:
 
@@ -363,11 +358,11 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 	    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken123"}'
 
 
-### 5.2 Wahl starten
+### 4.5.2 Wahl starten
 
     curl -X POST http://localhost:3001/startVoting
 
-## 6. 🧑‍💻 Abstimmung durchführen
+## 4.6. 🧑‍💻 Abstimmung durchführen
 
     Öffne das React-Frontend im Browser (http://localhost:3002)
 
@@ -375,17 +370,17 @@ Füge die Komponenten VoteForm.js, Results.js, App.js wie oben beschrieben unter
 
     Kandidat auswählen & abstimmen
 
-## 7. 🏁 Wahl beenden & Ergebnisse anzeigen
+## 4.7. 🏁 Wahl beenden & Ergebnisse anzeigen
 
-### 7.1 Wahl beenden
+### 4.7.1 Wahl beenden
 
     curl -X POST http://localhost:3001/endVoting
 
-### 7.2 Ergebnisse im Browser sehen
+### 4.7.2 Ergebnisse im Browser sehen
 
 Navigiere zu http://localhost:3002/results
 
-## 8. Fehlerquellen
+## 4.8. Fehlerquellen
 
 Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der Scripte sind:
 
