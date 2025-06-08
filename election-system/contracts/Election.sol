@@ -76,6 +76,7 @@ contract Election {
     function startVoting() public onlyAdmin {
         require(candidates.length >= 2, "Mindestens zwei Kandidaten erforderlich.");
         votingOpen = true;
+        electionBegin = true;
     }
 
     function endVoting() public onlyAdmin {
