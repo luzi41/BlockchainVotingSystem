@@ -1,11 +1,36 @@
-import React from "react";
+import react, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
+import { BrowserProvider } from "ethers";
+import { CONTRACT_ADDRESSES } from "./config";
+import Election from "./artifacts/contracts/Election.sol/Election.json";
 import Start from "./components/Start"
 import VoteForm from "./components/VoteForm";
 import Results from "./components/Results";
 
 function App() {
+
+  const ethers = require("ethers");
+
+  const [status, setStatus] = useState("Status unbekannt.");
+
+  useEffect(() => {
+    async function fetchStatus() {
+        
+        try {
+          if (window.ethereum) {
+            const provider = new BrowserProvider(window.ethereum);
+            const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+            const status = await contract.getElectionStatus();
+            setStatus(status);
+          }
+       }
+        catch (error) {
+            console.error("Fehler beim Abrufen des Wahlstatus:", error);
+        }        
+    }
+    fetchStatus();  
+    }, []);
+
   return (
     <Router>
       <nav>
@@ -18,6 +43,7 @@ function App() {
       </nav>
 
       <h1>Wahl 2xxx</h1>
+      <div>{status}</div>
 
       <Routes>
         <Route path="/" element={<Start />} />
