@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/luzi41/BlockchainVotingSystem/issues"
   },
-  "homepage": "https://github.com/luzi41/BlockchainVotingSystem#readme",
+  "homepage": "https://github.com/luzi41/BlockchainVotingSystem/",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.24.1"
