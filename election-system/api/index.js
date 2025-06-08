@@ -68,7 +68,6 @@ app.post("/endVoting", async (req, res) => {
   }
 });
 
-// Neu app.post("/registerToken")
 app.post("/registerToken", async (req, res) => {
   const { token } = req.body;
 
