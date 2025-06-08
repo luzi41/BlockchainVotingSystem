@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const fs = require("fs");
 const { ethers } = require("ethers");
 const app = express();
@@ -16,6 +16,7 @@ async function loadContract() {
   return new ethers.Contract(contractAddress, abi, signer);
 }
 
+/*
 app.post("/registerVoter", async (req, res) => {
   const { voterAddress } = req.body;
   try {
@@ -27,6 +28,7 @@ app.post("/registerVoter", async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 });
+*/
 
 app.post("/registerCandidate", async (req, res) => {
   const { name } = req.body;

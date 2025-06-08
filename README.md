@@ -265,43 +265,45 @@ Dadurch wird im Verzeichnis quorum-test-network/ ein vollständiges Netzwerk mit
 
 im Verzeichnis election-system
 
-    npm init
-     npm install --save-dev hardhat
-     npx hardhat init
+npm init
+npm install --save-dev hardhat
+npx hardhat init
 
 Antworten:
 
-    Typ: "Create a basic sample project"
+Typ: "Create a basic sample project"
 
-    Sprache: "JavaScript"
+Sprache: "JavaScript"
 
-    Weitere: Standard/Yes
+Weitere: Standard/Yes
 
 
 ### 4.2.3 SmartContract kompilieren
 
 im Verzeichnis election-system
 
-    cd contracts
-    npx hardhat compile
+    cd contracts && npx hardhat compile
 
 ### 4.2.4 Konfiguration anpassen (hardhat.config.js)
 
 im Verzeichnis election-system
+💡 Den Account ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
 
-    module.exports = {
-      solidity: "0.8.28",
-      networks: {
-        quorum: {
-          url: "http://localhost:8545",
-          accounts: {
-            mnemonic: "test test test test test test test test test test test junk"
-          }
-        }
-      }
-    };
 
-    💡 Die Accounts-Mnemonik ersetzt du ggf. mit passenden privaten Keys oder Encrypted Keystore des Accounts Member1 aus quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (das Netzwerk muss gestartet sein).
+	require("@nomicfoundation/hardhat-toolbox");
+	module.exports = {
+	solidity: "0.8.28",
+	  networks: {
+	    quorum: {
+	      url: "http://localhost:8545",
+	      accounts: {
+	        "0x8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7"
+	      }
+	    }
+	  }
+	};
+
+
 
 ### 4.2.5 Contract deployen
 
@@ -325,9 +327,9 @@ Stelle sicher, dass in api/deployment-address.txt die richtige Contract-Adresse 
 
 im Verzeichnis election-system
 
-    cd api
-     npm install express ethers // wenn noch nicht geschehen
-     node index.js
+cd api
+npm install express ethers // wenn noch nicht geschehen
+node index.js
 
 ## 4.4. 🖥 Frontend starten
 
@@ -335,8 +337,7 @@ im Verzeichnis election-system
 
 Öffne ein neues Terminalfenster im Verzeichnis election-system:
   
-     cd frontend
-     $npm install
+     cd frontend && $npm install
   
 in src/config.js die richtige Contract-Adresse einfügen (aus api/deployment-address.txt).
 
@@ -364,26 +365,27 @@ im Verzeichnis election-system/frontend
 
 - Verwende die API:
 
-	    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}'
-	
-	    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}'
-	
-	    curl -X POST http://localhost:3001/registerVoter -H "Content-Type: application/json" -d '{"voterAddress": "0xDEADBEEF..."}' // Normale neue Ethereum Adressen mit Metamask erstellt.
-	
-	    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken123"}'
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Denise"}' &&
+      curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Emily"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken4"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken5"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
+      curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}' &&
+      curl -X POST http://localhost:3001/startVoting 
 
-
-### 4.5.2 Wahl starten
-
-    curl -X POST http://localhost:3001/startVoting
 
 ## 4.6. 🧑‍💻 Abstimmung durchführen
 
-    Öffne das React-Frontend im Browser (http://localhost:3002)
-
-    MetaMask verbinden
-
-    Kandidat auswählen & abstimmen
+- Öffne das React-Frontend im Browser (http://localhost:3002)
+- MetaMask verbinden
+- Kandidat auswählen & abstimmen
 
 ## 4.7. 🏁 Wahl beenden & Ergebnisse anzeigen
 

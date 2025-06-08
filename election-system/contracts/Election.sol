@@ -7,6 +7,7 @@ contract Election {
 
     address public admin;
     bool public votingOpen;
+    bool public electionBegin;
 
     struct Candidate {
         string name;
@@ -59,20 +60,23 @@ contract Election {
         return registeredTokens[keccak256(abi.encodePacked(_token))] && !usedTokens[keccak256(abi.encodePacked(_token))];
     }
 
-    function markTokenUsed(string memory _token) public onlyAdmin {
+    function markTokenUsed(string memory _token) public {
         require(registeredTokens[keccak256(abi.encodePacked(_token))], "Token not registered");
         require(!usedTokens[keccak256(abi.encodePacked(_token))], "Token already used");
         usedTokens[keccak256(abi.encodePacked(_token))] = true;
     }    
 
+    /*
     function registerVoter(address _voter) public onlyAdmin {
         require(!voters[_voter].registered, unicode"Wähler ist bereits registriert.");
         voters[_voter] = Voter({registered: true, hasVoted: false});
     }
+    */
 
     function startVoting() public onlyAdmin {
         require(candidates.length >= 2, "Mindestens zwei Kandidaten erforderlich.");
         votingOpen = true;
+        electionBegin = true;
     }
 
     function endVoting() public onlyAdmin {
@@ -80,13 +84,13 @@ contract Election {
     }
 
     function vote(uint _candidateIndex, string memory _token) public onlyDuringVoting {
-        Voter storage sender = voters[msg.sender];
-        require(sender.registered, unicode"Nicht registrierter Wähler.");
-        require(!sender.hasVoted, unicode"Wähler hat bereits abgestimmt.");
+        // Voter storage sender = voters[msg.sender];
+        // require(sender.registered, unicode"Nicht registrierter Wähler.");
+        // require(!sender.hasVoted, unicode"Wähler hat bereits abgestimmt.");
         require(_candidateIndex < candidates.length, unicode"Ungültiger Kandidat.");
         require(isTokenValid(_token), "Invalid or used token");
 
-        sender.hasVoted = true;
+        // sender.hasVoted = true;
         markTokenUsed(_token);
         candidates[_candidateIndex].voteCount += 1;
     }
@@ -117,8 +121,25 @@ contract Election {
 
             totalVotes = totalVotes + candidates[i].voteCount;
         }
-
         return totalVotes;
+    }
+
+    function getElectionStatus() public view returns (string memory status)
+    {
+        if (electionBegin == true)
+        {
+            if (votingOpen == true)
+            {
+                status = unicode"Die Wahl ist geöffnet.";
+            }
+            else {
+                status = unicode"Die Wahl ist geschlossen.";
+            }
+
+        }
+        else {
+            status = unicode"Die Wahl hat noch nicht begonnen.";
+        }
     }
 
 }
