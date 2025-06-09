@@ -351,11 +351,6 @@ im Verzeichnis election-system/frontend
 
     cp  -R ../artifacts src/
 
-### 4.4.4 Frontend starten
-
-im Verzeichnis election-system/frontend    
-
-    npm start
 
 ## 4.5. 🗳 Admin-Konfiguration & Wahlprozess
 
@@ -380,6 +375,11 @@ im Verzeichnis election-system/frontend
       curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}' &&
       curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Wahl 2025"}'
 
+### 4.5.2 Frontend starten
+
+im Verzeichnis election-system/frontend    
+
+    npm start
 
 ## 4.6. 🧑‍💻 Abstimmung durchführen
 
