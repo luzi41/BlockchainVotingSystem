@@ -1,6 +1,6 @@
-import react, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, Contract } from "ethers";
 import { CONTRACT_ADDRESSES } from "./config";
 import Election from "./artifacts/contracts/Election.sol/Election.json";
 import Start from "./components/Start"
@@ -9,28 +9,39 @@ import Results from "./components/Results";
 
 function App() {
 
-  const ethers = require("ethers");
+  const [status, setStatus] = useState(CONTRACT_ADDRESSES.registry);
+  const [title, setTitle] = useState("Wahl 2029");
 
-  const [status, setStatus] = useState("Status unbekannt.");
-
-  useEffect(() => {
+  useEffect(() =>  {
     async function fetchStatus() {
         
         try {
           if (window.ethereum) {
+            
+            // Wallet
             const provider = new BrowserProvider(window.ethereum);
-            const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+
+            // SmartContract
+            const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+            
+            // Election
             const status = await contract.getElectionStatus();
-            setStatus(status);
+            setStatus(CONTRACT_ADDRESSES.registry + ": " + status);
+            
+            const electionTitle = await contract.getElectionTitle();
+            setTitle(electionTitle);
           }
-       }
+        }
         catch (error) {
             console.error("Fehler beim Abrufen des Wahlstatus:", error);
         }        
     }
-    fetchStatus();  
-    }, []);
 
+    fetchStatus();  
+
+  }, []);
+
+  
   return (
     <Router>
       <nav>
@@ -38,12 +49,13 @@ function App() {
           <li><Link to="/">Start</Link></li>
           <li><Link to="/vote">Abstimmen</Link></li>
           <li><Link to="/results">Ergebnisse</Link></li>
-          <li class="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem/tree/v0.6" target="_blank">Blockchain Voting System 0.6</Link></li>
+          <li><Link to="http://localhost:25000" target="_blank">Explorer</Link></li>
+          <li class="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.7</Link></li>
         </ul>
       </nav>
 
       <div>
-        <h1>Wahl 2xxx</h1>
+        <h1>{title}</h1>
         <p>{status}</p>
       </div>
 
