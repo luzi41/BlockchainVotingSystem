@@ -54,20 +54,6 @@ function VoteForm() {
     fetchCandidates();
   }, []);
 
-  /*
-   * Stimmabgabe über API!!!
-   *
-  const vote = async (candidateId) => {
-    const encrypted = encryptVote(candidateId);
-    await fetch("http://localhost:3001/vote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ encryptedVote: encrypted }),
-    });
-    alert("Stimme abgegeben!");
-  };
-  */
-
   const vote = async () => {
       
     if (!window.ethereum) return alert("MetaMask erforderlich!");
@@ -78,7 +64,7 @@ function VoteForm() {
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
       const encrypted = encryptVote(selectedCandidate);
-      const tx = await contract.castEncryptedVote(selectedCandidate, tokenInput);
+      const tx = await contract.castEncryptedVote(encrypted, tokenInput);
       await tx.wait();
       console.log(tx.data);
       
