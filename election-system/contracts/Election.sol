@@ -90,12 +90,14 @@ contract Election {
         candidates[_candidateIndex].voteCount += 1;
     }
 
-    function castEncryptedVote(string memory encryptedVote) public {
+    function castEncryptedVote(string memory encryptedVote, string memory _token) public {
+        require(isTokenValid(_token), "Invalid or used token");
+        markTokenUsed(_token);
         //require(registeredVoters[msg.sender], "Nicht registriert");
         encryptedVotes.push(encryptedVote);
     }
 
-    function getEncryptedVotes() public view returns (string[] memory) {
+    function getEncryptedVotes() public view onlyAfterVoting returns (string[] memory) {
         require(msg.sender == admin, "Nur Admin");
         return encryptedVotes;
     }
