@@ -4,8 +4,8 @@ const { ethers } = require("ethers");
 const forge = require("node-forge");
 
 // Config laden
-const abi = require("./Election.json").abi;
-const contractAddress = fs.readFileSync("deployment-address.txt", "utf8").trim();
+const abi = require(__dirname, "../api/Election.json").abi;
+const contractAddress = fs.readFileSync(__dirname, "../api/deployment-address.txt", "utf8").trim();
 const PRIVATE_KEY_PATH = path.join(__dirname, "../keys/private.pem");
 const RESULT_OUTPUT_PATH = path.join(__dirname, "../frontend/src/results/aggregated.json");
 
