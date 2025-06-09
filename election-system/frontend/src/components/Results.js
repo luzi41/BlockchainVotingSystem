@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { BrowserProvider} from "ethers";
-//import results from "../results/aggregated.json";
-import Election from "../artifacts/contracts/Election.sol/Election.json";
-// import Results fom aggegeted.json
-
-import { CONTRACT_ADDRESSES} from "../config";
 
 const ethers = require("ethers");
 
 function Results() {
   const [status, setStatus] = useState("Ergebnisse folgen nach Entschlüsselung durch Wahlleiter.");
-  
   const [html, setHtml] = useState("");
 
   useEffect(() => {
