@@ -378,7 +378,7 @@ im Verzeichnis election-system/frontend
       curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6"}' &&
       curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
       curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}' &&
-      curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Wahl 2925"}'
+      curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Wahl 2025"}'
 
 
 ## 4.6. 🧑‍💻 Abstimmung durchführen
