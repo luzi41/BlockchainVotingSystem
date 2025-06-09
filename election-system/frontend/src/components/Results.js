@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-const ethers = require("ethers");
-
 function Results() {
   const [status, setStatus] = useState("Ergebnisse folgen nach Entschlüsselung durch Wahlleiter.");
   const [html, setHtml] = useState("");
@@ -35,7 +33,7 @@ function Results() {
       }
     };
     fetchResults();
-  }, []);
+  }, [status]);
   return (<div>{html}</div>);
 }
 
