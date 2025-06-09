@@ -328,7 +328,7 @@ Stelle sicher, dass in api/deployment-address.txt die richtige Contract-Adresse 
 im Verzeichnis election-system
 
     cd api
-    npm install express ethers // wenn noch nicht geschehen
+    npm install express ethers node-forge // wenn noch nicht geschehen
     node index.js
 
 ## 4.4. 🖥 Frontend starten
