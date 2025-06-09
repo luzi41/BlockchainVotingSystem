@@ -42,7 +42,7 @@ contract Election {
     }
 
     modifier onlyBeforeVoting() {
-        require(electionBegin, unicode"Die Wahl ist schon geöffnet.");
+        require(!electionBegin, unicode"Die Wahl ist schon geöffnet.");
         _;
     }    
 
@@ -54,7 +54,7 @@ contract Election {
         candidates.push(Candidate({name: _name, voteCount: 0}));
     }
 
-    function registerToken(string memory _token) public onlyAdmin {
+    function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
         
         require(!registeredTokens[keccak256(abi.encodePacked(_token))], "Token already registered");
         registeredTokens[keccak256(abi.encodePacked(_token))] = true;
