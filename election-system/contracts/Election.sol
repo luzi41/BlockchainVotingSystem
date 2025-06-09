@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+// V 0.7.1
+
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
     mapping(bytes32 => bool) public usedTokens;
@@ -8,7 +10,7 @@ contract Election {
     address public admin;
     bool public votingOpen;
     bool public electionBegin;
-    string public electionTitle = "Wahl 2025";
+    string public electionTitle;
 
     struct Candidate {
         string name;
@@ -39,17 +41,18 @@ contract Election {
         _;
     }
 
+    modifier onlyBeforeVoting() {
+        require(electionBegin, unicode"Die Wahl ist schon geöffnet.");
+        _;
+    }    
+
     constructor() {
         admin = msg.sender;
     }
   
-
-    function registerCandidate(string memory _name) public onlyAdmin {
+    function registerCandidate(string memory _name) public onlyAdmin onlyBeforeVoting {
         candidates.push(Candidate({name: _name, voteCount: 0}));
     }
-
-
-    // Neu zum Test
 
     function registerToken(string memory _token) public onlyAdmin {
         
@@ -65,19 +68,13 @@ contract Election {
         require(registeredTokens[keccak256(abi.encodePacked(_token))], "Token not registered");
         require(!usedTokens[keccak256(abi.encodePacked(_token))], "Token already used");
         usedTokens[keccak256(abi.encodePacked(_token))] = true;
-    }    
-
-    /*
-    function registerVoter(address _voter) public onlyAdmin {
-        require(!voters[_voter].registered, unicode"Wähler ist bereits registriert.");
-        voters[_voter] = Voter({registered: true, hasVoted: false});
     }
-    */
 
-    function startVoting() public onlyAdmin {
+    function startVoting(string memory _electionTitle) public onlyAdmin {
         require(candidates.length >= 2, "Mindestens zwei Kandidaten erforderlich.");
         votingOpen = true;
         electionBegin = true;
+        electionTitle = _electionTitle;
     }
 
     function endVoting() public onlyAdmin {
@@ -85,13 +82,8 @@ contract Election {
     }
 
     function vote(uint _candidateIndex, string memory _token) public onlyDuringVoting {
-        // Voter storage sender = voters[msg.sender];
-        // require(sender.registered, unicode"Nicht registrierter Wähler.");
-        // require(!sender.hasVoted, unicode"Wähler hat bereits abgestimmt.");
         require(_candidateIndex < candidates.length, unicode"Ungültiger Kandidat.");
         require(isTokenValid(_token), "Invalid or used token");
-
-        // sender.hasVoted = true;
         markTokenUsed(_token);
         candidates[_candidateIndex].voteCount += 1;
     }
@@ -112,6 +104,7 @@ contract Election {
         winnerVoteCount = candidates[winningIndex].voteCount;
     }
 
+    // Fehlt Wahlbezirk
     function getCandidates() public view returns (Candidate[] memory) {
         return candidates;
     }
@@ -131,20 +124,20 @@ contract Election {
         {
             if (votingOpen == true)
             {
-                status = unicode"Die Wahl ist geöffnet.";
+                return status = unicode"Die Wahl ist geöffnet.";
             }
             else {
-                status = unicode"Die Wahl ist geschlossen.";
+                return status = unicode"Die Wahl ist geschlossen.";
             }
 
         }
         else {
-            status = unicode"Die Wahl hat noch nicht begonnen.";
+            return status = unicode"Die Wahl hat noch nicht begonnen.";
         }
     }
 
     function getElectionTitle() public view returns (string memory title)
     {
-        title = electionTitle;
+        return title = electionTitle;
     }
 }
