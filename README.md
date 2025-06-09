@@ -311,7 +311,6 @@ im Verzeichnis election-system
 
      npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
 
-
 ## 4.3. Backend-API
 
 ### 4.3.1 API vorbereiten
@@ -393,7 +392,11 @@ im Verzeichnis election-system/frontend
 
     curl -X POST http://localhost:3001/endVoting
 
-### 4.7.2 Ergebnisse im Browser sehen
+### 4.7.2 Auszählung der Ergebnisse
+
+    npx hardhat run scripts/decrypt-and-write-results.js
+
+### 4.7.3 Ergebnisse im Browser sehen
 
 Navigiere zu http://localhost:3002/results
 
