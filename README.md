@@ -394,7 +394,8 @@ im Verzeichnis election-system/frontend
 
 ### 4.7.2 Auszählung der Ergebnisse
 
-    npx hardhat run scripts/decrypt-and-write-results.js
+    cd scripts/
+    node decrypt-and-write-results.js
 
 ### 4.7.3 Ergebnisse im Browser sehen
 
