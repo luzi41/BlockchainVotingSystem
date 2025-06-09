@@ -31,8 +31,8 @@ nav ul li {
 nav ul li a {
   display: block;
   color: white;
+  padding: 14px 16px;  
   text-align: center;
-  padding: 14px 16px;
   text-decoration: none;  
 }
 
@@ -47,6 +47,10 @@ div {
   padding: 15px;
 }
 
+div div {
+  padding: 0;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -56,4 +60,8 @@ th, td {
   border: 1px solid black;
   padding: 15px;
   text-align: left;
+}
+
+#ContractAddress {
+  display: none;
 }
