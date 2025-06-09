@@ -408,3 +408,4 @@ Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der S
 # 5. ToDo
 
 - Verschlüsselung der Stimmabgabe
+- ZK-Proof 
