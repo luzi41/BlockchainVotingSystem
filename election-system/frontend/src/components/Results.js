@@ -9,12 +9,10 @@ function Results() {
   useEffect(() => {
       async function fetchResults() {
       try {
-        const results = await import('../results/aggregated.json'); // Pfad ggf. anpassen
-        
+        const results = await import('../results/aggregated.json');
         const htmlContent = (
-        
           <div>
-            <h2>Endergebnisse</h2>
+            <h2>Wahlergebnisse</h2>
             <ul>
               {Object.entries(results.default).map(([name, count]) => (
                 <li key={name}>
