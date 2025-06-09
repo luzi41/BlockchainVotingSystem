@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, Contract } from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 
 const ethers = require("ethers");
@@ -8,7 +8,7 @@ const ethers = require("ethers");
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
-  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
 
   useEffect(() => {
@@ -17,7 +17,7 @@ function VoteForm() {
         try {
           if (window.ethereum) {
             const provider = new BrowserProvider(window.ethereum);
-            const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+            const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
             const candidatesList = await contract.getCandidates();
             setCandidates(candidatesList);
           }
@@ -40,11 +40,12 @@ function VoteForm() {
       const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
       const tx = await contract.vote(selectedCandidate, tokenInput);
       await tx.wait();
-      setStatus("✅ Stimme erfolgreich abgegeben! Hash: " + ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
+      setError("✅ Erfolgreich! Transaction: " + tx.hash); 
+
     } catch (err) {
-        setStatus("❌ Fehler: " + err.message + " Hash: " + ethers.keccak256(ethers.toUtf8Bytes(tokenInput)));
+        setError("❌ Fehler: " + err.message);
     }
-  };
+  } ;
 
   return (
     <div>
@@ -52,14 +53,14 @@ function VoteForm() {
       <select onChange={(e) => setSelectedCandidate(e.target.value)}>
         <option value="">Wähle einen Kandidaten</option>
         {candidates.map((candidate, index) => (
-          <option key={index} value={index}>
+          <option key={index} value={index} name="candidate">
             {candidate.name}
           </option>
         ))}
       </select>
       <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)}></input>
       <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
-      <p>{status}</p>
+      <p>{error}</p>
     </div>
   );
 }
