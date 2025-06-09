@@ -49,6 +49,7 @@ app.post("/registerCandidate", async (req, res) => {
 });
 
 app.post("/startVoting", async (req, res) => {
+  const { title } = req.body;
   try {
     const contract = await loadContract();
     const tx = await contract.startVoting();
