@@ -404,3 +404,7 @@ Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der S
 - Falscher Zeichensatz,
 - alte Keys in den Scriptdateien,
 - beim mehrfachen Verwenden des API: Prompt nicht sauber - führt zu ungültigen Eingaben. Abhilfe: nach jeder Eingabe 'Enter' doppelt betätigen.
+
+# 5. ToDo
+
+- Verschlüsselung der Stimmabgabe
