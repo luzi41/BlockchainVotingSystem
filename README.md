@@ -213,6 +213,8 @@ Beispiel-Transaktion:
         return True
 
 
+![Screenshot BVS](./images/Screenshot_BVS.png)
+
 # 4 Installation (Prototyp)
 🔧 Voraussetzungen
 
