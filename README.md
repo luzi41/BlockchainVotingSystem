@@ -113,11 +113,11 @@ Dieser Solidity-Vertrag ermöglicht:
 
 Das Frontend (FE) ist ein einfaches, aber funktionales React + ethers.js UI-Frontend zur Interaktion mit den Smart Contracts auf Quorum. Es ermöglicht in der Testversion:
 
-- Registrierung als Online-Wähler
+- Abruf von Informationen zur Wahl 
 - Abgabe einer verschlüsselten Stimme
 - Abruf und Anzeige der Wahlergebnisse
     
-In der Produktiv-Version gibt es natürlich verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc.
+In der Produktiv-Version wird es verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc. geben.
 
 ### Dateistruktur
 
