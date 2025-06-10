@@ -22,7 +22,7 @@ function Results() {
         );
         setHtml(htmlContent);
       } catch (err) {
-        setStatus("❌ Fehler: " , err);
+        
         console.error('Fehler beim Laden des Moduls:', err);
         setHtml (
           <div>
