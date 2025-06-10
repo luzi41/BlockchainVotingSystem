@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.8.2
+// V 0.8.0
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -90,15 +90,14 @@ contract Election {
         candidates[_candidateIndex].voteCount += 1;
     }
 
-    function castEncryptedVote(string memory encryptedVote, string memory _token) public {
+    function castEncryptedVote(string memory encryptedVote, string memory _token) public onlyDuringVoting {
         require(isTokenValid(_token), "Invalid or used token");
         markTokenUsed(_token);
-        //require(registeredVoters[msg.sender], "Nicht registriert");
         encryptedVotes.push(encryptedVote);
     }
 
     function getEncryptedVotes() public view onlyAfterVoting returns (string[] memory) {
-        require(msg.sender == admin, "Nur Admin");
+        // require(msg.sender == admin, "Nur Admin");
         return encryptedVotes;
     }
 
