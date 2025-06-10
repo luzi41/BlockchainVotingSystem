@@ -31,8 +31,8 @@ nav ul li {
 nav ul li a {
   display: block;
   color: white;
+  padding: 14px 16px;  
   text-align: center;
-  padding: 14px 16px;
   text-decoration: none;  
 }
 
@@ -47,6 +47,10 @@ div {
   padding: 15px;
 }
 
+div div {
+  padding: 0;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -56,4 +60,42 @@ th, td {
   border: 1px solid black;
   padding: 15px;
   text-align: left;
+}
+
+#ballot {
+  max-width: 20cm;
+}
+
+div .row {
+  border: 1px dotted black;
+  margin: -1px 0 0 -1px;
+  
+}
+
+/* Floating column for labels: 25% width */
+.col-5 {
+  float: right;
+  width: 5%;
+  margin-top: 6px;
+  display: table-cell;
+}
+
+/* Floating column for inputs: 75% width */
+.col-95 {
+  float: left;
+  width: 95%;
+  margin-top: 6px;
+  display: table-cell;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+#ContractAddress {
+  display: none;
 }

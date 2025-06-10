@@ -1,15 +1,40 @@
 import { useState, useEffect } from "react";
+import forge from "node-forge";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
-import { BrowserProvider, Contract } from "ethers";
+import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 
-const ethers = require("ethers");
+const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2
+AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb
+4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RP
+uK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JS
+hIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0
+XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+gls
+iQIDAQAB
+-----END PUBLIC KEY-----`;
+
+/*
+async function loadPublicKey() {
+  const res = await fetch("../keys/public.pem");
+  const pem = await res.text();
+  return pem;
+}
+*/
+async function encryptVote(candidateId) {
+  //const pem = await loadPublicKey();
+  const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
+  const encrypted = pubKey.encrypt(candidateId.toString(), "RSA-OAEP");
+  return forge.util.encode64(encrypted);
+};
+
 
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
+
 
   useEffect(() => {
     async function fetchCandidates() {
@@ -37,28 +62,43 @@ function VoteForm() {
       const provider = new BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
-      const tx = await contract.vote(selectedCandidate, tokenInput);
+      const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
+      const encrypted = encryptVote(selectedCandidate);
+      // const tx = await contract.vote(selectedCandidate, tokenInput);
+      const tx = await contract.castEncryptedVote(encrypted, tokenInput);
+   
       await tx.wait();
+      console.log(tx.data);
+      
       setError("✅ Erfolgreich! Transaction: " + tx.hash); 
 
     } catch (err) {
         setError("❌ Fehler: " + err.message);
     }
   } ;
+  
+  // <option key={index} value={candidate.name + " (" + index + ")" } name="candidate">
+  /*
+      <option value="">Wähle einen Kandidaten</option>
+        {candidates.map((candidate, index ) => (
+        
+          <div class="col-75">{candidate.name}</div><input type="radio" name="" key=""></input></div>
+        </div>
+        )
+
+  */
 
   return (
-    <div>
-      <h2>Stimme abgeben</h2>
-      <select onChange={(e) => setSelectedCandidate(e.target.value)}>
-        <option value="">Wähle einen Kandidaten</option>
-        {candidates.map((candidate, index) => (
-          <option key={index} value={index} name="candidate">
-            {candidate.name}
-          </option>
+    <div id="ballot">
+      <p>Ihr Token</p>
+      <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+      <h2>Stimmzettel</h2>
+        {candidates.map((candidate, index ) => (
+        <div class="row">
+          <div class="col-95">{candidate.name}</div>
+          <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+        </div>
         ))}
-      </select>
-      <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)}></input>
       <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
       <p>{error}</p>
     </div>

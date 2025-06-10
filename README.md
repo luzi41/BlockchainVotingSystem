@@ -113,11 +113,11 @@ Dieser Solidity-Vertrag ermöglicht:
 
 Das Frontend (FE) ist ein einfaches, aber funktionales React + ethers.js UI-Frontend zur Interaktion mit den Smart Contracts auf Quorum. Es ermöglicht in der Testversion:
 
-- Registrierung als Online-Wähler
+- Abruf von Informationen zur Wahl 
 - Abgabe einer verschlüsselten Stimme
 - Abruf und Anzeige der Wahlergebnisse
     
-In der Produktiv-Version gibt es natürlich verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc.
+In der Produktiv-Version wird es verschiedene Frontends für die jeweiligen Rollen: Wähler, Wahlleiter etc. geben.
 
 ### Dateistruktur
 
@@ -212,6 +212,8 @@ Beispiel-Transaktion:
 
         return True
 
+
+![Screenshot BVS](./images/Screenshot_BVS.png)
 
 # 4 Installation (Prototyp)
 🔧 Voraussetzungen
@@ -311,7 +313,6 @@ im Verzeichnis election-system
 
      npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
 
-
 ## 4.3. Backend-API
 
 ### 4.3.1 API vorbereiten
@@ -393,7 +394,12 @@ im Verzeichnis election-system/frontend
 
     curl -X POST http://localhost:3001/endVoting
 
-### 4.7.2 Ergebnisse im Browser sehen
+### 4.7.2 Auszählung der Ergebnisse
+
+    cd scripts/
+    node decrypt-and-write-results.js
+
+### 4.7.3 Ergebnisse im Browser sehen
 
 Navigiere zu http://localhost:3002/results
 
@@ -404,3 +410,8 @@ Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der S
 - Falscher Zeichensatz,
 - alte Keys in den Scriptdateien,
 - beim mehrfachen Verwenden des API: Prompt nicht sauber - führt zu ungültigen Eingaben. Abhilfe: nach jeder Eingabe 'Enter' doppelt betätigen.
+
+# 5. ToDo
+
+- Verschlüsselung der Stimmabgabe
+- ZK-Proof 
