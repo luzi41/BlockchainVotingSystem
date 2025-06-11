@@ -56,7 +56,7 @@ function App() {
 
       <div id="app">
         <h1>{title}</h1>
-        <p id="ContractAddress">{status}</p>
+        <span id="ContractAddress">{status}</span>
       </div>
 
       <Routes>

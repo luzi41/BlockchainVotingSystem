@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 function Results() {
-  const [status, setStatus] = useState("Ergebnisse folgen nach Entschlüsselung durch Wahlleiter.");
+  const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
   const [timestamp, setTimestamp] = useState("");
   const [tx, setTx] = useState("");
@@ -12,9 +12,6 @@ function Results() {
       async function fetchResults() {
       try {
         const results = await import('../results/aggregated.json');
-        setTx = "";
-        setSignature = "";
-
         const htmlContent = (
           <div class="border">
             <h2>Wahlergebnisse</h2>
