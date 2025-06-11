@@ -17,8 +17,8 @@ contract Election {
 
     struct Candidate {
         string name;
-        uint voteCount;
         uint wahlbezirk;
+        string partei;
     }
 
     struct Voter {
@@ -54,8 +54,8 @@ contract Election {
         admin = msg.sender;
     }
   
-    function registerCandidate(string memory _name) public onlyAdmin onlyBeforeVoting {
-        candidates.push(Candidate({name: _name, voteCount: 0, wahlbezirk: 1}));
+    function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public onlyAdmin onlyBeforeVoting {
+        candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
     }
 
     function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
@@ -99,34 +99,8 @@ contract Election {
         aggregatedVotes = _aggregatedVotes;
     }
 
-    function getWinner() public view onlyAfterVoting returns (string memory winnerName, uint winnerVoteCount) {
-        uint winningVoteCount = 0;
-        uint winningIndex = 0;
-
-        for (uint i = 0; i < candidates.length; i++) {
-            
-            if (candidates[i].voteCount > winningVoteCount) {
-                winningVoteCount = candidates[i].voteCount;
-                winningIndex = i;
-            }
-
-        }
-        winnerName = candidates[winningIndex].name;
-        winnerVoteCount = candidates[winningIndex].voteCount;
-    }
-
-    // Fehlt Wahlbezirk
     function getCandidates() public view returns (Candidate[] memory) {
         return candidates;
-    }
-
-    function getTotalVotes() public view onlyAfterVoting returns (uint totalVotes)
-    {
-        for (uint i = 0; i < candidates.length; i++) {
-
-            totalVotes = totalVotes + candidates[i].voteCount;
-        }
-        return totalVotes;
     }
 
     function getElectionStatus() public view returns (string memory status)
