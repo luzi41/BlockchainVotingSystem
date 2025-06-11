@@ -54,7 +54,7 @@ function App() {
         </ul>
       </nav>
 
-      <div class="border">
+      <div id="app">
         <h1>{title}</h1>
         <p id="ContractAddress">{status}</p>
       </div>
