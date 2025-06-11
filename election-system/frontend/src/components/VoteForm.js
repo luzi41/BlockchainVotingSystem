@@ -77,17 +77,6 @@ function VoteForm() {
         setError("❌ Fehler: " + err.message);
     }
   } ;
-  
-  // <option key={index} value={candidate.name + " (" + index + ")" } name="candidate">
-  /*
-      <option value="">Wähle einen Kandidaten</option>
-        {candidates.map((candidate, index ) => (
-        
-          <div class="col-75">{candidate.name}</div><input type="radio" name="" key=""></input></div>
-        </div>
-        )
-
-  */
 
   return (
   <div>
@@ -95,9 +84,9 @@ function VoteForm() {
       <p>Ihr Token</p>
       <p>
         <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-        <button class=".btn"><img src={scanner} alt="Photo Icon" width="13" height="13" /></button></p>
+        <button class=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button></p>
     </div>
-    <div class="border">
+    <div class="">
       <div id="ballot">
         <h2>Stimmzettel</h2>
           {candidates.map((candidate, index ) => (
