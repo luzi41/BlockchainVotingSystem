@@ -213,7 +213,15 @@ Beispiel-Transaktion:
         return True
 
 
+Abbildung 2: BVS Stimmzettel-Seite
+
 ![Screenshot BVS](./images/Screenshot_BVS.png)
+
+
+Abbildung 3: BVS Wahlergebnisseite
+
+![Screenshot BVS Results page](./images/V8_BvsResultsPage.png)
+
 
 # 4 Installation (Prototyp)
 🔧 Voraussetzungen
