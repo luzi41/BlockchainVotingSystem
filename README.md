@@ -220,7 +220,7 @@ Abbildung 2: BVS Stimmzettel-Seite
 
 Abbildung 3: BVS Wahlergebnisseite
 
-![Screenshot BVS Results page](./images/V8_BvsResultsPage.png)
+![Screenshot BVS Results page](./images/V08_BvsResultsPage.png)
 
 
 # 4 Installation (Prototyp)
