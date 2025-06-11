@@ -18,6 +18,7 @@ contract Election {
     struct Candidate {
         string name;
         uint voteCount;
+        uint wahlbezirk;
     }
 
     struct Voter {
@@ -54,7 +55,7 @@ contract Election {
     }
   
     function registerCandidate(string memory _name) public onlyAdmin onlyBeforeVoting {
-        candidates.push(Candidate({name: _name, voteCount: 0}));
+        candidates.push(Candidate({name: _name, voteCount: 0, wahlbezirk: 1}));
     }
 
     function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
