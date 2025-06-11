@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.8.0
+// V 0.9.0
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -13,10 +13,12 @@ contract Election {
     bool public votingOpen;
     bool public electionBegin;
     string public electionTitle;
+    string public aggregatedVotes;
 
     struct Candidate {
         string name;
-        uint voteCount;
+        uint wahlbezirk;
+        string partei;
     }
 
     struct Voter {
@@ -52,8 +54,8 @@ contract Election {
         admin = msg.sender;
     }
   
-    function registerCandidate(string memory _name) public onlyAdmin onlyBeforeVoting {
-        candidates.push(Candidate({name: _name, voteCount: 0}));
+    function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public onlyAdmin onlyBeforeVoting {
+        candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
     }
 
     function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
@@ -83,13 +85,6 @@ contract Election {
         votingOpen = false;
     }
 
-    function vote(uint _candidateIndex, string memory _token) public onlyDuringVoting {
-        require(_candidateIndex < candidates.length, unicode"Ungültiger Kandidat.");
-        require(isTokenValid(_token), "Invalid or used token");
-        markTokenUsed(_token);
-        candidates[_candidateIndex].voteCount += 1;
-    }
-
     function castEncryptedVote(string memory encryptedVote, string memory _token) public onlyDuringVoting {
         require(isTokenValid(_token), "Invalid or used token");
         markTokenUsed(_token);
@@ -97,38 +92,15 @@ contract Election {
     }
 
     function getEncryptedVotes() public view onlyAfterVoting returns (string[] memory) {
-        // require(msg.sender == admin, "Nur Admin");
         return encryptedVotes;
     }
 
-    function getWinner() public view onlyAfterVoting returns (string memory winnerName, uint winnerVoteCount) {
-        uint winningVoteCount = 0;
-        uint winningIndex = 0;
-
-        for (uint i = 0; i < candidates.length; i++) {
-            
-            if (candidates[i].voteCount > winningVoteCount) {
-                winningVoteCount = candidates[i].voteCount;
-                winningIndex = i;
-            }
-
-        }
-        winnerName = candidates[winningIndex].name;
-        winnerVoteCount = candidates[winningIndex].voteCount;
+    function storeAggregatedVotes(string memory _aggregatedVotes) public onlyAdmin onlyAfterVoting {
+        aggregatedVotes = _aggregatedVotes;
     }
 
-    // Fehlt Wahlbezirk
     function getCandidates() public view returns (Candidate[] memory) {
         return candidates;
-    }
-
-    function getTotalVotes() public view onlyAfterVoting returns (uint totalVotes)
-    {
-        for (uint i = 0; i < candidates.length; i++) {
-
-            totalVotes = totalVotes + candidates[i].voteCount;
-        }
-        return totalVotes;
     }
 
     function getElectionStatus() public view returns (string memory status)

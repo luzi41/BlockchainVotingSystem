@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -14,6 +15,9 @@ code {
 
 nav {
   font-size: 1em;
+  margin: 0;
+  border: 0;
+  width: 100.8%;
 }
 
 nav ul {
@@ -21,7 +25,7 @@ nav ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;  
+  background-color: #000;  
 }
 
 nav ul li {
@@ -62,8 +66,19 @@ th, td {
   text-align: left;
 }
 
+#root {
+    padding: 0;
+}
+
+#app {
+  padding: 15px;
+}
+
 #ballot {
+  margin: 5px;
+  padding: 2px;
   max-width: 20cm;
+  border: 1px solid black;
 }
 
 div .row {
@@ -95,7 +110,20 @@ div .row {
   clear: both;
 }
 
+div .border {
+  width: 100%;
+  padding: 10px 5px;
+  margin: 10px auto;
+  border: 0.1em dotted black;
+}
+
+.btn {
+  max-height: 10px;
+  padding: 0;
+  margin: 0;
+}
 
 #ContractAddress {
-  display: none;
+  display: inline;
 }
+
