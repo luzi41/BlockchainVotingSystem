@@ -86,6 +86,7 @@ function VoteForm() {
         <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
         <button class=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button></p>
     </div>
+
     <div class="">
       <div id="ballot">
         <h2>Stimmzettel</h2>
@@ -98,7 +99,7 @@ function VoteForm() {
         <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
         <p>{error}</p>
       </div>
-      </div>
+    </div>
   </div>
   );
 }
