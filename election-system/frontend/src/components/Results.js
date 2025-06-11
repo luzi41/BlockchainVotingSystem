@@ -9,7 +9,7 @@ function Results() {
       try {
         const results = await import('../results/aggregated.json');
         const htmlContent = (
-          <div>
+          <div class="border">
             <h2>Wahlergebnisse</h2>
             <ul>
               {Object.entries(results.default).map(([name, count]) => (
@@ -25,7 +25,7 @@ function Results() {
         
         console.error('Fehler beim Laden des Moduls:', err);
         setHtml (
-          <div>
+          <div class="border">
             <h2>Wahlergebnisse</h2>
             <p>{status}</p>
           </div>

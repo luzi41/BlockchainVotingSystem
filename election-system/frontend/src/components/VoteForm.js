@@ -3,6 +3,7 @@ import forge from "node-forge";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
+import scanner from "../assets/scan-59.png";
 
 const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2
@@ -89,19 +90,27 @@ function VoteForm() {
   */
 
   return (
-    <div id="ballot">
+  <div>
+    <div class="border">
       <p>Ihr Token</p>
-      <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-      <h2>Stimmzettel</h2>
-        {candidates.map((candidate, index ) => (
-        <div class="row">
-          <div class="col-95">{candidate.name}</div>
-          <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
-        </div>
-        ))}
-      <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
-      <p>{error}</p>
+      <p>
+        <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+        <button class=".btn"><img src={scanner} alt="Photo Icon" width="13" height="13" /></button></p>
     </div>
+    <div class="border">
+      <div id="ballot">
+        <h2>Stimmzettel</h2>
+          {candidates.map((candidate, index ) => (
+          <div class="row">
+            <div class="col-95">{candidate.name}</div>
+            <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+          </div>
+          ))}
+        <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
+        <p>{error}</p>
+      </div>
+      </div>
+  </div>
   );
 }
 
