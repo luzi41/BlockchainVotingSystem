@@ -421,5 +421,5 @@ Mögliche Fehlerquellen beim Kompilieren der SmartContracts und Ausführen der S
 
 # 5. ToDo
 
-- Verschlüsselung der Stimmabgabe
+- Speicherung der aggregierten Stimmen in der Blockchain mit Signatur nach Ende der Stimmabgabe.
 - ZK-Proof 
