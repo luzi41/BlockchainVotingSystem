@@ -79,27 +79,23 @@ function VoteForm() {
   } ;
 
   return (
-  <div>
-    <div class="border">
+  <div>   
       <p>Ihr Token</p>
       <p>
         <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
         <button class=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button></p>
-    </div>
-
-    <div class="">
-      <div id="ballot">
+    
+    <div  id="ballot">    
         <h2>Stimmzettel</h2>
           {candidates.map((candidate, index ) => (
           <div class="row">
             <div class="col-95">{candidate.name}</div>
             <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
           </div>
-          ))}
-        <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Abstimmen</button>
-        <p>{error}</p>
-      </div>
+          ))}      
     </div>
+    <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
+    <p>{error}</p>
   </div>
   );
 }
