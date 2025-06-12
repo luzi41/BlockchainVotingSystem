@@ -84,25 +84,35 @@ th, td {
 
 div .row {
   border: 1px dotted black;
-  margin: -1px 0 0 -1px;
-  
+  /* margin: -1px 0 0 -1px; */
+  margin: 0;
+  padding: 0;
+  width: 100%;  
 }
-
-/* Floating column for labels: 25% width */
-.col-5 {
-  float: right;
-  width: 5%;
-  margin-top: 6px;
-  display: table-cell;
-}
-
-/* Floating column for inputs: 75% width */
+/* Floating column for titles: 95% width */
 .col-95 {
+  margin: 0;
+  padding: 0;
   float: left;
   width: 95%;
-  margin-top: 6px;
-  display: table-cell;
 }
+
+/* Floating column for labels: 5% width */
+.col-5 {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 5%;
+}
+
+/* Floating column for inputs: 50% width */
+.col-50 {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 50%;
+}
+
 
 /* Clear floats after the columns */
 .row:after {
@@ -110,6 +120,7 @@ div .row {
   display: table;
   clear: both;
 }
+
 
 div .border {
   width: 100%;
