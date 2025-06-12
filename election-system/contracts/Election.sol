@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.9.0
+// V 0.10.0
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
