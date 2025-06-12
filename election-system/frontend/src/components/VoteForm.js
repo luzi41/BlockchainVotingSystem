@@ -27,7 +27,7 @@ function VoteForm() {
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
-  const [wahlbezirk, setWahlbezirk] = useState("");  
+  const [wahlbezirk, setWahlbezirk] = useState(1);  
       
   useEffect(() => {
     async function fetchCandidates() {
@@ -36,7 +36,7 @@ function VoteForm() {
             const provider = new BrowserProvider(window.ethereum);
             const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
             const candidatesList = await contract.getCandidates(wahlbezirk);
-            console.log("Kandidaten:", candidatesList);
+            //console.log("Kandidaten:", candidatesList);
             setCandidates(candidatesList);
           }
        }
@@ -99,8 +99,9 @@ function VoteForm() {
           </div>
           ))}      
     </div>
-    <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
-    <p>{error}</p>
+      <div class="center"><button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
+      <p>{error}</p>
+    </div>
   </div>
   );
 }
