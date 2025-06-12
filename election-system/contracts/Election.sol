@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.10.0
+// V 0.9.0
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -100,9 +100,6 @@ contract Election {
     }
 
     function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
-        if (_wahlbezirk == 0) {
-            return candidates; // Return all candidates if wahlbezirk is 0
-        }
         // First, count how many candidates match the wahlbezirk
         uint count = 0;
         for (uint i = 0; i < candidates.length; i++) {
@@ -113,6 +110,11 @@ contract Election {
 
         // Create a new array with the correct size
         Candidate[] memory filteredCandidates = new Candidate[](count);
+        if (count == 0) {
+            return new Candidate[](0); // Return an empty array if no candidates found
+        }
+
+        
         uint index = 0;
         for (uint i = 0; i < candidates.length; i++) {
             if (candidates[i].wahlbezirk == _wahlbezirk) {
