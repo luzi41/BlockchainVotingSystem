@@ -99,8 +99,28 @@ contract Election {
         aggregatedVotes = _aggregatedVotes;
     }
 
-    function getCandidates() public view returns (Candidate[] memory) {
-        return candidates;
+    function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
+        if (_wahlbezirk == 0) {
+            return candidates; // Return all candidates if wahlbezirk is 0
+        }
+        // First, count how many candidates match the wahlbezirk
+        uint count = 0;
+        for (uint i = 0; i < candidates.length; i++) {
+            if (candidates[i].wahlbezirk == _wahlbezirk) {
+                count++;
+            }
+        }
+
+        // Create a new array with the correct size
+        Candidate[] memory filteredCandidates = new Candidate[](count);
+        uint index = 0;
+        for (uint i = 0; i < candidates.length; i++) {
+            if (candidates[i].wahlbezirk == _wahlbezirk) {
+                filteredCandidates[index] = candidates[i];
+                index++;
+            }
+        }
+        return filteredCandidates;
     }
 
     function getElectionStatus() public view returns (string memory status)
