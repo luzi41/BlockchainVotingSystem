@@ -66,8 +66,13 @@ th, td {
   text-align: left;
 }
 
+.center {
+  text-align: center;
+}
+
 #root {
     padding: 0;
+    max-width: 27cm;
 }
 
 #app {
@@ -76,9 +81,11 @@ th, td {
 
 #ballot {
   /*float: left;*/
-  margin: 0px;
+  margin-top: 15px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 5px;
-  max-width: 20cm;
+  
   border: 1px solid black;
 }
 
