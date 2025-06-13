@@ -97,15 +97,20 @@ To start the network, go to the installation directory (quorum-test-network if y
 
     ./run.sh
     
-## 3.2 API and Frontend
+## 3.2 SmartContract, API and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
-### 3.2.1 Install Hardhat
+### 3.2.1 Install Hardhat (only once)
 
     cd BlockchainVotingSystem/election-system
-    npm init npm install --save-dev hardhat npx hardhat init 
+    npm init 
+    npm install --save-dev hardhat 
+    npx hardhat init 
+    
+### 3.2.2 Compile SmartContract
 
-
-
+    cd contracts
+    npx hardhat compile
+    
 ## 3.4 Test
