@@ -74,3 +74,6 @@ Functions:
 - Validation against blockchain (only valid, not duplicate tokens)
 - Result + blockchain reference transmitted to election officer
 - Results publicly viewable via a dashboard (verified via blockchain)
+
+
+# 3. Installation (Prototype)
