@@ -182,9 +182,7 @@ Save the ABI in the election-system directory:
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}'
     
-## 4.5
-
-Start voting phase:
+## 4.5 Start voting phase:
 
     curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Test-Election 2025"}'
 
