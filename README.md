@@ -78,6 +78,21 @@ Functions:
 
 # 3. Installation (Prototype)
 
+## Preconditions
+- Node.js (LTS)
+- npm
+- Git
+- Docker & Docker Compose
+- curl command line
+- MetaMask Browser Extension
+
 ## 3.1 Quorum blockchain network
+
+To create the tutorial docker-compose files and artifacts, run:
+  
+      npx quorum-dev-quickstart
+  
+Follow the prompts displayed to run GoQuorum and logging with ELK. Enter n for Codefi Orchestrate and y for private transactions.
+
 ## 3.2 API and Frontend
 ## 3.4 Test
