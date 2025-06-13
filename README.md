@@ -1,6 +1,6 @@
 # 1. Objectives 
 
-A secure, privacy-compliant and traceable online voting system for parliamentary elections that: 
+A secure, privacy-compliant and traceable online voting system for surveys and elections that: 
 - allows only registered voters to cast their votes,
 - guarantees the anonymity of the vote,
 - documents essential election processes in an audit-proof manner (blockchain),
