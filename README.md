@@ -110,11 +110,35 @@ git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
 ### 3.2.2 Customize hardhat config
 
+election-system$ 
 
+    nano hardhat.config.js
+    
+If necessary, replace the account with suitable private keys or encrypted keystore of the account 
+Member1 from quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (the network must be started).
+
+    require("@nomicfoundation/hardhat-toolbox");
+    module.exports = {
+    solidity: "0.8.28",
+    networks: {
+      quorum: {
+        url: "http://localhost:8545",
+        accounts: {
+          "0x8bbbb1b345af56b560a5b20bd4b0ed1cd..."
+       }
+      }
+     }
+    };
 
 ### 3.2.3 Compile SmartContract
 
     cd contracts
     npx hardhat compile
-    
+
+### 3.2.4 Deploy contract
+
+election-system$
+
+     npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
+     
 ## 3.4 Test
