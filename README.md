@@ -143,11 +143,43 @@ election-system$
 
      npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
      
-## 3.3 API
+## 3.3 Backend API
 
-## 3.5 Frontend
+### 3.3.1
 
-## 3.6 Input test data
+Save the ABI in the election-system directory:
+
+    cp artifacts/contracts/Election.sol/Election.json api/Election.json
+
+### 3.3.2
+
+    cd api
+    npm install express ethers node-forge // (once)
+    node index.js
+
+## 3.4 Fill blockchain with test data (candidates, voter hashs)
+
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "CDU"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "SPD"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly", "wahlbezirk": "1", "partei": "FDP"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Denise", "wahlbezirk": "1", "partei": "Grüne"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Emily", "wahlbezirk": "1", "partei": "Linke"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken4"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken5"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
+    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}'
+    
+## 3.5
+
+Start voting phase:
+
+    curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Test-Election 2025"}'
+
+## 3.6 Install and start frontend-UI
 
 ## 3.7 Test
 
