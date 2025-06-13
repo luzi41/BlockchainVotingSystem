@@ -41,3 +41,11 @@ Functions:
   - Blockchain service: Persists election events (registration, token issuance, voting, storing the encrypted vote)
   - Counting service: Automatically carries out the counting after the polls close
   - Reporting service: Transmits result with checksums to the returning officer
+
+## C Blockchain component 
+
+- Permissioned blockchain (e.g. Hyperledger Fabric or Quorum)
+- Nodes: Electoral Commission, Parties, Neutral Observers Entries: registrations (hash),
+- votes cast (anonymous, tokens + timestamps only),
+- counting results,
+- event logs
