@@ -98,4 +98,14 @@ To start the network, go to the installation directory (quorum-test-network if y
     ./run.sh
     
 ## 3.2 API and Frontend
+
+git clone https://github.com/luzi41/BlockchainVotingSystem.git
+
+### 3.2.1 Install Hardhat
+
+    cd BlockchainVotingSystem/election-system
+    npm init npm install --save-dev hardhat npx hardhat init 
+
+
+
 ## 3.4 Test
