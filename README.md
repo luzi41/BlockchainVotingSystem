@@ -9,4 +9,9 @@ A secure, privacy-compliant and traceable online voting system for parliamentary
 
 # 2. Requirements 
 
-Authentication and anonymity For a democratic election, it must be ensured that only eligible voters can cast their votes and that each eligible voter has the same number of votes. At the same time, the anonymity of the votes cast must be preserved. One of the requirements for the integrity of an online election is that the election result must be conclusively verified. This requirement is called End-To-End Verifiability (E2E-V). The objectives of a verification of an election are: Selection as intended; registered as selected and counted as registered." This means that it must be verifiable:
+Authentication and anonymity For a democratic election, it must be ensured that only eligible voters can cast their votes and that each eligible voter has the same number of votes. At the same time, the anonymity of the votes cast must be preserved. One of the requirements for the integrity of an online election is that the election result must be conclusively verified. This requirement is called End-To-End Verifiability (E2E-V). The objectives of a verification of an election are: Selection as intended; registered as selected and counted as registered. 
+This means that it must be verifiable:
+
+- Has the intended candidate been elected? For example, if the candidates on the lists were swapped, a voter could unintentionally make the wrong choice.
+- Was the vote transmitted and stored as elected? Due to manipulation in transmission or storage, votes can be lost or stored twice in an online voting system.
+- Was the vote also counted as it was stored?
