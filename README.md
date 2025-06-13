@@ -181,5 +181,27 @@ Start voting phase:
 
 ## 3.6 Install and start frontend-UI
 
+     cd frontend && $npm install
+     cp  -R ../artifacts src/   // copy ABI to the frontend
+     npm start
+     
 ## 3.7 Test
 
+- Open the React frontend in your browser (http://localhost:3002)
+- Connect MetaMask
+- goto /voteForm
+- Select candidate & vote
+
+### 3.7.1 Stop voting phase
+
+    curl -X POST http://localhost:3001/endVoting
+
+### 3.7.2 Counting the results
+
+election-system/scripts$
+
+    node decrypt-and-write-results.js
+    
+### 3.7.3 See results in the browser
+
+Navigate to http://localhost:3002/results
