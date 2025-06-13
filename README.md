@@ -22,3 +22,22 @@ An online voting system must guarantee a secret ballot. Since an online election
 The problem of potential blackmail extends the requirement of mere secrecy: the danger of votes being bought or blackmailed can only be prevented if a voter does not have the opportunity to prove how she voted. If she were able to do so, a blackmailer could demand this receipt and she would be susceptible to blackmail. A requirement that is therefore placed on electronic voting systems is referred to in the literature as "coercion resistance". In addition, a possible blackmailer must not have the opportunity to establish a connection between the voter and her voting decision, even without the cooperation of the voter. In order to meet the requirements of secrecy and resilience, it is necessary to encrypt voting decisions when they are transferred to the blockchain in such a way that the blackmailer has no possibility of obtaining a key from the victim or the victim's computer to decrypt the data in order to gain knowledge of the voter's actual voting decision – whether with or without the cooperation of the voter.
 
 # 2. System Components (Architecture Overview)
+
+## A Frontend
+
+Platforms: Web & Mobile 
+Functions: 
+- Authentication
+- Display of the ballot paper
+- Voting and encryption Confirmation (anonymized)
+
+## B. Backend
+
+- Microservice architecture, containerized (e.g. Docker/Kubernetes)
+- Key services:
+  - Registration service: verifies eligibility to vote and creates encrypted token for voting system
+  - Voter authentication: Integrates e.g. eID, ID card with online function or ELSTER certificate
+  - Voting Service: Accepts Vote
+  - Blockchain service: Persists election events (registration, token issuance, voting, storing the encrypted vote)
+  - Counting service: Automatically carries out the counting after the polls close
+  - Reporting service: Transmits result with checksums to the returning officer
