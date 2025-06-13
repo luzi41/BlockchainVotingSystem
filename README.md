@@ -107,8 +107,12 @@ git clone https://github.com/luzi41/BlockchainVotingSystem.git
     npm init 
     npm install --save-dev hardhat 
     npx hardhat init 
-    
-### 3.2.2 Compile SmartContract
+
+### 3.2.2 Customize hardhat config
+
+
+
+### 3.2.3 Compile SmartContract
 
     cd contracts
     npx hardhat compile
