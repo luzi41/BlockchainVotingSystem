@@ -15,13 +15,6 @@ XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+gls
 iQIDAQAB
 -----END PUBLIC KEY-----`;
 
-/*
-async function loadPublicKey() {
-  const res = await fetch("../keys/public.pem");
-  const pem = await res.text();
-  return pem;
-}
-*/
 async function encryptVote(candidateId) {
   //const pem = await loadPublicKey();
   const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
@@ -29,22 +22,21 @@ async function encryptVote(candidateId) {
   return forge.util.encode64(encrypted);
 };
 
-
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
-
-
+  const [wahlbezirk, setWahlbezirk] = useState(1);  
+      
   useEffect(() => {
     async function fetchCandidates() {
-        
         try {
           if (window.ethereum) {
             const provider = new BrowserProvider(window.ethereum);
             const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-            const candidatesList = await contract.getCandidates();
+            const candidatesList = await contract.getCandidates(wahlbezirk);
+            //console.log("Kandidaten:", candidatesList);
             setCandidates(candidatesList);
           }
        }
@@ -52,8 +44,9 @@ function VoteForm() {
             console.error("Fehler beim Abrufen der Kandidaten:", error);
         }        
     }
+
     fetchCandidates();
-  }, []);
+  }, [wahlbezirk]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
 
   const vote = async () => {
       
@@ -65,7 +58,6 @@ function VoteForm() {
       const signer = await provider.getSigner();
       const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
       const encrypted = encryptVote(selectedCandidate);
-      // const tx = await contract.vote(selectedCandidate, tokenInput);
       const tx = await contract.castEncryptedVote(encrypted, tokenInput);
    
       await tx.wait();
@@ -79,23 +71,37 @@ function VoteForm() {
   } ;
 
   return (
-  <div>   
-      <p>Ihr Token</p>
-      <p>
-        <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-        <button class=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button></p>
-    
+  <div>
+    <div class="row">   
+      <div class="col-50">
+        <p>Ihr Token</p>
+        <p>
+          <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+          <button class=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+        </p>
+      </div>
+      <div class="col-50">
+        <p>Ihr Wahlbezirk</p>
+        <p>
+          <input type="number" placeholder="Wahlbezirk" name="wahlbezirk" value={wahlbezirk} onChange={(e) => setWahlbezirk(e.target.value)} />
+      </p>      
+      </div>
+    </div>
+  
     <div  id="ballot">    
         <h2>Stimmzettel</h2>
           {candidates.map((candidate, index ) => (
           <div class="row">
-            <div class="col-95">{candidate.name}</div>
+            <div class="col-95">
+              <span class="left">{candidate.name} &nbsp; {candidate.partei}</span>
+            </div>
             <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
           </div>
           ))}      
     </div>
-    <button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
-    <p>{error}</p>
+      <div class="center"><button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
+      <p>{error}</p>
+    </div>
   </div>
   );
 }
