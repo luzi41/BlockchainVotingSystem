@@ -60,7 +60,7 @@ Functions:
 - counting results,
 - event logs
 
-# 3 Electoral process (End-to-End)
+# 3. Electoral process (End-to-End)
 
 ## 1. Registration
 
