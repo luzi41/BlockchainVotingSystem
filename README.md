@@ -50,3 +50,27 @@ Functions:
 - votes cast (anonymous, tokens + timestamps only),
 - counting results,
 - event logs
+
+# 3 Electoral process (End-to-End)
+
+## 1. Registration
+
+- User authenticates with official ID document
+- Verification by registration service (connection to population register)
+- Token issuance to the user (will be needed later to vote)
+- Registration logged on blockchain (only hash of the token)
+
+## 2. Voting
+
+- User logs in with token in the frontend
+- Voice is encrypted locally in the browser (end-to-end)
+- Vote (anonymous) and token (signed) are sent to the backend
+- Token will be cancelled (no multiple submission possible)
+- Blockchain: Entry with timestamp, token hash, transaction ID
+
+## 3. Counting & Transmission of Results
+
+- After the polls close: votes are aggregated by the counting service
+- Validation against blockchain (only valid, not duplicate tokens)
+- Result + blockchain reference transmitted to election officer
+- Results publicly viewable via a dashboard (verified via blockchain)
