@@ -97,7 +97,7 @@ To start the network, go to the installation directory (quorum-test-network if y
 
     ./run.sh
     
-## 3.2 SmartContract, API and Frontend
+## 3.2 SmartContract
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
@@ -132,6 +132,8 @@ Member1 from quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (the
 
 ### 3.2.3 Compile SmartContract
 
+election-system$
+
     cd contracts
     npx hardhat compile
 
@@ -141,4 +143,11 @@ election-system$
 
      npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
      
-## 3.4 Test
+## 3.3 API
+
+## 3.5 Frontend
+
+## 3.6 Input test data
+
+## 3.7 Test
+
