@@ -93,6 +93,9 @@ To create the tutorial docker-compose files and artifacts, run:
       npx quorum-dev-quickstart
   
 Follow the prompts displayed to run GoQuorum and logging with ELK. Enter n for Codefi Orchestrate and y for private transactions.
+To start the network, go to the installation directory (quorum-test-network if you used the default value) and run:
 
+    ./run.sh
+    
 ## 3.2 API and Frontend
 ## 3.4 Test
