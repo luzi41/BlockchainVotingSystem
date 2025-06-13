@@ -1,3 +1,5 @@
+
+# ![BVS Logo](./images/BVS_Logo.png) Blockchain Voting System
 The motivation for developing a new system for conducting online elections lies in the advantages such a system offers, provided transparency, security, and organizational issues are satisfactorily resolved:
 1. New opportunities for democratic participation, thus increasing political influence
 2. Voters can vote from any time and location, increasing voter turnout
