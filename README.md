@@ -85,7 +85,7 @@ Functions:
 - Results publicly viewable via a dashboard (verified via blockchain)
 
 
-# 3. Installation (Prototype)
+# 4. Installation (Prototype)
 
 ## Preconditions
 - Node.js (LTS)
@@ -95,7 +95,7 @@ Functions:
 - curl command line
 - MetaMask Browser Extension
 
-## 3.1 Quorum blockchain network
+## 4.1 Quorum blockchain network
 
 To create the tutorial docker-compose files and artifacts, run:
   
@@ -106,18 +106,18 @@ To start the network, go to the installation directory (quorum-test-network if y
 
     ./run.sh
     
-## 3.2 SmartContract
+## 4.2 SmartContract
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
-### 3.2.1 Install Hardhat (only once)
+### 4.2.1 Install Hardhat (only once)
 
     cd BlockchainVotingSystem/election-system
     npm init 
     npm install --save-dev hardhat 
     npx hardhat init 
 
-### 3.2.2 Customize hardhat config
+### 4.2.2 Customize hardhat config
 
 election-system$ 
 
@@ -139,34 +139,34 @@ Member1 from quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (the
      }
     };
 
-### 3.2.3 Compile SmartContract
+### 4.2.3 Compile SmartContract
 
 election-system$
 
     cd contracts
     npx hardhat compile
 
-### 3.2.4 Deploy contract
+### 4.2.4 Deploy contract
 
 election-system$
 
      npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
      
-## 3.3 Backend API
+## 4.3 Backend API
 
-### 3.3.1
+### 4.3.1
 
 Save the ABI in the election-system directory:
 
     cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
-### 3.3.2
+### 4.3.2
 
     cd api
     npm install express ethers node-forge // (once)
     node index.js
 
-## 3.4 Fill blockchain with test data (candidates, voter hashs)
+## 4.4 Fill blockchain with test data (candidates, voter hashs)
 
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "CDU"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "SPD"}' &&
@@ -182,26 +182,26 @@ Save the ABI in the election-system directory:
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7"}' &&
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8"}'
     
-## 3.5
+## 4.5
 
 Start voting phase:
 
     curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Test-Election 2025"}'
 
-## 3.6 Install and start frontend-UI
+## 4.6 Install and start frontend-UI
 
      cd frontend && $npm install
      cp  -R ../artifacts src/   // copy ABI to the frontend
      npm start
      
-## 3.7 Test
+## 4.7 Test
 
 - Open the React frontend in your browser (http://localhost:3002)
 - Connect MetaMask
 - goto /voteForm
 - Select candidate & vote
 
-### 3.7.1 Stop voting phase
+### 4.7.1 Stop voting phase
 
     curl -X POST http://localhost:3001/endVoting
 
@@ -211,6 +211,6 @@ election-system/scripts$
 
     node decrypt-and-write-results.js
     
-### 3.7.3 See results in the browser
+### 4.7.3 See results in the browser
 
 Navigate to http://localhost:3002/results
