@@ -45,7 +45,8 @@ Functions:
 ## C Blockchain component 
 
 - Permissioned blockchain (e.g. Hyperledger Fabric or Quorum)
-- Nodes: Electoral Commission, Parties, Neutral Observers Entries: registrations (hash),
+- Nodes: Electoral Commission, Parties, Neutral Observers
+- Entries: registrations (hash),
 - votes cast (anonymous, tokens + timestamps only),
 - counting results,
 - event logs
