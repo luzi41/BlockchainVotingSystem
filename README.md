@@ -192,6 +192,9 @@ Start voting phase:
 
      cd frontend && $npm install
      cp  -R ../artifacts src/   // copy ABI to the frontend
+  
+  Insert SmartContract deploy address in src/config.js
+  
      npm start
      
 ## 4.7 Test
