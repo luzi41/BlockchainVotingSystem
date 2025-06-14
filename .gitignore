@@ -67,3 +67,7 @@ election-system/api/Election.json
 election-system/frontend/src/results/aggregated.json
 election-system/hardhat.config.js
 election-system/frontend/src/artifacts/contracts/Election.sol/Election.dbg.json
+election-system/frontend/src/artifacts/contracts/Election.sol/Election.json
+election-system/frontend/src/artifacts/contracts/Election.sol/Election.tally.json
+election-system/frontend/src/artifacts/contracts/Election.sol/Election.tally.dbg.json
+
