@@ -114,7 +114,7 @@ git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
     cd BlockchainVotingSystem/election-system
     npm init 
-    npm install --save-dev hardhat 
+    npm install --save-dev hardhat prompt
     npx hardhat init 
 
 ### 4.2.2 Customize hardhat config
