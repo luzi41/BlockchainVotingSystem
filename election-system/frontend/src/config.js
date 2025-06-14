@@ -1,5 +1,5 @@
 export const CONTRACT_ADDRESSES = {
-  registry: "0x0bf77110A0a4a67f36C1115d58D48E612968Cf06", // Contract address
+  registry: "0x00fFD3548725459255f1e78A61A07f1539Db0271", // Contract address
   ledger: "0x...",
   tally: "0x...",
 };
