@@ -150,8 +150,10 @@ election-system$
 
 election-system$
 
-     npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
-     
+     npx hardhat run scripts/deployElection.js --network quorum 
+
+Save contract address in api/deployment-address.txt
+
 ## 4.3 Backend API
 
 ### 4.3.1
