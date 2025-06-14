@@ -114,7 +114,7 @@ git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
     cd BlockchainVotingSystem/election-system
     npm init 
-    npm install --save-dev hardhat 
+    npm install --save-dev hardhat prompt
     npx hardhat init 
 
 ### 4.2.2 Customize hardhat config
@@ -150,8 +150,11 @@ election-system$
 
 election-system$
 
-     npx hardhat run scripts/deployElection.js --network quorum > api/deployment-address.txt
-     
+     npx hardhat run scripts/deployElection.js --network quorum 
+
+- Save contract address in api/deployment-address.txt
+- Replace also the contract address in frontend/src/config.js
+
 ## 4.3 Backend API
 
 ### 4.3.1
@@ -160,18 +163,20 @@ Save the ABI in the election-system directory:
 
     cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
-### 4.3.2 Install and start API
+### 4.3.2 Generate OpenSSL RSA private.pem and  public.pem
+
+- Store private.pem in election-system/keys,
+- Replace public.key ascii-text in election-system/frontend/src/components/voteForm.js.
+
+### 4.3.3 Install and start API
 
     cd api
     npm install express ethers node-forge // (once)
     node index.js
 
-### 4.3.3 Generate OpenSSL RSA private.pem and  public.pem
-
-- Store private.pem in election-system/keys,
-- Replace public.key ascii-text in election-system/frontend/src/components/voteForm.js.
-
 ## 4.4 Fill blockchain with test data (candidates, voter hashs)
+
+Open a new terminal and exec:
 
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "CDU"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "SPD"}' &&
@@ -193,11 +198,14 @@ Save the ABI in the election-system directory:
 
 ## 4.6 Install and start frontend-UI
 
+Install: 
      cd frontend && $npm install
-     cp  -R ../artifacts src/   // copy ABI to the frontend
-  
-  Insert SmartContract deploy address in src/config.js
-  
+
+copy ABI to the frontend:
+     cp  -R ../artifacts src/  
+
+Start frontend:
+
      npm start
      
 ## 4.7 Test
@@ -211,7 +219,7 @@ Save the ABI in the election-system directory:
 
     curl -X POST http://localhost:3001/endVoting
 
-### 3.7.2 Counting the results
+### 4.7.2 Counting the results
 
 election-system/scripts$
 
