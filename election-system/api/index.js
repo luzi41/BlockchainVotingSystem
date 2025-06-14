@@ -102,4 +102,6 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
+
 });    
+

@@ -36,7 +36,6 @@ function VoteForm() {
             const provider = new BrowserProvider(window.ethereum);
             const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
             const candidatesList = await contract.getCandidates(wahlbezirk);
-            //console.log("Kandidaten:", candidatesList);
             setCandidates(candidatesList);
           }
        }
