@@ -162,16 +162,16 @@ Save the ABI in the election-system directory:
 
     cp artifacts/contracts/Election.sol/Election.json api/Election.json
 
-### 4.3.2 Install and start API
+### 4.3.2 Generate OpenSSL RSA private.pem and  public.pem
+
+- Store private.pem in election-system/keys,
+- Replace public.key ascii-text in election-system/frontend/src/components/voteForm.js.
+
+### 4.3.3 Install and start API
 
     cd api
     npm install express ethers node-forge // (once)
     node index.js
-
-### 4.3.3 Generate OpenSSL RSA private.pem and  public.pem
-
-- Store private.pem in election-system/keys,
-- Replace public.key ascii-text in election-system/frontend/src/components/voteForm.js.
 
 ## 4.4 Fill blockchain with test data (candidates, voter hashs)
 
