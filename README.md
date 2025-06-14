@@ -219,7 +219,7 @@ Start frontend:
 
     curl -X POST http://localhost:3001/endVoting
 
-### 3.7.2 Counting the results
+### 4.7.2 Counting the results
 
 election-system/scripts$
 
