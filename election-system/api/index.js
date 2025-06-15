@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const fs = require("fs");
 const forge = require("node-forge");
 const privateKeyPem = fs.readFileSync("../keys/private.pem", "utf8");
@@ -102,4 +102,6 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
+
 });    
+
