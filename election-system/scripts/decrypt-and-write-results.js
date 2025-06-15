@@ -40,10 +40,10 @@ async function decryptVotes() {
   return decryptedVotes;
 }
 
-// 4. Ergebnisse aggregieren und speichern
+// 4a Ergebnisse aggregieren und speichern (alt)
 async function aggregateAndWrite() {
   const votes = await decryptVotes();
-  const tally = {};
+  const tally = {};  
 
   for (const name of votes) {
     tally[name] = (tally[name] || 0) + 1;
@@ -53,4 +53,25 @@ async function aggregateAndWrite() {
   console.log("✅ Ergebnisse gespeichert unter:", RESULT_OUTPUT_PATH);
 }
 
+// 4b
+async function aggregateAndStore(params) {
+  const votes = await decryptVotes();
+  const tally = {};
+
+  for (const name of votes) {
+    tally[name] = (tally[name] || 0) + 1;
+  }
+
+  const timestamp = new Date().toISOString();
+  const signature = privateKey.sign(forge.md.sha256.create().update(JSON.stringify(tally)).digest().getBytes());
+
+  const tx = await contract.storeResults(tally, timestamp, signature);
+  console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
+  await tx.wait();
+  console.log("✅ Transaktion bestätigt:", tx.hash);
+}
+
+  
+
+// alt: 
 aggregateAndWrite().catch(console.error);

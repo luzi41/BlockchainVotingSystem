@@ -26,6 +26,13 @@ contract Election {
         bool hasVoted;
     }
 
+    struct ElectionResult {
+        string tally;
+        string signature;
+        uint timestamp;
+    }
+
+    // Array to store candidates
     Candidate[] public candidates;
 
     mapping(address => Voter) public voters;
@@ -95,8 +102,27 @@ contract Election {
         return encryptedVotes;
     }
 
+    /*
     function storeAggregatedVotes(string memory _aggregatedVotes) public onlyAdmin onlyAfterVoting {
         aggregatedVotes = _aggregatedVotes;
+    }
+    */
+
+    function storeElectionResult(string memory _tally, string memory _signature) public view onlyAdmin onlyAfterVoting {
+        ElectionResult({
+            tally: _tally,
+            signature: _signature,
+            timestamp: block.timestamp
+        });
+    }
+
+    function getElectionResult() public view returns (string memory tally, string memory signature, uint timestamp) {
+        ElectionResult memory result = ElectionResult({
+            tally: tally,
+            signature: signature,
+            timestamp: block.timestamp
+        });
+        return (result.tally, result.signature, result.timestamp);
     }
 
     function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
