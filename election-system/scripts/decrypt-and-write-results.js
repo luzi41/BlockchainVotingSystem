@@ -3,6 +3,7 @@ const path = require("path");
 const { Wallet, JsonRpcProvider, Contract } = require("ethers");
 const forge = require("node-forge");
 
+
 // Config laden
 const PRIVATE_KEY_PATH = path.join(__dirname, "../keys/private.pem");
 const contractAddress = fs.readFileSync("../api/deployment-address.txt", "utf8").trim();
@@ -17,8 +18,9 @@ const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
 
 // 2. Contract verbinden
 const provider = new JsonRpcProvider("http://localhost:8545");
-const contract = new Contract(contractAddress, abi, provider);
-
+//const wallet = new Wallet("0x8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7", provider);
+const contract = new Contract(contractAddress, abi, provider);  
+//const contract = new Contract(contractAddress, abi, wallet);
 
 // 3. Stimmen abrufen und entschlüsseln
 async function decryptVotes() {
@@ -54,7 +56,7 @@ async function aggregateAndWrite() {
 }
 
 // 4b
-async function aggregateAndStore(params) {
+async function aggregateAndStore() {
   const votes = await decryptVotes();
   const tally = {};
 
@@ -63,15 +65,32 @@ async function aggregateAndStore(params) {
   }
 
   const timestamp = new Date().toISOString();
-  const signature = privateKey.sign(forge.md.sha256.create().update(JSON.stringify(tally)).digest().getBytes());
+ 
+  
+  // Signieren der Ergebnisse
+  // Erstellen des Hashes der Ergebnisse
+  const md = forge.md.sha1.create();
+  md.update(JSON.stringify(tally), 'utf8');
+ 
+  const signature = forge.util.encode64(privateKey.sign(md));
 
-  const tx = await contract.storeResults(tally, timestamp, signature);
-  console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
-  await tx.wait();
-  console.log("✅ Transaktion bestätigt:", tx.hash);
-}
-
+  //console.log(signature)
+  try {
+    const tx = await contract.storeElectionResult(JSON.stringify(tally), signature);
+    //await tx.wait() 
+  } catch (error) {
+      console.error("Fehler beim Speichern der Ergebnisse:", error);
+  }
   
 
+  //console.log("✅ Ergebnisse gespeichert und Transaktion gesendet: ", tx);
+  //await tx.wait();
+  //console.log("✅ Transaktion bestätigt:", tx.hash);
+}
+
 // alt: 
-aggregateAndWrite().catch(console.error);
+//aggregateAndWrite().catch(console.error);
+
+// neu:
+aggregateAndStore().catch(console.error);
+// Hinweis: Diese Funktion aggregiert die Stimmen und speichert sie in der Blockchain.

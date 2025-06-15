@@ -108,7 +108,7 @@ contract Election {
     }
     */
 
-    function storeElectionResult(string memory _tally, string memory _signature) public view onlyAdmin onlyAfterVoting {
+    function storeElectionResult(string memory _tally, string memory _signature) public view onlyAfterVoting {
         ElectionResult({
             tally: _tally,
             signature: _signature,
@@ -116,7 +116,7 @@ contract Election {
         });
     }
 
-    function getElectionResult() public view returns (string memory tally, string memory signature, uint timestamp) {
+    function getElectionResults() public view returns (string memory tally, string memory signature, uint timestamp) {
         ElectionResult memory result = ElectionResult({
             tally: tally,
             signature: signature,
