@@ -107,6 +107,39 @@ prompt.get(['PathToQuorum'], function (err, result) {
         console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
         res.send({ status: "success", tx: tx.hash });     
       } catch (err) {
+        res.status(500).send({ error: err.message });
+      }  
+    });
+    */
+    app.post("/storeElectionResult", async (req, res) => {
+      //const { tally, signature } = req.body;
+      try {
+        const contract = await loadContract();
+        const encryptedVotes = await contract.getEncryptedVotes();
+        const decryptedVotes = [];  
+        
+        for (let i = 0; i < encryptedVotes.length; i++) {
+          const encryptedVote = encryptedVotes[i];
+          const encryptedBytes = Buffer.from(encryptedVote, "base64");
+          const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
+          decryptedVotes.push(decrypted);
+        }
+        
+        const tally = {};
+
+        for (const name of decryptedVotes) {
+          tally[name] = (tally[name] || 0) + 1;
+        }
+
+        const timestamp = new Date().toISOString();
+        const md = forge.md.sha1.create();
+        md.update(JSON.stringify(tally), 'utf8');
+        const signature = forge.util.encode64(privateKey.sign(md));  
+        const tx = await contract.storeElectionResult(JSON.stringify(tally), signature);
+        await tx.wait() 
+        console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
+        res.send({ status: "success", tx: tx.hash });     
+      } catch (err) {
           console.error("Fehler beim Speichern der Ergebnisse:", err);
           res.status(500).send({ error: err.message });
       }
