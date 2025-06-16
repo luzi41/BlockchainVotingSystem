@@ -35,6 +35,8 @@ contract Election {
     // Array to store candidates
     Candidate[] public candidates;
 
+    ElectionResult[] public electionResults;
+
     mapping(address => Voter) public voters;
 
     modifier onlyAdmin() {
@@ -134,20 +136,16 @@ contract Election {
     }
     */
 
-    function storeElectionResult(string memory _tally, string memory _signature) public view onlyAfterVoting {
-        ElectionResult({
-            tally: _tally,
-            signature: _signature,
-            timestamp: block.timestamp
-        });
+    function storeElectionResult(string memory _tally, string memory _signature) public onlyAfterVoting {
+        ElectionResult memory result;
+        result.tally = _tally;
+        result.signature = _signature;
+        result.timestamp = 0;
+        electionResults.push(result);
     }
 
     function getElectionResults() public view returns (string memory tally, string memory signature, uint timestamp) {
-        ElectionResult memory result = ElectionResult({
-            tally: tally,
-            signature: signature,
-            timestamp: block.timestamp
-        });
+        ElectionResult storage result = electionResults[0];
         return (result.tally, result.signature, result.timestamp);
     }
 
