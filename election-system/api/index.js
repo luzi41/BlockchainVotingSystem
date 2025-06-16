@@ -2,7 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const forge = require("node-forge");
 const privateKeyPem = fs.readFileSync("../keys/private.pem", "utf8");
-const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
+//const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
 const { ethers } = require("ethers");
 const app = express();
 const prompt = require('prompt');
@@ -29,6 +29,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
       return new ethers.Contract(contractAddress, abi, signer);
     }
 
+    /*
     app.post("/vote", async (req, res) => {
         const { encryptedVote, token } = req.body;
         try {
@@ -39,7 +40,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
             res.status(500).json({ error: err.message });
         }
     });
-
+    */
 
     app.post("/registerCandidate", async (req, res) => {
       const { name, wahlbezirk, partei } = req.body;
@@ -89,7 +90,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
         res.status(500).send({ error: err.message });
       }
     });
-
+    /*
     app.post("/storeAggregatedVotes", async (req, res) => {
       const { aggregatedVotes } = req.body;
       try {
@@ -99,6 +100,40 @@ prompt.get(['PathToQuorum'], function (err, result) {
       } catch (err) {
         res.status(500).send({ error: err.message });
       }  
+    });
+    */
+    app.post("/storeElectionResult", async (req, res) => {
+      //const { tally, signature } = req.body;
+      try {
+        const contract = await loadContract();
+        const encryptedVotes = await contract.getEncryptedVotes();
+        const decryptedVotes = [];  
+        
+        for (let i = 0; i < encryptedVotes.length; i++) {
+          const encryptedVote = encryptedVotes[i];
+          const encryptedBytes = Buffer.from(encryptedVote, "base64");
+          const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
+          decryptedVotes.push(decrypted);
+        }
+        
+        const tally = {};
+
+        for (const name of decryptedVotes) {
+          tally[name] = (tally[name] || 0) + 1;
+        }
+
+        const timestamp = new Date().toISOString();
+        const md = forge.md.sha1.create();
+        md.update(JSON.stringify(tally), 'utf8');
+        const signature = forge.util.encode64(privateKey.sign(md));  
+        const tx = await contract.storeElectionResult(JSON.stringify(tally), signature);
+        await tx.wait() 
+        console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
+        res.send({ status: "success", tx: tx.hash });     
+      } catch (err) {
+          console.error("Fehler beim Speichern der Ergebnisse:", err);
+          res.status(500).send({ error: err.message });
+      }
     });
 
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
