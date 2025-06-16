@@ -130,12 +130,6 @@ contract Election {
         return encryptedVotes;
     }
 
-    /*
-    function storeAggregatedVotes(string memory _aggregatedVotes) public onlyAdmin onlyAfterVoting {
-        aggregatedVotes = _aggregatedVotes;
-    }
-    */
-
     function storeElectionResult(string memory _tally, string memory _signature) public onlyAfterVoting {
         ElectionResult memory result;
         result.tally = _tally;
