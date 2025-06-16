@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.9.0
+// V 0.13.4
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -90,7 +90,7 @@ contract Election {
         }
         return filteredCandidates;
     }
-    
+
     function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
         
         require(!registeredTokens[keccak256(abi.encodePacked(_token))], "Token already registered");
