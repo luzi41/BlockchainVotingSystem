@@ -145,7 +145,10 @@ contract Election {
     }
 
     function getElectionResults() public view returns (string memory tally, string memory signature, uint timestamp) {
-        ElectionResult storage result = electionResults[0];
+        
+        uint index = electionResults.length -1;
+
+        ElectionResult storage result = electionResults[index];
         return (result.tally, result.signature, result.timestamp);
     }
 
