@@ -79,7 +79,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/storeElectionResult", async (req, res) => {
-      //const { tally, signature } = req.body;
+     
       try {
         const contract = await loadContract();
         const encryptedVotes = await contract.getEncryptedVotes();
@@ -110,7 +110,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
         res.status(500).send({ error: err.message });
       }  
     });
-    */
+    
     app.post("/storeElectionResult", async (req, res) => {
       //const { tally, signature } = req.body;
       try {
