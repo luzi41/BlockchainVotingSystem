@@ -1,7 +1,5 @@
 export const CONTRACT_ADDRESSES = {
-  registry: "0x7FD1e1e54e626B6CE92399913cCe3ecE77d81069", // Contract address
-  ledger: "0x...",
-  tally: "0x...",
+  registry: "0x7335c660507D9adF154ABd1C62E359c093Ac54b5", // Contract address
 };
 
 export const PROVIDER_URL = "http://localhost:8545"; // oder RPC-URL deiner Quorum-Node

@@ -8,7 +8,7 @@ function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
   const [timestamp, setTimestamp] = useState("");
-  const [tally, setTally] = useState("");
+  //const [tally, setTally] = useState("");
   const [signature, setSignature] = useState("");
 
   useEffect(() => {
@@ -20,23 +20,23 @@ function Results() {
         }
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-        const results = await contract.getElectionResult();
+        const newResults = await contract.getElectionResults();
+        const tally = newResults.tally;
+        const signature = newResults.signature;
+        const timestamp = newResults.timestamp;
+        
         setStatus("Die Ergebnisse wurden erfolgreich abgerufen.");
-        setTimestamp(results.timestamp);
-        setTally(results.tally);
-        setSignature(results.signature);
+        //setTimestamp(results.timestamp);
+        //setTally(results.tally);
+        //setSignature(results.signature);
         //const results = await import('../results/aggregated.json');
         const htmlContent = (
           <div class="border">
             <h2>Wahlergebnisse</h2>
-            <ul>
-              {Object.entries(results.tally).map(([name, count]) => (
-                <li key={name}>
-                  {name}: {count} Stimmen
-                </li>
-              ))}
-            </ul>
+            <p>Status: {status}</p>
+            <p><pre>{tally}</pre></p>
             <div>Zeitstempel:{timestamp} <br />Signature: {signature}</div>
+            
           </div>
         );
         setHtml(htmlContent);
