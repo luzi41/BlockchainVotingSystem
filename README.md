@@ -223,7 +223,7 @@ Start frontend:
 
 election-system/scripts$
 
-    node decrypt-and-write-results.js
+    curl -X POST http://localhost:3001/storeElectionResults
     
 ### 4.7.3 See results in the browser
 

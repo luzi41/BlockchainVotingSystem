@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.9.0
+// V 0.13.4
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -26,7 +26,16 @@ contract Election {
         bool hasVoted;
     }
 
+    struct ElectionResult {
+        string tally;
+        string signature;
+        uint timestamp;
+    }
+
+    // Array to store candidates
     Candidate[] public candidates;
+
+    ElectionResult[] public electionResults;
 
     mapping(address => Voter) public voters;
 
@@ -56,6 +65,32 @@ contract Election {
   
     function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public onlyAdmin onlyBeforeVoting {
         candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+    }
+
+    function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
+        // First, count how many candidates match the wahlbezirk
+        uint count = 0;
+        for (uint i = 0; i < candidates.length; i++) {
+            if (candidates[i].wahlbezirk == _wahlbezirk) {
+                count++;
+            }
+        }
+
+        // Create a new array with the correct size
+        Candidate[] memory filteredCandidates = new Candidate[](count);
+        if (count == 0) {
+            return new Candidate[](0); // Return an empty array if no candidates found
+        }
+
+        
+        uint index = 0;
+        for (uint i = 0; i < candidates.length; i++) {
+            if (candidates[i].wahlbezirk == _wahlbezirk) {
+                filteredCandidates[index] = candidates[i];
+                index++;
+            }
+        }
+        return filteredCandidates;
     }
 
     function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
@@ -95,34 +130,20 @@ contract Election {
         return encryptedVotes;
     }
 
-    function storeAggregatedVotes(string memory _aggregatedVotes) public onlyAdmin onlyAfterVoting {
-        aggregatedVotes = _aggregatedVotes;
+    function storeElectionResult(string memory _tally, string memory _signature) public onlyAfterVoting {
+        ElectionResult memory result;
+        result.tally = _tally;
+        result.signature = _signature;
+        result.timestamp = 0;
+        electionResults.push(result);
     }
 
-    function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
-        // First, count how many candidates match the wahlbezirk
-        uint count = 0;
-        for (uint i = 0; i < candidates.length; i++) {
-            if (candidates[i].wahlbezirk == _wahlbezirk) {
-                count++;
-            }
-        }
-
-        // Create a new array with the correct size
-        Candidate[] memory filteredCandidates = new Candidate[](count);
-        if (count == 0) {
-            return new Candidate[](0); // Return an empty array if no candidates found
-        }
-
+    function getElectionResults() public view returns (string memory tally, string memory signature, uint timestamp) {
         
-        uint index = 0;
-        for (uint i = 0; i < candidates.length; i++) {
-            if (candidates[i].wahlbezirk == _wahlbezirk) {
-                filteredCandidates[index] = candidates[i];
-                index++;
-            }
-        }
-        return filteredCandidates;
+        uint index = electionResults.length -1;
+
+        ElectionResult storage result = electionResults[index];
+        return (result.tally, result.signature, result.timestamp);
     }
 
     function getElectionStatus() public view returns (string memory status)

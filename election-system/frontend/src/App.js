@@ -50,7 +50,7 @@ function App() {
           <li><Link to="/vote">Abstimmen</Link></li>
           <li><Link to="/results">Ergebnisse</Link></li>
           <li><Link to="http://localhost:25000" target="_blank">Explorer</Link></li>
-          <li class="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.9</Link></li>
+          <li class="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.13.4</Link></li>
         </ul>
       </nav>
 
