@@ -7,9 +7,6 @@ import { CONTRACT_ADDRESSES } from "../config";
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
-  const [timestamp, setTimestamp] = useState("");
-  //const [tally, setTally] = useState("");
-  const [signature, setSignature] = useState("");
 
   useEffect(() => {
       async function fetchResults() {
@@ -21,21 +18,29 @@ function Results() {
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
         const newResults = await contract.getElectionResults();
-        const tally = newResults.tally;
-        const signature = newResults.signature;
-        const timestamp = newResults.timestamp;
         
         setStatus("Die Ergebnisse wurden erfolgreich abgerufen.");
-        //setTimestamp(results.timestamp);
-        //setTally(results.tally);
-        //setSignature(results.signature);
-        //const results = await import('../results/aggregated.json');
+
+        const results = JSON.parse(newResults.tally);
         const htmlContent = (
           <div class="border">
             <h2>Wahlergebnisse</h2>
-            <p>Status: {status}</p>
-            <p><pre>{tally}</pre></p>
-            <div>Zeitstempel:{timestamp} <br />Signature: {signature}</div>
+              <table border="1" cellPadding="5" cellSpacing="0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Stimmen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(results).map(([name, value]) => (
+                    <tr key={name}>
+                      <td>{name}</td>
+                      <td>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>            
             
           </div>
         );
