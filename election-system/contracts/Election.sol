@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.13.4
+// V 0.14
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -13,7 +13,6 @@ contract Election {
     bool public votingOpen;
     bool public electionBegin;
     string public electionTitle;
-    string public aggregatedVotes;
 
     struct Candidate {
         string name;
@@ -30,6 +29,7 @@ contract Election {
         string tally;
         string signature;
         uint timestamp;
+        uint wahlbezirk;
     }
 
     // Array to store candidates
@@ -37,7 +37,7 @@ contract Election {
 
     ElectionResult[] public electionResults;
 
-    mapping(address => Voter) public voters;
+    // wird nicht mehr gebraucht: mapping(address => Voter) public voters;
 
     modifier onlyAdmin() {
         require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen!");
