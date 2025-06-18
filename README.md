@@ -198,10 +198,12 @@ Open a new terminal and exec:
 
 ## 4.6 Install and start frontend-UI
 
-Install: 
+Install:
+
      cd frontend && $npm install
 
 copy ABI to the frontend:
+
      cp  -R ../artifacts src/  
 
 Start frontend:
