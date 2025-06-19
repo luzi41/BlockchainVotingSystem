@@ -1,11 +1,14 @@
 @startuml
 autonumber
 actor Wähler
+participant "Frontend\nRegister" as FEA
+participant "Frontend\nResults" as FER
+participant "Frontend\nVoting" as FEV
 participant "Registrierungsservice/\nWahlamt" as RS
 participant "Blockchain-Service/\nSmartContract" as BC
 participant "Wahlkommision/\nAPI" as VoteAPI
-participant "Frontend\nVoting" as FEV
-participant "Frontend\nResults" as FER
+
+
 
 
 == Registrierung ==
@@ -20,9 +23,13 @@ RS -> BC : Schreibe Hash(Token) in Blockchain\n(Typ: REGISTRATION)
 
 Wähler -> FEV : Öffne Wahlclient und gebe Token ein
 Wähler -> FEV : Gebe Stimme ab
-FEV -> FEV : Verschlüssele Stimme lokal
-FEV -> BC : Sende Token + verschlüsselte Stimme
 
+group VoteForm
+FEV -> FEV : Verschlüssele\n Stimme lokal
+FEV -> BC : Sende Token + verschlüsselte Stimme
+end
+
+group castEncryptedVote
 BC -> BC : Prüfe, ob Token-Hash registriert ist
 BC -> BC : Prüfe, ob Token schon verwendet wurde
 alt Token gültig & nicht verwendet
@@ -31,6 +38,7 @@ alt Token gültig & nicht verwendet
     BC -> FEV : Bestätige gültige Stimmabgabe/\n(Transaktion)
 else Ungültiger oder bereits verwendeter Token
     BC -> FEV : Fehler: Ungültiger oder verbrauchter Token
+end
 end
 
 == Auszählung ==
