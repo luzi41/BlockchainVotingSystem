@@ -18,10 +18,9 @@ RS -> BC : Schreibe Hash(Token) in Blockchain\n(Typ: REGISTRATION)
 
 == Stimmabgabe ==
 
+group VoteForm
 Wähler -> FEV : Öffne Wahlclient und gebe Token ein
 Wähler -> FEV : Gebe Stimme ab
-
-group VoteForm
 FEV -> FEV : Verschlüssele\n Stimme lokal
 FEV -> BC : Sende Token + verschlüsselte Stimme
 end
