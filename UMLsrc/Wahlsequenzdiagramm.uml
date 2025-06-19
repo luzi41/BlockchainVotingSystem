@@ -8,9 +8,6 @@ participant "Registrierungsservice/\nWahlamt" as RS
 participant "Blockchain-Service/\nSmartContract" as BC
 participant "Wahlkommision/\nAPI" as VoteAPI
 
-
-
-
 == Registrierung ==
 
 Wähler -> RS : Authentifiziere (z.B. eID)
