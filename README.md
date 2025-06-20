@@ -224,7 +224,7 @@ Start frontend:
 
 election-system/scripts$
 
-    curl -X POST http://localhost:3001/storeElectionResults
+    curl -X POST http://localhost:3001/storeElectionResult
     
 ### 4.7.3 See results in the browser
 
