@@ -202,6 +202,7 @@ Install:
      cd frontend && $npm install
 
 copy ABI to the frontend:
+
      cp  -R ../artifacts src/  
 
 Start frontend:
