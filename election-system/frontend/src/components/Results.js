@@ -17,14 +17,21 @@ function Results() {
         }
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+        const htmlContent = "";
+
+        // Wahlbezirke abrufen und Folgendes für jeden wahlbezirk
+        // Wiederholung Anfang
         const newResults = await contract.getElectionResults();
         
-        setStatus("Die Ergebnisse wurden erfolgreich abgerufen.");
+        setStatus("Die Ergebnisse wurden erfolgreich abgerufen: " + newResults + " Stimmen");
 
         const results = JSON.parse(newResults.tally);
-        const htmlContent = (
+        //const ergebnis = JSON.stringify(results);
+        const wbHtmlContent = (
           <div class="border">
             <h2>Wahlergebnisse</h2>
+            <p>{newResults.tally}</p>
+            <p>{status}</p>
               <table border="1" cellPadding="5" cellSpacing="0">
                 <thead>
                   <tr>
@@ -44,7 +51,10 @@ function Results() {
             
           </div>
         );
-        setHtml(htmlContent);
+        setHtml(htmlContent + wbHtmlContent); // Wiederholung anfügen
+        // Wiederholung Ende
+
+        
       } catch (err) {
         
         console.error('Fehler beim Laden des Moduls:', err);

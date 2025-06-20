@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.13.4
+// V 0.14
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
     mapping(bytes32 => bool) public usedTokens;
 
-    string[] public encryptedVotes;
-
     address public admin;
     bool public votingOpen;
     bool public electionBegin;
     string public electionTitle;
-    string public aggregatedVotes;
 
     struct Candidate {
         string name;
@@ -30,14 +27,22 @@ contract Election {
         string tally;
         string signature;
         uint timestamp;
+        uint wahlbezirk;
     }
+
+    struct EncryptedVote {
+        string vote;
+        uint wahlbezirk;
+    }
+
+    EncryptedVote[] public encryptedVotes;
 
     // Array to store candidates
     Candidate[] public candidates;
 
     ElectionResult[] public electionResults;
 
-    mapping(address => Voter) public voters;
+    // wird nicht mehr gebraucht: mapping(address => Voter) public voters;
 
     modifier onlyAdmin() {
         require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen!");
@@ -120,30 +125,56 @@ contract Election {
         votingOpen = false;
     }
 
-    function castEncryptedVote(string memory encryptedVote, string memory _token) public onlyDuringVoting {
+    function castEncryptedVote(string memory _encryptedVote, string memory _token, uint _wahlbezirk) public onlyDuringVoting {
         require(isTokenValid(_token), "Invalid or used token");
         markTokenUsed(_token);
+        EncryptedVote memory encryptedVote;
+        encryptedVote.vote = _encryptedVote;
+        encryptedVote.wahlbezirk = _wahlbezirk;
         encryptedVotes.push(encryptedVote);
     }
 
-    function getEncryptedVotes() public view onlyAfterVoting returns (string[] memory) {
-        return encryptedVotes;
+    function getEncryptedVotes(uint _wahlbezirk) public view onlyAfterVoting returns (EncryptedVote[] memory) {
+
+        // First, count how many votes match the wahlbezirk
+        uint count = 0;
+        for (uint i = 0; i < encryptedVotes.length; i++) {
+            if (encryptedVotes[i].wahlbezirk == _wahlbezirk) {
+                count++;
+            }
+        }
+
+        // Create a new array with the correct size
+        EncryptedVote[] memory filteredEncryptedVotes = new EncryptedVote[](count);
+        if (count == 0) {
+            return new EncryptedVote[](0); // Return an empty array if no candidates found
+        }
+        
+        uint index = 0;
+        for (uint i = 0; i < encryptedVotes.length; i++) {
+            if (encryptedVotes[i].wahlbezirk == _wahlbezirk) {
+                filteredEncryptedVotes[index] = encryptedVotes[i];
+                index++;
+            }
+        }
+        return filteredEncryptedVotes;
     }
 
-    function storeElectionResult(string memory _tally, string memory _signature) public onlyAfterVoting {
+    function storeElectionResult(string memory _tally, string memory _signature, uint _wahlbezirk) public onlyAfterVoting {
         ElectionResult memory result;
         result.tally = _tally;
         result.signature = _signature;
-        result.timestamp = 0;
+        result.timestamp = block.timestamp;
+        result.wahlbezirk = _wahlbezirk;
         electionResults.push(result);
     }
 
-    function getElectionResults() public view returns (string memory tally, string memory signature, uint timestamp) {
+    function getElectionResults() public view returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
         
         uint index = electionResults.length -1;
 
         ElectionResult storage result = electionResults[index];
-        return (result.tally, result.signature, result.timestamp);
+        return (result.tally, result.wahlbezirk, result.signature, result.timestamp);
     }
 
     function getElectionStatus() public view returns (string memory status)
