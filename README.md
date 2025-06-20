@@ -199,6 +199,7 @@ Open a new terminal and exec:
 ## 4.6 Install and start frontend-UI
 
 Install: 
+
      cd frontend && $npm install
 
 copy ABI to the frontend:
@@ -224,8 +225,8 @@ Start frontend:
 
 election-system/scripts$
 
-    curl -X POST http://localhost:3001/storeElectionResult
-    
+    curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "1"}'
+
 ### 4.7.3 See results in the browser
 
 Navigate to http://localhost:3002/results
