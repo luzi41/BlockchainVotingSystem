@@ -72,3 +72,4 @@ election-system/frontend/src/artifacts/contracts/Election.sol/Election.tally.jso
 election-system/frontend/src/artifacts/contracts/Election.sol/Election.tally.dbg.json
 
 election-system/admin-ui/src/reportWebVitals.js
+election-system/frontend/src/artifacts/index.text
