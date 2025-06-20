@@ -79,22 +79,27 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/storeElectionResult", async (req, res) => {
-     
+      // Wahlbezirk abfragen
+      const { wahlbezirk } = req.body;
+      //const wahlbezirk = 1;
       try {
         const contract = await loadContract();
-        const encryptedVotes = await contract.getEncryptedVotes();
-        const decryptedVotes = [];  
+        const encryptedVotes = await contract.getEncryptedVotes(wahlbezirk);
+        console.log("Anzahl Stimmen: " + encryptedVotes.length);
+        const decryptedVotes = [[]];  
         
         for (let i = 0; i < encryptedVotes.length; i++) {
           const encryptedVote = encryptedVotes[i];
-          const encryptedBytes = Buffer.from(encryptedVote, "base64");
+          const eVote = encryptedVote.vote;
+
+          const encryptedBytes = Buffer.from(eVote, "base64");
           const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
-          decryptedVotes.push(decrypted);
+          decryptedVotes[wahlbezirk] = decrypted;
         }
         
         const tally = {};
 
-        for (const name of decryptedVotes) {
+        for (const name of decryptedVotes[wahlbezirk]) {
           tally[name] = (tally[name] || 0) + 1;
         }
 
@@ -102,7 +107,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
         const md = forge.md.sha1.create();
         md.update(JSON.stringify(tally), 'utf8');
         const signature = forge.util.encode64(privateKey.sign(md));  
-        const tx = await contract.storeElectionResult(JSON.stringify(tally), signature);
+        const tx = await contract.storeElectionResult(JSON.stringify(tally), signature, wahlbezirk);
         await tx.wait() 
         console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
         res.send({ status: "success", tx: tx.hash });     
