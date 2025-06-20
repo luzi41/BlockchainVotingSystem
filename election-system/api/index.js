@@ -82,11 +82,12 @@ prompt.get(['PathToQuorum'], function (err, result) {
       // Wahlbezirk abfragen
       const { wahlbezirk } = req.body;
       //const wahlbezirk = 1;
+      
       try {
         const contract = await loadContract();
         const encryptedVotes = await contract.getEncryptedVotes(wahlbezirk);
         console.log("Anzahl Stimmen: " + encryptedVotes.length);
-        const decryptedVotes = [[]];  
+        const decryptedVotes = [];  
         
         for (let i = 0; i < encryptedVotes.length; i++) {
           const encryptedVote = encryptedVotes[i];
@@ -94,12 +95,13 @@ prompt.get(['PathToQuorum'], function (err, result) {
 
           const encryptedBytes = Buffer.from(eVote, "base64");
           const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
-          decryptedVotes[wahlbezirk] = decrypted;
+          console.log("Stimme " + i + "= " + decrypted)
+          decryptedVotes[i] = decrypted;
         }
         
         const tally = {};
 
-        for (const name of decryptedVotes[wahlbezirk]) {
+        for (const name of decryptedVotes) {
           tally[name] = (tally[name] || 0) + 1;
         }
 
@@ -110,10 +112,12 @@ prompt.get(['PathToQuorum'], function (err, result) {
         const tx = await contract.storeElectionResult(JSON.stringify(tally), signature, wahlbezirk);
         await tx.wait() 
         console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
-        res.send({ status: "success", tx: tx.hash });     
+        
+        res.send({ status: "success" });     
       } catch (err) {
         res.status(500).send({ error: err.message });
       }  
+      
     });
 
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
