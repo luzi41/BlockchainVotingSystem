@@ -62,6 +62,8 @@ Functions:
 
 # 3. Electoral process (End-to-End)
 
+![Sequence diagram](images/Wahlsequenzdiagramm.svg "Election process")
+
 ## 1. Registration
 
 - User authenticates with official ID document
