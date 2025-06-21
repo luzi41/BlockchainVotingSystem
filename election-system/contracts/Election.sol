@@ -23,23 +23,26 @@ contract Election {
         string partei;
     }
 
+    /* wird nicht mehr gebraucht
     struct Voter {
         bool registered;
         bool hasVoted;
     }
+    */
 
     struct ElectionResult {
         string tally;
         string signature;
         uint timestamp;
-        uint wahlbezirk;
+        uint electionDistrict;
     }
 
     struct EncryptedVote {
         string vote;
-        uint wahlbezirk;
+        uint electionDistrict;
     }
 
+    //array to store encrypted votes
     EncryptedVote[] public encryptedVotes;
 
     ElectionDistrict[] public electionDistricts;
@@ -47,6 +50,7 @@ contract Election {
     // Array to store candidates
     Candidate[] public candidates;
 
+    // Array to store decrypted results
     ElectionResult[] public electionResults;
 
     modifier onlyAdmin() {
@@ -73,10 +77,16 @@ contract Election {
         admin = msg.sender;
     }
 
+    // fkt. Wahlbezirke (ElectionDistricts)
+    function getElectionDistricts() public view returns (ElectionDistrict[] memory){
+        return electionDistricts;
+    }
+
     function registerElectionDistrict(string memory _name, uint _nummer) public onlyAdmin onlyBeforeVoting {
         electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer}));
     }
   
+    // fkt. Kandidaten
     function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public onlyAdmin onlyBeforeVoting {
         bool found = false;
         for (uint i = 0; i < electionDistricts.length; i++)
@@ -119,6 +129,7 @@ contract Election {
         return filteredCandidates;
     }
 
+    // fkt. Wähler (Wählertoken)
     function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
         
         require(!registeredTokens[keccak256(abi.encodePacked(_token))], "Token already registered");
@@ -135,32 +146,33 @@ contract Election {
         usedTokens[keccak256(abi.encodePacked(_token))] = true;
     }
 
-    function startVoting(string memory _electionTitle) public onlyAdmin {
+    function castEncryptedVote(string memory _encryptedVote, string memory _token, uint _wahlbezirk) public onlyDuringVoting {
+        require(isTokenValid(_token), "Invalid or used token");
+        markTokenUsed(_token);
+        EncryptedVote memory encryptedVote;
+        encryptedVote.vote = _encryptedVote;
+        encryptedVote.electionDistrict = _wahlbezirk;
+        encryptedVotes.push(encryptedVote);
+    }
+
+    // fkt. Wahl
+    function startVoting(string memory _electionTitle) public onlyAdmin onlyBeforeVoting {
         require(candidates.length >= 2, "Mindestens zwei Kandidaten erforderlich.");
         votingOpen = true;
         electionBegin = true;
         electionTitle = _electionTitle;
     }
 
-    function endVoting() public onlyAdmin {
+    function endVoting() public onlyAdmin onlyDuringVoting {
         votingOpen = false;
     }
 
-    function castEncryptedVote(string memory _encryptedVote, string memory _token, uint _wahlbezirk) public onlyDuringVoting {
-        require(isTokenValid(_token), "Invalid or used token");
-        markTokenUsed(_token);
-        EncryptedVote memory encryptedVote;
-        encryptedVote.vote = _encryptedVote;
-        encryptedVote.wahlbezirk = _wahlbezirk;
-        encryptedVotes.push(encryptedVote);
-    }
-
-    function getEncryptedVotes(uint _wahlbezirk) public view onlyAfterVoting returns (EncryptedVote[] memory) {
+    function getEncryptedVotes(uint _wahlbezirk) public view onlyAfterVoting onlyAdmin returns (EncryptedVote[] memory) {
 
         // First, count how many votes match the wahlbezirk
         uint count = 0;
         for (uint i = 0; i < encryptedVotes.length; i++) {
-            if (encryptedVotes[i].wahlbezirk == _wahlbezirk) {
+            if (encryptedVotes[i].electionDistrict == _wahlbezirk) {
                 count++;
             }
         }
@@ -173,7 +185,7 @@ contract Election {
         
         uint index = 0;
         for (uint i = 0; i < encryptedVotes.length; i++) {
-            if (encryptedVotes[i].wahlbezirk == _wahlbezirk) {
+            if (encryptedVotes[i].electionDistrict == _wahlbezirk) {
                 filteredEncryptedVotes[index] = encryptedVotes[i];
                 index++;
             }
@@ -181,21 +193,22 @@ contract Election {
         return filteredEncryptedVotes;
     }
 
-    function storeElectionResult(string memory _tally, string memory _signature, uint _wahlbezirk) public onlyAfterVoting {
+    function storeElectionResult(string memory _tally, string memory _signature, uint _wahlbezirk) public onlyAfterVoting onlyAdmin {
         ElectionResult memory result;
         result.tally = _tally;
         result.signature = _signature;
         result.timestamp = block.timestamp;
-        result.wahlbezirk = _wahlbezirk;
+        result.electionDistrict = _wahlbezirk;
         electionResults.push(result);
     }
 
-    function getElectionResults() public view returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
+    //fkt. public Client
+    function getElectionResults() public view onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
         
         uint index = electionResults.length -1;
 
         ElectionResult storage result = electionResults[index];
-        return (result.tally, result.wahlbezirk, result.signature, result.timestamp);
+        return (result.tally, result.electionDistrict, result.signature, result.timestamp);
     }
 
     function getElectionStatus() public view returns (string memory status)
