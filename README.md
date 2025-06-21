@@ -178,6 +178,7 @@ Save the ABI in the election-system directory:
 
 Open a new terminal and exec:
 
+    curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "1"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "CDU"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "SPD"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly", "wahlbezirk": "1", "partei": "FDP"}' &&

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.14
+// V 0.15
 
 contract Election {
     mapping(bytes32 => bool) public registeredTokens;
@@ -11,6 +11,11 @@ contract Election {
     bool public votingOpen;
     bool public electionBegin;
     string public electionTitle;
+
+    struct ElectionDistrict {
+        string name;
+        uint nummer;
+    }
 
     struct Candidate {
         string name;
@@ -37,12 +42,12 @@ contract Election {
 
     EncryptedVote[] public encryptedVotes;
 
+    ElectionDistrict[] public electionDistricts;
+
     // Array to store candidates
     Candidate[] public candidates;
 
     ElectionResult[] public electionResults;
-
-    // wird nicht mehr gebraucht: mapping(address => Voter) public voters;
 
     modifier onlyAdmin() {
         require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen!");
@@ -67,9 +72,25 @@ contract Election {
     constructor() {
         admin = msg.sender;
     }
+
+    function registerElectionDistrict(string memory _name, uint _nummer) public onlyAdmin onlyBeforeVoting {
+        electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer}));
+    }
   
     function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public onlyAdmin onlyBeforeVoting {
-        candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+        bool found = false;
+        for (uint i = 0; i < electionDistricts.length; i++)
+        {
+            if (electionDistricts[i].nummer == _wahlbezirk) {
+                candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            revert(unicode"Kein gültiger Wahlbezirk!");
+        }
+        
     }
 
     function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {

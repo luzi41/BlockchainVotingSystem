@@ -19,7 +19,9 @@ function Results() {
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
         const htmlContent = "";
 
-        // Wahlbezirke abrufen und Folgendes für jeden wahlbezirk
+        // Wahlbezirke abrufen und Folgendes für jeden wahlbezirk 
+        // (Election.sol -> Array Wahlbezirke, Funktion Wahlbezirk hinzufügen)
+        // (API -> Wahlbezirk hinzufügen)
         // Wiederholung Anfang
         const newResults = await contract.getElectionResults();
         

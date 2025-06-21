@@ -29,6 +29,18 @@ prompt.get(['PathToQuorum'], function (err, result) {
       return new ethers.Contract(contractAddress, abi, signer);
     }
 
+    app.post("/registerElectionDistrict", async (req, res) => {
+      const {name, nummer} = req.body;
+      try {
+        const contract = await loadContract();
+        const tx = await contract.registerElectionDistrict(name, nummer);
+        await tx.wait();
+        res.send({status: "success", tx: tx.hash });
+      } catch (error) {
+        res.status(500).send({ error: err.message });
+      }
+    });
+
     app.post("/registerCandidate", async (req, res) => {
       const { name, wahlbezirk, partei } = req.body;
       try {
@@ -79,9 +91,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/storeElectionResult", async (req, res) => {
-      // Wahlbezirk abfragen
       const { wahlbezirk } = req.body;
-      //const wahlbezirk = 1;
       
       try {
         const contract = await loadContract();
