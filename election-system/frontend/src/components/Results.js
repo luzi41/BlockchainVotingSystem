@@ -1,4 +1,4 @@
-// V 0.13.4
+// V 0.15.4
 import React, { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Election.sol/Election.json";
 import { BrowserProvider, Contract} from "ethers";
@@ -7,7 +7,8 @@ import { CONTRACT_ADDRESSES } from "../config";
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
-
+  const [electionDistricts, setElectionDistricts] = useState("");
+  
   useEffect(() => {
       async function fetchResults() {
       try {
@@ -17,7 +18,7 @@ function Results() {
         }
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-        const htmlContent = "";
+        //const htmlContent = "";
 
         // Wahlbezirke abrufen und Folgendes für jeden wahlbezirk 
         // (Election.sol -> Array Wahlbezirke, Funktion Wahlbezirk hinzufügen)
@@ -25,7 +26,7 @@ function Results() {
         // Wiederholung Anfang
         const newResults = await contract.getElectionResults();
         
-        setStatus("Die Ergebnisse wurden erfolgreich abgerufen: " + newResults + " Stimmen");
+        setStatus("Die Ergebnisse wurden erfolgreich abgerufen.");
 
         const results = JSON.parse(newResults.tally);
         //const ergebnis = JSON.stringify(results);
@@ -53,7 +54,31 @@ function Results() {
             
           </div>
         );
-        setHtml(htmlContent + wbHtmlContent); // Wiederholung anfügen
+
+        const ed = (<div class="border"><h2>Wahlbezirke</h2></div>);
+        const _electionDistricts = await contract.getElectionDistricts();
+        const htmlED = (
+              <table border="1" cellPadding="5" cellSpacing="0">
+                <thead>
+                  <tr>
+                    
+                    <th>Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(_electionDistricts).map(([ID, value]) => (
+                    <tr key={ID}>
+                      
+                      <td>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>            
+        );
+        
+        setElectionDistricts(htmlED);
+        
+        setHtml(wbHtmlContent); // Wiederholung anfügen
         // Wiederholung Ende
 
         
@@ -69,8 +94,8 @@ function Results() {
       }
     };
     fetchResults();
-  }, [status]);
-  return (<div>{html}</div>);
+  }, [status, electionDistricts]);
+  return (<div>{electionDistricts}{html}</div>);
 }
 
 export default Results;

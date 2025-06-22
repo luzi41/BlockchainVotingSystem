@@ -14,7 +14,7 @@ autonumber 10
 Partei -> API: Gibt Wahllisten ab
 activate API
   API -> API: Prüft Wahllisten
-  API -> BC: Registriert Kandidaten
+  API -> BC: Registriert Kandidaten \n registerCandidate
   alt Kandidat gültig
     BC --> API: Success
   else Kandidat nicht gültig

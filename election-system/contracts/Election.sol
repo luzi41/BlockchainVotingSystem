@@ -203,13 +203,26 @@ contract Election {
     }
 
     //fkt. public Client
+    // Gibt nur den Datensatz für den letzten Bezirk zurück (alt)
     function getElectionResults() public view onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
         
-        uint index = electionResults.length -1;
+        uint index = electionResults.length -1; // index letzter Datensatz im Array (fängt bei Null an!)
 
         ElectionResult storage result = electionResults[index];
         return (result.tally, result.electionDistrict, result.signature, result.timestamp);
     }
+
+    // Neu: Gibt Datensatz für einen bestimmten Wahlbezirk zurück
+    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (string memory tally, uint electionDistrict, string memory signature, uint timestamp) {
+        
+        for (uint i = 0; i < electionResults.length; i++) {
+            if (electionResults[i].electionDistrict == _electionDistrict) {
+                ElectionResult storage result = electionResults[i];
+                return (result.tally, result.electionDistrict, result.signature, result.timestamp);
+            }
+        }
+        revert(string(abi.encodePacked("No results for district ", uintToString(_electionDistrict))));
+    }    
 
     function getElectionStatus() public view returns (string memory status)
     {
@@ -232,5 +245,25 @@ contract Election {
     function getElectionTitle() public view returns (string memory title)
     {
         return title = electionTitle;
+    }
+
+    // Helper function to convert uint to string
+    function uintToString(uint v) internal pure returns (string memory str) {
+        if (v == 0) {
+            return "0";
+        }
+        uint maxlength = 100;
+        bytes memory reversed = new bytes(maxlength);
+        uint i = 0;
+        while (v != 0) {
+            uint remainder = v % 10;
+            v = v / 10;
+            reversed[i++] = bytes1(uint8(48 + remainder));
+        }
+        bytes memory s = new bytes(i);
+        for (uint j = 0; j < i; j++) {
+            s[j] = reversed[i - j - 1];
+        }
+        str = string(s);
     }
 }
