@@ -26,59 +26,55 @@ function Results() {
         // Wiederholung Anfang
         const newResults = await contract.getElectionResults();
         
-        setStatus("Die Ergebnisse wurden erfolgreich abgerufen.");
+        setStatus("Die Ergebnisse wurden erfolgreich abgerufen. Wahlkreis " + newResults.wahlbezirk);
 
         const results = JSON.parse(newResults.tally);
-        //const ergebnis = JSON.stringify(results);
-        const wbHtmlContent = (
-          <div class="border">
-            <h2>Wahlergebnisse</h2>
-            <p>{newResults.tally}</p>
-            <p>{status}</p>
-              <table border="1" cellPadding="5" cellSpacing="0">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Stimmen</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(results).map(([name, value]) => (
-                    <tr key={name}>
-                      <td>{name}</td>
-                      <td>{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>            
-            
-          </div>
-        );
 
-        const ed = (<div class="border"><h2>Wahlbezirke</h2></div>);
+
         const _electionDistricts = await contract.getElectionDistricts();
         const htmlED = (
-              <table border="1" cellPadding="5" cellSpacing="0">
-                <thead>
-                  <tr>
-                    
-                    <th>Name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(_electionDistricts).map(([ID, value]) => (
-                    <tr key={ID}>
-                      
-                      <td>{value}</td>
+          <div>
+            <h2>Wahlkreise</h2>
+            <table border="1" cellPadding="5" cellSpacing="0">
+              <thead>
+
+              </thead>
+              <tbody>
+                {Object.entries(_electionDistricts).map(([ID, value]) => (
+                  <>
+                    <tr key={ID}> 
+                      <td><a href="#" onclick="javascript:window.open('Hallo')">{value.name} {value.nummer}</a></td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>            
+                    <tr>
+                      <td>
+                        <table border="0" cellPadding="5" cellSpacing="0">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Stimmen</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Object.entries(results).map(([name, value]) => (
+                              <tr key={name}>
+                                <td>{name}</td>
+                                <td>{value}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>                           
+                      </td>
+                    </tr>
+                  </>
+                ))}
+              </tbody>
+            </table> 
+          </div>           
         );
         
-        setElectionDistricts(htmlED);
+        //setElectionDistricts(htmlED);
         
-        setHtml(wbHtmlContent); // Wiederholung anfügen
+        setHtml(htmlED); // Wiederholung anfügen
         // Wiederholung Ende
 
         
@@ -95,7 +91,7 @@ function Results() {
     };
     fetchResults();
   }, [status, electionDistricts]);
-  return (<div>{electionDistricts}{html}</div>);
+  return (<div>{html}</div>);
 }
 
 export default Results;
