@@ -78,11 +78,11 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/registerToken", async (req, res) => {
-      const { token } = req.body;
+      const { token, electionDistrict } = req.body;
 
       try {
         const contract = await loadContract();
-        const tx = await contract.registerToken(token);
+        const tx = await contract.registerToken(token, electionDistrict);
         await tx.wait();
         res.send({ status: "success", tx: tx.hash });
       } catch (err) {
