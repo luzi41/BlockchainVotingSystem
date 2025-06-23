@@ -1,0 +1,77 @@
+@startuml Wahlsequenzdiagramm
+autonumber
+actor Wähler
+participant "Frontend\nResults" as FER
+participant "Frontend\nVoting" as FEV
+participant "Registrierungsservice/\nWahlamt/API" as RS
+participant "Blockchain-Service/\nSmartContract" as BC
+participant "Wahlkommission/\nAPI" as API
+actor Partei
+
+activate BC
+== Registrierung Kandidaten ==
+autonumber 10
+Partei -> API: Gibt Wahllisten ab
+activate API
+  API -> API: Prüft Wahllisten
+  API -> BC: Registriert Kandidaten \n registerCandidate
+  alt Kandidat gültig
+    BC --> API: Success
+  else Kandidat nicht gültig
+    BC --> API: Fehler
+  end
+deactivate API
+
+== Registrierung Wähler ==
+autonumber 20
+'activate Wähler
+  Wähler -> RS : Authentifiziere (z.B. eID)
+  activate RS
+    RS -> RS : Prüfe Wahlberechtigung
+    alt Wahlberechtigung gültig
+      RS -> RS : Generiere Token
+      RS --> Wähler : Übermittle Token (z.B. QR-Code)
+      RS -> BC : Schreibe Hash(Token) in Blockchain\n(Typ: REGISTRATION)
+    else Wahlberechtigung nicht gültig
+      RS --> Wähler: Fehler
+    end
+  deactivate RS
+'deactivate Wähler
+== Stimmabgabe ==
+autonumber 30 
+Wähler -> FEV : Öffne Wahlclient und gebe Token ein
+activate FEV
+  Wähler -> FEV : Gebe Stimme ab
+  FEV -> FEV : Verschlüssele\n Stimme lokal
+  FEV -> BC : Sende Token + verschlüsselte Stimme
+  BC -> BC : Prüfe, ob Token-Hash registriert ist
+  BC -> BC : Prüfe, ob Token schon verwendet wurde
+  alt Token gültig & nicht verwendet
+    BC -> BC : Speichere Stimme
+    BC -> BC : Schreibe Hash(Token) in Blockchain\n(Typ: VOTE_CAST)
+    BC --> FEV : Bestätige gültige Stimmabgabe/\n(Transaktion)
+  else Ungültiger oder bereits verwendeter Token
+    BC --> FEV : Fehler: Ungültiger oder verbrauchter Token
+  end
+deactivate FEV
+
+== Auszählung ==
+
+autonumber 40
+
+activate API
+  API -> BC: Anforderung verschlüsselte Stimmen
+  BC --> API: Senden verschlüsselter Stimmen
+  API -> API: Entschlüsselung Stimmen
+  API -> API: Auszählung Stimmen
+  API -> BC: Übermittlung Ergebnis
+deactivate API
+
+== Ergebnis ==
+autonumber 50
+activate FER
+  FER -> BC: Abruf Ergebnis
+  BC --> FER: Senden Ergebnis
+deactivate FER
+deactivate BC
+@enduml

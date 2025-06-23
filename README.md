@@ -62,14 +62,16 @@ Functions:
 
 # 3. Electoral process (End-to-End)
 
-## 1. Registration
+![Sequence diagram](images/Wahlsequenzdiagramm.svg "Election process")
+
+## 3.1 Registration
 
 - User authenticates with official ID document
 - Verification by registration service (connection to population register)
 - Token issuance to the user (will be needed later to vote)
 - Registration logged on blockchain (only hash of the token)
 
-## 2. Voting
+## 3.2 Voting
 
 - User logs in with token in the frontend
 - Voice is encrypted locally in the browser (end-to-end)
@@ -77,11 +79,14 @@ Functions:
 - Token will be cancelled (no multiple submission possible)
 - Blockchain: Entry with timestamp, token hash, transaction ID
 
-## 3. Counting & Transmission of Results
+## 3.3 Counting & Transmission of Results
 
 - After the polls close: votes are aggregated by the counting service
 - Validation against blockchain (only valid, not duplicate tokens)
 - Result + blockchain reference transmitted to election officer
+
+## 3.4 Results
+
 - Results publicly viewable via a dashboard (verified via blockchain)
 
 
@@ -178,6 +183,7 @@ Save the ABI in the election-system directory:
 
 Open a new terminal and exec:
 
+    curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "1"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "CDU"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "SPD"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly", "wahlbezirk": "1", "partei": "FDP"}' &&
