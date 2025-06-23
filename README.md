@@ -62,7 +62,7 @@ Functions:
 
 # 3. Electoral process (End-to-End)
 
-![Sequence diagram](images/Wahlsequenzdiagramm.svg "Election process")
+![Sequence diagram](images/Wahlsequenzdiagramm.png "Election process")
 
 ## 3.1 Registration
 

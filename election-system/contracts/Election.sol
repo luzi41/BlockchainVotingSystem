@@ -122,7 +122,6 @@ contract Election {
             return new Candidate[](0); // Return an empty array if no candidates found
         }
 
-        
         uint index = 0;
         for (uint i = 0; i < candidates.length; i++) {
             if (candidates[i].wahlbezirk == _wahlbezirk) {
@@ -246,15 +245,28 @@ contract Election {
     }
 
     // Neu: Gibt Datensatz für einen bestimmten Wahlbezirk zurück
-    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (string memory tally, uint electionDistrict, string memory signature, uint timestamp) {
-        
+    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (ElectionResult[] memory _electionResults) {
+        uint count = 0;
         for (uint i = 0; i < electionResults.length; i++) {
             if (electionResults[i].electionDistrict == _electionDistrict) {
-                ElectionResult storage result = electionResults[i];
-                return (result.tally, result.electionDistrict, result.signature, result.timestamp);
+                count++;
+                //ElectionResult storage result = electionResults[i];
+                //result[i] = (result.tally, result.electionDistrict, result.signature, result.timestamp);
             }
         }
-        revert(string(abi.encodePacked("No results for district ", uintToString(_electionDistrict))));
+        ElectionResult[] memory _results = new ElectionResult[](count);
+        if (count == 0) {
+            return new ElectionResult[](0); // Return an empty array if no candidates found
+        }
+        uint index = 0;
+        for (uint i; i < electionResults.length; i++) {
+            if (electionResults[i].electionDistrict == _electionDistrict) {
+                _results[index] = electionResults[i];
+                index++;
+            }
+        }    
+        return _results;
+        //revert(string(abi.encodePacked("No results for district ", uintToString(_electionDistrict))));
     }    
 
     function getElectionStatus() public view returns (string memory status)

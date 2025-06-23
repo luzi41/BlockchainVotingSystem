@@ -7,7 +7,7 @@ import { CONTRACT_ADDRESSES } from "../config";
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
-  const [electionDistricts, setElectionDistricts] = useState("");
+  //const [electionDistricts, setElectionDistricts] = useState("");
   
   useEffect(() => {
       async function fetchResults() {
@@ -24,14 +24,23 @@ function Results() {
         // (Election.sol -> Array Wahlbezirke, Funktion Wahlbezirk hinzufügen)
         // (API -> Wahlbezirk hinzufügen)
         // Wiederholung Anfang
-        const newResults = await contract.getElectionResults();
-        
-        setStatus("Die Ergebnisse wurden erfolgreich abgerufen. Wahlkreis " + newResults.wahlbezirk);
-
-        const results = JSON.parse(newResults.tally);
-
 
         const _electionDistricts = await contract.getElectionDistricts();
+        const results = [];
+        for (var i = 0; i < 3; i++) {
+          let j = i + 1;
+          const newResult = await contract.getElectionResultsDistrict(j);
+          results[i] = JSON.parse(newResult.tally);          
+        }
+        const tblResults = (
+          <>
+            {results.map((results) =>
+              Object.entries(results).map(([name, stimmen]) => (
+                <tr key={name}><td>{name}</td><td>{stimmen}</td></tr>
+              ))
+            )}
+          </>
+        );     
         const htmlED = (
           <div>
             <h2>Wahlkreise</h2>
@@ -55,12 +64,7 @@ function Results() {
                             </tr>
                           </thead>
                           <tbody>
-                            {Object.entries(results).map(([name, value]) => (
-                              <tr key={name}>
-                                <td>{name}</td>
-                                <td>{value}</td>
-                              </tr>
-                            ))}
+                            {tblResults}
                           </tbody>
                         </table>                           
                       </td>
@@ -69,6 +73,7 @@ function Results() {
                 ))}
               </tbody>
             </table> 
+            {status}
           </div>           
         );
         
@@ -90,7 +95,7 @@ function Results() {
       }
     };
     fetchResults();
-  }, [status, electionDistricts]);
+  }, [status]);
   return (<div>{html}</div>);
 }
 
