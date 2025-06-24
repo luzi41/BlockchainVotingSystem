@@ -78,11 +78,11 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/registerToken", async (req, res) => {
-      const { token } = req.body;
+      const { token, electionDistrict } = req.body;
 
       try {
         const contract = await loadContract();
-        const tx = await contract.registerToken(token);
+        const tx = await contract.registerToken(token, electionDistrict);
         await tx.wait();
         res.send({ status: "success", tx: tx.hash });
       } catch (err) {
@@ -126,10 +126,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
         res.send({ status: "success" });     
       } catch (err) {
         res.status(500).send({ error: err.message });
-      }  
-      
+      }
     });
-
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
-
 });    

@@ -16,7 +16,6 @@ iQIDAQAB
 -----END PUBLIC KEY-----`;
 
 async function encryptVote(candidateId) {
-  //const pem = await loadPublicKey();
   const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
   const encrypted = pubKey.encrypt(candidateId.toString(), "RSA-OAEP");
   return forge.util.encode64(encrypted);

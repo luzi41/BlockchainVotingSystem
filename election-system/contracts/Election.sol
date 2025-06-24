@@ -1,16 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.15
+// V 0.16.3
 
 contract Election {
-    mapping(bytes32 => bool) public registeredTokens;
-    mapping(bytes32 => bool) public usedTokens;
+
+    // alte Methode
+    // mapping(bytes32 => bool) public registeredTokens;
+    // mapping(bytes32 => bool) public usedTokens;
 
     address public admin;
     bool public votingOpen;
     bool public electionBegin;
     string public electionTitle;
+    uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
+
+    struct Token {
+        bytes32 token;
+        uint electionDistrict;
+        bool usedToken;
+    }
 
     struct ElectionDistrict {
         string name;
@@ -22,13 +31,6 @@ contract Election {
         uint wahlbezirk;
         string partei;
     }
-
-    /* wird nicht mehr gebraucht
-    struct Voter {
-        bool registered;
-        bool hasVoted;
-    }
-    */
 
     struct ElectionResult {
         string tally;
@@ -52,6 +54,9 @@ contract Election {
 
     // Array to store decrypted results
     ElectionResult[] public electionResults;
+
+    // Array to store token
+    Token[] tokens;
 
     modifier onlyAdmin() {
         require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen!");
@@ -118,7 +123,6 @@ contract Election {
             return new Candidate[](0); // Return an empty array if no candidates found
         }
 
-        
         uint index = 0;
         for (uint i = 0; i < candidates.length; i++) {
             if (candidates[i].wahlbezirk == _wahlbezirk) {
@@ -129,26 +133,55 @@ contract Election {
         return filteredCandidates;
     }
 
-    // fkt. Wähler (Wählertoken)
-    function registerToken(string memory _token) public onlyAdmin onlyBeforeVoting  {
-        
-        require(!registeredTokens[keccak256(abi.encodePacked(_token))], "Token already registered");
-        registeredTokens[keccak256(abi.encodePacked(_token))] = true;
+    // fkt. Wähler (Wählertoken, Wahlbezirk)
+    function registerToken(string memory _token, uint _electionDistrict) public onlyAdmin onlyBeforeVoting  {
+
+        for (uint i = 0; i < tokens.length; i++) { 
+            if (tokens[i].token == keccak256(abi.encodePacked(_token)) && tokens[i].electionDistrict == _electionDistrict) {
+                revert("Token already registered");
+            }
+        }
+
+        Token memory token;
+        token.token = keccak256(abi.encodePacked(_token));
+        token.electionDistrict = _electionDistrict;
+        tokens.push(token);
+    }   
+
+    function isTokenValid(string memory _token, uint _electionDistrict) public view returns (bool) {
+        // alte Methode
+        //return registeredTokens[keccak256(abi.encodePacked(_token))] && !usedTokens[keccak256(abi.encodePacked(_token))];
+
+        // neue Methode
+        bool valid = false;
+        for (uint i = 0; i < tokens.length; i++) {
+            if (tokens[i].token == keccak256(abi.encodePacked(_token)) 
+                && tokens[i].usedToken == false 
+                && tokens[i].electionDistrict == _electionDistrict) {
+                valid = true;
+            }
+        }
+        return valid;
     }
 
-    function isTokenValid(string memory _token) public view returns (bool) {
-        return registeredTokens[keccak256(abi.encodePacked(_token))] && !usedTokens[keccak256(abi.encodePacked(_token))];
-    }
+    function markTokenUsed(string memory _token, uint _electionDistrict) public {
+        // alte Methode
+        // require(registeredTokens[keccak256(abi.encodePacked(_token))], "Token not registered");
+        // require(!usedTokens[keccak256(abi.encodePacked(_token))], "Token already used");
+        // usedTokens[keccak256(abi.encodePacked(_token))] = true;
 
-    function markTokenUsed(string memory _token) public {
-        require(registeredTokens[keccak256(abi.encodePacked(_token))], "Token not registered");
-        require(!usedTokens[keccak256(abi.encodePacked(_token))], "Token already used");
-        usedTokens[keccak256(abi.encodePacked(_token))] = true;
+        // neue Methode
+        for (uint i = 0; i < tokens.length; i++) {
+            if (tokens[i].token == keccak256(abi.encodePacked(_token)) 
+               && tokens[i].electionDistrict == _electionDistrict) {
+                tokens[i].usedToken = true;
+               } 
+        }
     }
 
     function castEncryptedVote(string memory _encryptedVote, string memory _token, uint _wahlbezirk) public onlyDuringVoting {
-        require(isTokenValid(_token), "Invalid or used token");
-        markTokenUsed(_token);
+        require(isTokenValid(_token, _wahlbezirk), "Invalid or used token");
+        markTokenUsed(_token, _wahlbezirk);
         EncryptedVote memory encryptedVote;
         encryptedVote.vote = _encryptedVote;
         encryptedVote.electionDistrict = _wahlbezirk;
@@ -213,15 +246,15 @@ contract Election {
     }
 
     // Neu: Gibt Datensatz für einen bestimmten Wahlbezirk zurück
-    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (string memory tally, uint electionDistrict, string memory signature, uint timestamp) {
-        
+    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
+        uint count = 0;
         for (uint i = 0; i < electionResults.length; i++) {
             if (electionResults[i].electionDistrict == _electionDistrict) {
+                count++;
                 ElectionResult storage result = electionResults[i];
                 return (result.tally, result.electionDistrict, result.signature, result.timestamp);
             }
         }
-        revert(string(abi.encodePacked("No results for district ", uintToString(_electionDistrict))));
     }    
 
     function getElectionStatus() public view returns (string memory status)

@@ -7,7 +7,7 @@ import { CONTRACT_ADDRESSES } from "../config";
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
-  const [electionDistricts, setElectionDistricts] = useState("");
+  //const [electionDistricts, setElectionDistricts] = useState("");
   
   useEffect(() => {
       async function fetchResults() {
@@ -18,20 +18,16 @@ function Results() {
         }
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-        //const htmlContent = "";
-
-        // Wahlbezirke abrufen und Folgendes für jeden wahlbezirk 
-        // (Election.sol -> Array Wahlbezirke, Funktion Wahlbezirk hinzufügen)
-        // (API -> Wahlbezirk hinzufügen)
-        // Wiederholung Anfang
-        const newResults = await contract.getElectionResults();
-        
-        setStatus("Die Ergebnisse wurden erfolgreich abgerufen. Wahlkreis " + newResults.wahlbezirk);
-
-        const results = JSON.parse(newResults.tally);
-
-
         const _electionDistricts = await contract.getElectionDistricts();
+        const results = [];
+
+        for (var i = 0; i < _electionDistricts.length; i++) {
+          let j = i + 1;
+          const newResult = await contract.getElectionResultsDistrict(j);
+          results[i] = JSON.parse(newResult.tally);    
+          console.log(results[i]);
+        }
+             
         const htmlED = (
           <div>
             <h2>Wahlkreise</h2>
@@ -43,7 +39,7 @@ function Results() {
                 {Object.entries(_electionDistricts).map(([ID, value]) => (
                   <>
                     <tr key={ID}> 
-                      <td><a href="#" onclick="javascript:window.open('Hallo')">{value.name} {value.nummer}</a></td>
+                      <td>{value.name} {value.nummer}</td>
                     </tr>
                     <tr>
                       <td>
@@ -55,7 +51,7 @@ function Results() {
                             </tr>
                           </thead>
                           <tbody>
-                            {Object.entries(results).map(([name, value]) => (
+                            {Object.entries(results[ID]).map(([name, value]) => (
                               <tr key={name}>
                                 <td>{name}</td>
                                 <td>{value}</td>
@@ -69,8 +65,10 @@ function Results() {
                 ))}
               </tbody>
             </table> 
+            {status}
           </div>           
         );
+        
         
         //setElectionDistricts(htmlED);
         
@@ -90,7 +88,7 @@ function Results() {
       }
     };
     fetchResults();
-  }, [status, electionDistricts]);
+  }, [status]);
   return (<div>{html}</div>);
 }
 
