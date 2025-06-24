@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.16.2
+// V 0.16.3
 
 contract Election {
 
     // alte Methode
-    mapping(bytes32 => bool) public registeredTokens;
-    mapping(bytes32 => bool) public usedTokens;
+    // mapping(bytes32 => bool) public registeredTokens;
+    // mapping(bytes32 => bool) public usedTokens;
 
     address public admin;
     bool public votingOpen;
     bool public electionBegin;
     string public electionTitle;
+    uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
 
     struct Token {
         bytes32 token;
