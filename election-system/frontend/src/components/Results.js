@@ -18,29 +18,16 @@ function Results() {
         }
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-        //const htmlContent = "";
-
-        // Wahlbezirke abrufen und Folgendes für jeden wahlbezirk 
-        // (Election.sol -> Array Wahlbezirke, Funktion Wahlbezirk hinzufügen)
-        // (API -> Wahlbezirk hinzufügen)
-        // Wiederholung Anfang
-
         const _electionDistricts = await contract.getElectionDistricts();
         const results = [];
-        for (var i = 0; i < 3; i++) {
+
+        for (var i = 0; i < _electionDistricts.length; i++) {
           let j = i + 1;
           const newResult = await contract.getElectionResultsDistrict(j);
-          results[i] = JSON.parse(newResult.tally);          
+          results[i] = JSON.parse(newResult.tally);    
+          console.log(results[i]);
         }
-        const tblResults = (
-          <>
-            {results.map((results) =>
-              Object.entries(results).map(([name, stimmen]) => (
-                <tr key={name}><td>{name}</td><td>{stimmen}</td></tr>
-              ))
-            )}
-          </>
-        );     
+             
         const htmlED = (
           <div>
             <h2>Wahlkreise</h2>
@@ -52,7 +39,7 @@ function Results() {
                 {Object.entries(_electionDistricts).map(([ID, value]) => (
                   <>
                     <tr key={ID}> 
-                      <td><a href="#" onclick="javascript:window.open('Hallo')">{value.name} {value.nummer}</a></td>
+                      <td>{value.name} {value.nummer}</td>
                     </tr>
                     <tr>
                       <td>
@@ -64,7 +51,12 @@ function Results() {
                             </tr>
                           </thead>
                           <tbody>
-                            {tblResults}
+                            {Object.entries(results[ID]).map(([name, value]) => (
+                              <tr key={name}>
+                                <td>{name}</td>
+                                <td>{value}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>                           
                       </td>
@@ -76,6 +68,7 @@ function Results() {
             {status}
           </div>           
         );
+        
         
         //setElectionDistricts(htmlED);
         

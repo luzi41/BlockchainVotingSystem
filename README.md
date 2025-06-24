@@ -196,6 +196,11 @@ Open a new terminal and exec:
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Harry", "wahlbezirk": "2", "partei": "FDP"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Isolde", "wahlbezirk": "2", "partei": "Grüne"}' &&
     curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Jason", "wahlbezirk": "2", "partei": "Linke"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Karla", "wahlbezirk": "3", "partei": "CDU"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Louis", "wahlbezirk": "3", "partei": "SPD"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Mandy", "wahlbezirk": "3", "partei": "FDP"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Nele", "wahlbezirk": "3", "partei": "Grüne"}' &&
+    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Otto", "wahlbezirk": "3", "partei": "Linke"}' &&
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1", "electionDistrict" : "1"}' &&
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2", "electionDistrict" : "1"}' &&
     curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3", "electionDistrict" : "1"}' &&

@@ -126,10 +126,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
         res.send({ status: "success" });     
       } catch (err) {
         res.status(500).send({ error: err.message });
-      }  
-      
+      }
     });
-
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
-
 });    

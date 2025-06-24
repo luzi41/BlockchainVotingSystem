@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.15.6
+// V 0.16.2
 
 contract Election {
 
@@ -245,28 +245,15 @@ contract Election {
     }
 
     // Neu: Gibt Datensatz für einen bestimmten Wahlbezirk zurück
-    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (ElectionResult[] memory _electionResults) {
+    function getElectionResultsDistrict(uint _electionDistrict) public view onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
         uint count = 0;
         for (uint i = 0; i < electionResults.length; i++) {
             if (electionResults[i].electionDistrict == _electionDistrict) {
                 count++;
-                //ElectionResult storage result = electionResults[i];
-                //result[i] = (result.tally, result.electionDistrict, result.signature, result.timestamp);
+                ElectionResult storage result = electionResults[i];
+                return (result.tally, result.electionDistrict, result.signature, result.timestamp);
             }
         }
-        ElectionResult[] memory _results = new ElectionResult[](count);
-        if (count == 0) {
-            return new ElectionResult[](0); // Return an empty array if no candidates found
-        }
-        uint index = 0;
-        for (uint i; i < electionResults.length; i++) {
-            if (electionResults[i].electionDistrict == _electionDistrict) {
-                _results[index] = electionResults[i];
-                index++;
-            }
-        }    
-        return _results;
-        //revert(string(abi.encodePacked("No results for district ", uintToString(_electionDistrict))));
     }    
 
     function getElectionStatus() public view returns (string memory status)
