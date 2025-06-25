@@ -25,6 +25,7 @@ function VoteForm() {
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
+  const [selectedParty, setSelectedParty] = useState("");
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
   const [wahlbezirk, setWahlbezirk] = useState(1);  
@@ -67,8 +68,9 @@ function VoteForm() {
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
-      const encrypted = encryptVote(selectedCandidate);
-      const tx = await contract.castEncryptedVote(encrypted, tokenInput, wahlbezirk);
+      const encrypted1 = encryptVote(selectedCandidate);
+      const encrypted2 = encryptVote(selectedParty);
+      const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);
    
       await tx.wait();
       console.log(tx.data);
@@ -111,7 +113,16 @@ function VoteForm() {
       </div>
       <div id="zweitstimme">
           <h2>Zeitstimme</h2>
-
+          {party.map((party, index ) => (
+            <div class="row" key={index}>
+              <div class="col-95">
+                <span class="left">{party.name} &nbsp; {party.shortname}</span>
+                <div class="col-5">
+                  <input type="radio" key={index} value={party.short} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
+                </div>
+              </div>    
+            </div>
+          ))}
       </div>
     </div>
       <div class="center"><button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>

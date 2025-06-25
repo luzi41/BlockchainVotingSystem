@@ -41,6 +41,18 @@ prompt.get(['PathToQuorum'], function (err, result) {
       }
     });
 
+    app.post("/registerParty", async (req, res) => {
+      const { name, shortname } = req.body;
+      try {
+        const contract = await loadContract();
+        const tx = await contract.registerParty(name, shortname);
+        await tx.wait();
+        res.send({ status: "success", tx: tx.hash });     
+      } catch (err) {
+        res.status(500).send({ error: err.message });
+      }
+    });    
+
     app.post("/registerCandidate", async (req, res) => {
       const { name, wahlbezirk, partei } = req.body;
       try {
