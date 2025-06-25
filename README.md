@@ -164,9 +164,10 @@ election-system$
 
 ### 4.3.1
 
-Save the ABI in the election-system directory:
+Save the ABI in the election-system directory (replace filenames with your correct filenames) e.g.:
 
-    cp artifacts/contracts/Election.sol/Election.json api/Election.json
+    cp artifacts/contracts/Registry.sol/Registry.json api/Registry.json &&
+    cp artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json api/Bundestagswahl.json
 
 ### 4.3.2 Generate OpenSSL RSA private.pem and  public.pem
 

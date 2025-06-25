@@ -20,7 +20,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     const admin = wallet.connect(provider);
 
     // Contract factory und Deployment
-    const Election = await hre.ethers.getContractFactory("Election", admin);
+    const Election = await hre.ethers.getContractFactory("Bundestagswahl", admin);
     const election = await Election.deploy();
     
     console.log("Contract address: " + election.target);
