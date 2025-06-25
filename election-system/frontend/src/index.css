@@ -80,13 +80,28 @@ th, td {
 }
 
 #ballot {
-  /*float: left;*/
+  display: flex;
+}
+
+
+#erststimme {
+  float: left;
+  width: 50%;
   margin-top: 15px;
   margin-left: auto;
   margin-right: auto;
   padding: 5px;
-  
   border: 1px solid black;
+}
+
+#zweitstimme {
+  float: right;
+  width: 50%;
+  margin-top: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  border: 1px solid black;  
 }
 
 div .row {

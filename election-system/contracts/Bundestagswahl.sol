@@ -7,16 +7,25 @@ import "./Registry.sol";
 
 contract Bundestagswahl is Registry {
     uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
+    uint public nextCandidateUid;
+    uint public nextPartyUid;
 
     struct ElectionDistrict {
         string name;
         uint nummer;
     }
 
+    struct Party {
+        uint uid;
+        string name;
+        string shortname;
+    }
+
     struct Candidate {
+        uint uid;
         string name;
         uint wahlbezirk;
-        string partei;
+        uint partei;
     }
 
     struct ElectionResult {
@@ -39,10 +48,10 @@ contract Bundestagswahl is Registry {
     // Array to store candidates
     Candidate[] public candidates;
 
+    Party[] public parties;
+
     // Array to store decrypted results
     ElectionResult[] public electionResults;
-
-
 
     // fkt. Wahlbezirke (ElectionDistricts)
     function getElectionDistricts() public view returns (ElectionDistrict[] memory){
@@ -54,20 +63,30 @@ contract Bundestagswahl is Registry {
     }
   
     // fkt. Kandidaten
-    function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function registerCandidate(string memory _name, uint _wahlbezirk, uint _partei) public Registry.onlyAdmin Registry.onlyBeforeVoting {
         bool found = false;
         for (uint i = 0; i < electionDistricts.length; i++)
         {
             if (electionDistricts[i].nummer == _wahlbezirk) {
-                candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+                nextCandidateUid++;
+                candidates.push(Candidate({uid: nextCandidateUid, name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
                 found = true;
                 break;
             }
         }
         if (!found) {
             revert(unicode"Kein gültiger Wahlbezirk!");
-        }
-        
+        }        
+    }
+
+    function registerParty(string memory _name, string memory _shortname) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+        nextPartyUid++;
+        parties.push(Party({uid: nextPartyUid, name: _name, shortname: _shortname}));
+    }
+
+    function getParties() public view returns (Party[] memory)
+    {
+        return parties;
     }
 
     function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
@@ -105,9 +124,7 @@ contract Bundestagswahl is Registry {
         encryptedVotes.push(encryptedVote);
     }
 
-
     function getEncryptedVotes(uint _wahlbezirk) public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
-
         // First, count how many votes match the wahlbezirk
         uint count = 0;
         for (uint i = 0; i < encryptedVotes.length; i++) {

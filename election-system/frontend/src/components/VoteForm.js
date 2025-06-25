@@ -23,27 +23,39 @@ async function encryptVote(candidateId) {
 
 function VoteForm() {
   const [candidates, setCandidates] = useState([]);
+  const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
   const [wahlbezirk, setWahlbezirk] = useState(1);  
+  const provider = new BrowserProvider(window.ethereum);
+  const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
       
+
   useEffect(() => {
     async function fetchCandidates() {
         try {
           if (window.ethereum) {
-            const provider = new BrowserProvider(window.ethereum);
-            const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
             const candidatesList = await contract.getCandidates(wahlbezirk);
             setCandidates(candidatesList);
           }
        }
         catch (error) {
-            console.error("Fehler beim Abrufen der Kandidaten:", error);
+          console.error("Fehler beim Abrufen der Kandidaten:", error);
         }        
     }
 
+    async function fetchParties() {
+      try {
+        const partiesList = await contract.getParties();
+        setParties(partiesList);
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Parteien:", error);
+      }
+    }
+
     fetchCandidates();
+    fetchParties();
   }, [wahlbezirk]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
 
   const vote = async () => {
@@ -85,21 +97,26 @@ function VoteForm() {
       </p>      
       </div>
     </div>
-  
-    <div  id="ballot">    
-        <h2>Stimmzettel</h2>
-          {candidates.map((candidate, index ) => (
-          <div class="row">
-            <div class="col-95">
-              <span class="left">{candidate.name} &nbsp; {candidate.partei}</span>
-            </div>
-            <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+    <div id="ballot">
+      <div  id="erststimme">    
+        <h2>Erststimme</h2>
+        {candidates.map((candidate, index ) => (
+        <div class="row" key={index}>
+          <div class="col-95">
+            <span class="left">{candidate.name} &nbsp; {candidate.partei}</span>
           </div>
-          ))}      
+          <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+        </div>
+        ))}    
+      </div>
+      <div id="zweitstimme">
+          <h2>Zeitstimme</h2>
+
+      </div>
     </div>
       <div class="center"><button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
-      <p>{error}</p>
-    </div>
+        <p>{error}</p>
+      </div>
   </div>
   );
 }
