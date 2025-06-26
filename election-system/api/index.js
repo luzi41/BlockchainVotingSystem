@@ -49,7 +49,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
         await tx.wait();
         res.send({ status: "success", tx: tx.hash });     
       } catch (err) {
-        res.status(500).send({ error: err.message });
+        res.status(500).send({ error: err.message + " registerParty" });
       }
     });    
 
