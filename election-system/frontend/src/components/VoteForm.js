@@ -77,7 +77,7 @@ function VoteForm() {
       const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
       const encrypted1 = encryptVote(selectedCandidate);
       const encrypted2 = encryptVote(selectedParty);
-      const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);
+      const tx = await contract.castEncryptedVote(encrypted1, tokenInput, wahlbezirk);
    
       await tx.wait();
       console.log(tx.data);
