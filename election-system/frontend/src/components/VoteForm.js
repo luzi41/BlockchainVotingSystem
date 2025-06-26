@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import forge from "node-forge";
-import Election from "../artifacts/contracts/Election.sol/Election.json";
+import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 import scanner from "../assets/scan-59.png";
@@ -29,27 +29,33 @@ function VoteForm() {
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
   const [wahlbezirk, setWahlbezirk] = useState(1);  
-  const provider = new BrowserProvider(window.ethereum);
-  const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+
       
 
   useEffect(() => {
     async function fetchCandidates() {
-        try {
-          if (window.ethereum) {
-            const candidatesList = await contract.getCandidates(wahlbezirk);
-            setCandidates(candidatesList);
-          }
-       }
-        catch (error) {
+      try {
+        if (window.ethereum) {
+          const provider = new BrowserProvider(window.ethereum);
+          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);            
+          const candidatesList = await contract.getCandidates(wahlbezirk);
+          setCandidates(candidatesList);
+        }
+      }
+      catch (error) {
           console.error("Fehler beim Abrufen der Kandidaten:", error);
-        }        
+      }        
     }
 
     async function fetchParties() {
       try {
-        const partiesList = await contract.getParties();
-        setParties(partiesList);
+         
+        if (window.ethereum) {
+          const provider = new BrowserProvider(window.ethereum);
+          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);           
+          const partiesList = await contract.getParties();
+          setParties(partiesList);
+        }
       } catch (error) {
         console.error("Fehler beim Abrufen der Parteien:", error);
       }
@@ -57,6 +63,7 @@ function VoteForm() {
 
     fetchCandidates();
     fetchParties();
+
   }, [wahlbezirk]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
 
   const vote = async () => {
@@ -112,8 +119,8 @@ function VoteForm() {
         ))}    
       </div>
       <div id="zweitstimme">
-          <h2>Zeitstimme</h2>
-          {party.map((party, index ) => (
+          <h2>Zweitstimme</h2>
+          {parties.map((party, index ) => (
             <div class="row" key={index}>
               <div class="col-95">
                 <span class="left">{party.name} &nbsp; {party.shortname}</span>
