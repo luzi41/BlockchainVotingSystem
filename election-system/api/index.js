@@ -20,7 +20,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     const keystore = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountKeystore", "utf8");
     const password = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountPassword", "utf8").trim();
     const contractAddress = fs.readFileSync("deployment-address.txt", "utf8").trim();
-    const abi = require("./Election.json").abi;
+    const abi = require("./Bundestagswahl.json").abi;
 
     async function loadContract() {
       const provider = new ethers.JsonRpcProvider("http://localhost:8545");
@@ -47,11 +47,11 @@ prompt.get(['PathToQuorum'], function (err, result) {
         const contract = await loadContract();
         const tx = await contract.registerParty(name, shortname);
         await tx.wait();
-        res.send({ status: "success", tx: tx.hash });     
+        res.send({status: "success", tx: tx.hash});
       } catch (err) {
-        res.status(500).send({ error: err.message + " registerParty" });
+        res.status(500).send({ error: err.message });
       }
-    });    
+    });
 
     app.post("/registerCandidate", async (req, res) => {
       const { name, wahlbezirk, partei } = req.body;
@@ -141,4 +141,4 @@ prompt.get(['PathToQuorum'], function (err, result) {
       }
     });
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
-});    
+});

@@ -1,6 +1,6 @@
 // V 0.15.4
 import React, { useState, useEffect } from "react";
-import Election from "../artifacts/contracts/Election.sol/Election.json";
+import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 

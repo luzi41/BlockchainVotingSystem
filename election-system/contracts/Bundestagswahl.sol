@@ -1,14 +1,14 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.16.3
+// V 0.18.3
 
 import "./Registry.sol";
 
 contract Bundestagswahl is Registry {
     uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
-    uint public nextCandidateUid;
-    uint public nextPartyUid;
+    uint256 currentPartyId;
 
     struct ElectionDistrict {
         string name;
@@ -16,16 +16,15 @@ contract Bundestagswahl is Registry {
     }
 
     struct Party {
-        uint uid;
+        uint256 uid;
         string name;
         string shortname;
     }
 
     struct Candidate {
-        uint uid;
         string name;
         uint wahlbezirk;
-        uint partei;
+        string partei;
     }
 
     struct ElectionResult {
@@ -36,8 +35,7 @@ contract Bundestagswahl is Registry {
     }
 
     struct EncryptedVote {
-        string vote1;
-        string vote2;
+        string vote;
         uint electionDistrict;
     }
 
@@ -46,13 +44,15 @@ contract Bundestagswahl is Registry {
 
     ElectionDistrict[] public electionDistricts;
 
+    Party[] public parties;
+
     // Array to store candidates
     Candidate[] public candidates;
 
-    Party[] public parties;
-
     // Array to store decrypted results
     ElectionResult[] public electionResults;
+
+
 
     // fkt. Wahlbezirke (ElectionDistricts)
     function getElectionDistricts() public view returns (ElectionDistrict[] memory){
@@ -62,32 +62,31 @@ contract Bundestagswahl is Registry {
     function registerElectionDistrict(string memory _name, uint _nummer) public Registry.onlyAdmin Registry.onlyBeforeVoting {
         electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer}));
     }
+
+    function getParties() public view returns (Party[] memory) {
+        return parties;
+    }
+
+    function registerParty(string memory _name, string memory _shortname) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+        currentPartyId++;
+        parties.push(Party({uid: currentPartyId, name: _name, shortname: _shortname}));
+    }
   
     // fkt. Kandidaten
-    function registerCandidate(string memory _name, uint _wahlbezirk, uint _partei) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public Registry.onlyAdmin Registry.onlyBeforeVoting {
         bool found = false;
         for (uint i = 0; i < electionDistricts.length; i++)
         {
             if (electionDistricts[i].nummer == _wahlbezirk) {
-                nextCandidateUid++;
-                candidates.push(Candidate({uid: nextCandidateUid, name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+                candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
                 found = true;
                 break;
             }
         }
         if (!found) {
             revert(unicode"Kein gültiger Wahlbezirk!");
-        }        
-    }
-
-    function registerParty(string memory _name, string memory _shortname) public Registry.onlyAdmin Registry.onlyBeforeVoting {
-        nextPartyUid++;
-        parties.push(Party({uid: nextPartyUid, name: _name, shortname: _shortname}));
-    }
-
-    function getParties() public view returns (Party[] memory)
-    {
-        return parties;
+        }
+        
     }
 
     function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
@@ -116,17 +115,18 @@ contract Bundestagswahl is Registry {
     }
 
 
-    function castEncryptedVote(string memory _encryptedVote1, string memory _encryptedVote2, string memory _token, uint _wahlbezirk) public Registry.onlyDuringVoting {
+    function castEncryptedVote(string memory _encryptedVote, string memory _token, uint _wahlbezirk) public Registry.onlyDuringVoting {
         require(Registry.isTokenValid(_token, _wahlbezirk), "Invalid or used token");
         Registry.markTokenUsed(_token, _wahlbezirk);
         EncryptedVote memory encryptedVote;
-        encryptedVote.vote1 = _encryptedVote1;
-        encryptedVote.vote2 = _encryptedVote2;
+        encryptedVote.vote = _encryptedVote;
         encryptedVote.electionDistrict = _wahlbezirk;
         encryptedVotes.push(encryptedVote);
     }
 
+
     function getEncryptedVotes(uint _wahlbezirk) public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
+
         // First, count how many votes match the wahlbezirk
         uint count = 0;
         for (uint i = 0; i < encryptedVotes.length; i++) {
@@ -181,4 +181,4 @@ contract Bundestagswahl is Registry {
             }
         }
     }
-} 
+}
