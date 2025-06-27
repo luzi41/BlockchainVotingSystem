@@ -35,7 +35,8 @@ contract Bundestagswahl is Registry {
     }
 
     struct EncryptedVote {
-        string vote;
+        string vote1;
+        string vote2;
         uint electionDistrict;
     }
 
@@ -51,8 +52,6 @@ contract Bundestagswahl is Registry {
 
     // Array to store decrypted results
     ElectionResult[] public electionResults;
-
-
 
     // fkt. Wahlbezirke (ElectionDistricts)
     function getElectionDistricts() public view returns (ElectionDistrict[] memory){
@@ -114,16 +113,15 @@ contract Bundestagswahl is Registry {
         return filteredCandidates;
     }
 
-
-    function castEncryptedVote(string memory _encryptedVote, string memory _token, uint _wahlbezirk) public Registry.onlyDuringVoting {
+    function castEncryptedVote(string memory _encryptedVote1, string memory _encryptedVote2, string memory _token, uint _wahlbezirk) public Registry.onlyDuringVoting {
         require(Registry.isTokenValid(_token, _wahlbezirk), "Invalid or used token");
         Registry.markTokenUsed(_token, _wahlbezirk);
         EncryptedVote memory encryptedVote;
-        encryptedVote.vote = _encryptedVote;
+        encryptedVote.vote1 = _encryptedVote1;
+        encryptedVote.vote2 = _encryptedVote2;
         encryptedVote.electionDistrict = _wahlbezirk;
         encryptedVotes.push(encryptedVote);
     }
-
 
     function getEncryptedVotes(uint _wahlbezirk) public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
 

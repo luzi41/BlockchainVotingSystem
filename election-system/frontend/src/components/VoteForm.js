@@ -124,15 +124,18 @@ function VoteForm() {
             <div class="row" key={index}>
               <div class="col-95">
                 <span class="left">{party.name} &nbsp; {party.shortname}</span>
+              </div> 
                 <div class="col-5">
-                  <input type="radio" key={index} value={party.short} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
+                  
+                      <input type="radio" key={index} value={party.short} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
+                  
                 </div>
-              </div>    
+                 
             </div>
           ))}
       </div>
     </div>
-      <div class="center"><button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
+      <div class="center"><button onClick={vote} disabled={!tokenInput}>Absenden</button>
         <p>{error}</p>
       </div>
   </div>

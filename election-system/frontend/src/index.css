@@ -66,6 +66,16 @@ th, td {
   text-align: left;
 }
 
+.left {
+  float: left;
+  text-align: left;
+}
+
+.right {
+  float: right;
+  text-align: right;
+}
+
 .center {
   text-align: center;
 }
@@ -85,6 +95,9 @@ th, td {
   padding: 0;
 }
 
+#ballot h2 {
+  text-align: center;
+}
 
 #erststimme {
   float: left;
