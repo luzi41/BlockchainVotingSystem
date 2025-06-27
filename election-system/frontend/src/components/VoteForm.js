@@ -15,9 +15,9 @@ XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+gls
 iQIDAQAB
 -----END PUBLIC KEY-----`;
 
-async function encryptVote(candidateId) {
+async function encryptVote(toVoted) {
   const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
-  const encrypted = pubKey.encrypt(candidateId.toString(), "RSA-OAEP");
+  const encrypted = pubKey.encrypt(toVoted.toString(), "RSA-OAEP");
   return forge.util.encode64(encrypted);
 };
 
@@ -66,6 +66,12 @@ function VoteForm() {
 
   }, [wahlbezirk]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
 
+  /*
+   * function vote
+   * Aktion 33: Verschlüsselt Stimmen aus Formular und sendet 
+   * diese an den RPC-Knoten der Blockchain.
+   * @return string (tx hash or error)
+   */
   const vote = async () => {
       
     if (!window.ethereum) return alert("MetaMask erforderlich!");
@@ -77,11 +83,9 @@ function VoteForm() {
       const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
       const encrypted1 = encryptVote(selectedCandidate);
       const encrypted2 = encryptVote(selectedParty);
-      const tx = await contract.castEncryptedVote(encrypted1, tokenInput, wahlbezirk);
-   
+      const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);
       await tx.wait();
-      console.log(tx.data);
-      
+      //console.log(tx.data);
       setError("✅ Erfolgreich! Transaction: " + tx.hash); 
 
     } catch (err) {
@@ -126,11 +130,8 @@ function VoteForm() {
                 <span class="left">{party.name} &nbsp; {party.shortname}</span>
               </div> 
                 <div class="col-5">
-                  
                       <input type="radio" key={index} value={party.short} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
-                  
                 </div>
-                 
             </div>
           ))}
       </div>
