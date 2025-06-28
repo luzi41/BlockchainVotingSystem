@@ -16,7 +16,6 @@ prompt.get(['PathToQuorum'], function (err, result) {
     console.log('Command-line input received:');
     console.log('  PathToQuorum: ' + result.PathToQuorum);
 
-
     app.use(express.json());
 
     const keystore = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountKeystore", "utf8");
@@ -35,6 +34,27 @@ prompt.get(['PathToQuorum'], function (err, result) {
       const encryptedBytes = Buffer.from(_bytes, "base64");
       const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
       return decrypted;
+    }
+
+    function decryptStringVote(_vote) {
+      const decrypted = decryptBytes(_vote); // <- das auch in die Hilfsfunktion?
+      console.log("Stimme = " + decrypted) // <- das auch in die Hilfsfunktion?
+      return decrypted; // <- das auch in die Hilfsfunktion? (return)      
+    }
+
+    function tally(_decryptedVotes) {
+      const tally = {};        
+      for (const name of _decryptedVotes) {
+        tally[name] = (tally[name] || 0) + 1;
+      }
+      return JSON.stringify(tally);
+    }
+
+    function signature(_tally) {
+      const md1 = forge.md.sha1.create();
+      md1.update(_tally, 'utf8');
+      const signature = forge.util.encode64(privateKey.sign(md1));
+      return signature;
     }
 
     app.post("/registerElectionDistrict", async (req, res) => {
@@ -120,56 +140,25 @@ prompt.get(['PathToQuorum'], function (err, result) {
         const decryptedVotes1 = [];
         const decryptedVotes2 = [];  
         
-        for (let i = 0; i < encryptedVotes.length; i++) {
+        for (let i = 0; i < encryptedVotes.length; i++) {         
           const encryptedVote = encryptedVotes[i];
-          // Erststimme
-          const eVote1 = encryptedVote.vote1;
-          // in eigene Hilfsfunktion?!
-          //const encryptedBytes = Buffer.from(eVote1, "base64");
-          //const decrypted1 = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
-          const decrypted1 = decryptBytes(eVote1); // <- das auch in die Hilfsfunktion?
-          console.log("Stimme " + i + "= " + decrypted1) // <- das auch in die Hilfsfunktion?
-          decryptedVotes1[i] = decrypted1; // <- das auch in die Hilfsfunktion? (return)
-
-          // Zweitstimme
-          
-          const eVote2 = encryptedVote.vote2;
-          const decrypted2 = decryptBytes(eVote2);
-          console.log("Stimme " + i + "= " + decrypted2)
-          decryptedVotes2[i] = decrypted2;
+          decryptedVotes1[i] = decryptStringVote(encryptedVote.vote1);
+          decryptedVotes2[i] = decryptStringVote(encryptedVote.vote2);
         }
-        
-        // Erststimme Tally
-        // In funktion ausgliedern und für beide Stimmen benutzen
-        const tally1 = {};        
-        for (const name of decryptedVotes1) {
-          tally1[name] = (tally1[name] || 0) + 1;
-        }
-        const timestamp1 = new Date().toISOString();
-        const md1 = forge.md.sha1.create();
-        md1.update(JSON.stringify(tally1), 'utf8');
-        const signature1 = forge.util.encode64(privateKey.sign(md1));
-        // Ende ausgliedern
 
-        const tx1 = await contract.storeElectionResult1(JSON.stringify(tally1), signature1, wahlbezirk);
+        // Erststimme
+        const tally1 = tally(decryptedVotes1);
+        const signature1 = signature(tally1);
+        const tx1 = await contract.storeElectionResult1(tally1, signature1, wahlbezirk);
         await tx1.wait() 
-        console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx1.hash);
+        console.log("✅ Erststimmen gespeichert und Transaktion gesendet:", tx1.hash);
 
-        // Zweitstimme 
-        // In funktion ausgliedern und für beide Stimmen benutzen        
-        const tally2 = {};
-        for (const name of decryptedVotes2) {
-          tally2[name] = (tally2[name] || 0) + 1;
-        }
-        const timestamp2 = new Date().toISOString();
-        const md2 = forge.md.sha1.create();
-        md2.update(JSON.stringify(tally2), 'utf8');
-        const signature2 = forge.util.encode64(privateKey.sign(md2));  
-        // Ende ausgliedern
-
-        const tx2 = await contract.storeElectionResult1(JSON.stringify(tally2), signature2, wahlbezirk);
+        // Zweitstimme        
+        const tally2 = tally(decryptedVotes2);
+        const signature2 = signature(tally2);
+        const tx2 = await contract.storeElectionResult2(tally2, signature2, wahlbezirk);
         await tx2.wait() 
-        console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx2.hash);        
+        console.log("✅ Zweitstimmen gespeichert und Transaktion gesendet:", tx2.hash);        
         
         res.send({ status: "success" });     
       } catch (err) {
