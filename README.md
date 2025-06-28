@@ -186,53 +186,53 @@ Save the ABI in the election-system directory (replace filenames with your corre
 
 Open a new terminal and exec:
 
-    curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "1"}' &&
-    curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "2"}' &&
-    curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "3"}' &&    
-    curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Christlich Demokratische Union", "shortname" : "CDU"}' &&
-    curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Sozialdemokratische Partei Deutschlands", "shortname" : "SPD"}' &&
-    curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Freie Demokratische Partei", "shortname" : "FDP"}' &&
-    curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Bündnis 90/Die Grünen", "shortname" : "Grüne"}' &&
-    curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Die Linke", "shortname" : "Linke"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "1"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "2"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly", "wahlbezirk": "1", "partei": "3"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Denise", "wahlbezirk": "1", "partei": "4"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Emily", "wahlbezirk": "1", "partei": "5"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Fritz", "wahlbezirk": "2", "partei": "1"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Gertrud", "wahlbezirk": "2", "partei": "2"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Harry", "wahlbezirk": "2", "partei": "3"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Isolde", "wahlbezirk": "2", "partei": "4"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Jason", "wahlbezirk": "2", "partei": "5"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Karla", "wahlbezirk": "3", "partei": "1"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Louis", "wahlbezirk": "3", "partei": "2"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Mandy", "wahlbezirk": "3", "partei": "3"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Nele", "wahlbezirk": "3", "partei": "4"}' &&
-    curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Otto", "wahlbezirk": "3", "partei": "5"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken4", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken5", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8", "electionDistrict" : "1"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken9", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken10", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken11", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken12", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken13", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken14", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken15", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken16", "electionDistrict" : "2"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken17", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken18", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken19", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken20", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken21", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken22", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken23", "electionDistrict" : "3"}' &&
-    curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken24", "electionDistrict" : "3"}'     
+curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "1"}' &&
+curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "2"}' &&
+curl -X POST http://localhost:3001/registerElectionDistrict -H "Content-Type: application/json" -d '{"name" : "Wahlkreis", "nummer" : "3"}' &&    
+curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Christlich Demokratische Union", "shortname" : "CDU"}' &&
+curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Sozialdemokratische Partei Deutschlands", "shortname" : "SPD"}' &&
+curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Freie Demokratische Partei", "shortname" : "FDP"}' &&
+curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Bündnis 90/Die Grünen", "shortname" : "Grüne"}' &&
+curl -X POST http://localhost:3001/registerParty -H "Content-Type: application/json" -d '{"name" : "Die Linke", "shortname" : "Linke"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Alice", "wahlbezirk": "1", "partei": "CDU"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Bob", "wahlbezirk": "1", "partei": "SPD"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Charly", "wahlbezirk": "1", "partei": "FDP"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Denise", "wahlbezirk": "1", "partei": "Grüne"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Emily", "wahlbezirk": "1", "partei": "Linke"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Fritz", "wahlbezirk": "2", "partei": "CDU"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Gertrud", "wahlbezirk": "2", "partei": "SPD"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Harry", "wahlbezirk": "2", "partei": "FDP"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Isolde", "wahlbezirk": "2", "partei": "Grüne"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Jason", "wahlbezirk": "2", "partei": "Linke"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Karla", "wahlbezirk": "3", "partei": "CDU"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Louis", "wahlbezirk": "3", "partei": "SPD"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Mandy", "wahlbezirk": "3", "partei": "FDP"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Nele", "wahlbezirk": "3", "partei": "Grüne"}' &&
+curl -X POST http://localhost:3001/registerCandidate -H "Content-Type: application/json" -d '{"name": "Otto", "wahlbezirk": "3", "partei": "Linke"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken4", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken5", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken6", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken7", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken8", "electionDistrict" : "1"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken9", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken10", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken11", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken12", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken13", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken14", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken15", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken16", "electionDistrict" : "2"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken17", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken18", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken19", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken20", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken21", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken22", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken23", "electionDistrict" : "3"}' &&
+curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken24", "electionDistrict" : "3"}'
     
 ## 4.5 Start voting phase:
 

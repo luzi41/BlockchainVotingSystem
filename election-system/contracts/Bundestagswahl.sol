@@ -31,7 +31,7 @@ contract Bundestagswahl is Registry {
         string name;
         uint wahlbezirk;
         string partei;
-        string url;
+        //string url;
     }
 
     struct ElectionResult {
