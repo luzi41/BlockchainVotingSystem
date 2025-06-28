@@ -34,12 +34,19 @@ contract Bundestagswahl is Registry {
         //string url;
     }
 
-    struct ElectionResult {
+    struct ElectionResult1 {
         string tally;
         string signature;
         uint timestamp;
         uint electionDistrict;
     }
+
+    struct ElectionResult2 {
+        string tally;
+        string signature;
+        uint timestamp;
+        uint electionDistrict;
+    }    
 
     struct EncryptedVote {
         string vote1;
@@ -53,8 +60,9 @@ contract Bundestagswahl is Registry {
     // Array to store candidates
     Candidate[] public candidates;
 
-    // Array to store decrypted results
-    ElectionResult[] public electionResults;
+    // Arrays to store decrypted results
+    ElectionResult1[] public electionResults1;
+    ElectionResult2[] public electionResults2;
 
     // fkt. Wahlbezirke (ElectionDistricts)
     function getElectionDistricts() public view returns (ElectionDistrict[] memory){
@@ -152,32 +160,43 @@ contract Bundestagswahl is Registry {
         return filteredEncryptedVotes;
     }
 
-    function storeElectionResult(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
-        ElectionResult memory result;
+    function storeElectionResult1(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
+        ElectionResult1 memory result;
         result.tally = _tally;
         result.signature = _signature;
         result.timestamp = block.timestamp;
         result.electionDistrict = _wahlbezirk;
-        electionResults.push(result);
+        electionResults1.push(result);
     }
 
-    //fkt. public Client
-    // Gibt nur den Datensatz für den letzten Bezirk zurück (alt)
-    function getElectionResults() public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
+    function storeElectionResult2(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
+        ElectionResult2 memory result;
+        result.tally = _tally;
+        result.signature = _signature;
+        result.timestamp = block.timestamp;
+        result.electionDistrict = _wahlbezirk;
+        electionResults2.push(result);
+    }
+
+    // Neu: Gibt Datensatz Erststimmen für einen bestimmten Wahlbezirk zurück
+    function getElectionResultsDistrict1(uint _electionDistrict) public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
         
-        uint index = electionResults.length -1; // index letzter Datensatz im Array (fängt bei Null an!)
-
-        ElectionResult storage result = electionResults[index];
-        return (result.tally, result.electionDistrict, result.signature, result.timestamp);
+        for (uint i = 0; i < electionResults1.length; i++) {
+            if (electionResults1[i].electionDistrict == _electionDistrict) {
+                
+                ElectionResult1 storage result = electionResults1[i];
+                return (result.tally, result.electionDistrict, result.signature, result.timestamp);
+            }
+        }
     }
 
-    // Neu: Gibt Datensatz für einen bestimmten Wahlbezirk zurück
-    function getElectionResultsDistrict(uint _electionDistrict) public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
-        uint count = 0;
-        for (uint i = 0; i < electionResults.length; i++) {
-            if (electionResults[i].electionDistrict == _electionDistrict) {
-                count++;
-                ElectionResult storage result = electionResults[i];
+    // Neu: Gibt Datensatz Zweitstimmen für einen bestimmten Wahlbezirk zurück
+    function getElectionResultsDistrict2(uint _electionDistrict) public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
+        
+        for (uint i = 0; i < electionResults2.length; i++) {
+            if (electionResults2[i].electionDistrict == _electionDistrict) {
+                
+                ElectionResult2 storage result = electionResults2[i];
                 return (result.tally, result.electionDistrict, result.signature, result.timestamp);
             }
         }
