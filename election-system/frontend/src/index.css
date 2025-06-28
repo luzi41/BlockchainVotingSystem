@@ -13,14 +13,14 @@ code {
     monospace;
 }
 
-nav {
+nav.main {
   font-size: 1em;
   margin: 0;
   border: 0;
   width: 100%;
 }
 
-nav ul {
+nav.main ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -28,11 +28,11 @@ nav ul {
   background-color: #000;  
 }
 
-nav ul li {
+nav.main ul li {
   float: left;
 }
 
-nav ul li a {
+nav.main ul li a {
   display: block;
   color: white;
   padding: 14px 16px;  
@@ -40,7 +40,7 @@ nav ul li a {
   text-decoration: none;  
 }
 
-nav ul li.title {
+nav.main ul li.title {
   float: right;
   color: white;
   text-align: right;
@@ -66,6 +66,16 @@ th, td {
   text-align: left;
 }
 
+.left {
+  float: left;
+  text-align: left;
+}
+
+.right {
+  float: right;
+  text-align: right;
+}
+
 .center {
   text-align: center;
 }
@@ -80,13 +90,33 @@ th, td {
 }
 
 #ballot {
-  /*float: left;*/
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+#ballot h2 {
+  text-align: center;
+}
+
+#erststimme {
+  float: left;
+  width: 50%;
   margin-top: 15px;
   margin-left: auto;
   margin-right: auto;
   padding: 5px;
-  
   border: 1px solid black;
+}
+
+#zweitstimme {
+  float: right;
+  width: 50%;
+  margin-top: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  border: 1px solid black;  
 }
 
 div .row {

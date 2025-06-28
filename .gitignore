@@ -7,7 +7,6 @@ keys/
 election-system/frontend/src/artifacts
 election-system/frontend/src/results
 
-
 # Hardhat files
 election-system/cache
 election-system/artifacts
@@ -30,7 +29,6 @@ election-system/contracs/ElectionRegister.sol
 election-system/contracs/VoteLedger.sol
 election-system/contracs/Tally.sol
 
-
 # Hardhat Ignition default folder for deployments against a local node
 election-system/ignition/deployments/chain-31337
 
@@ -51,6 +49,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Data
+*.json
+
 # misc
 /cache
 election-system/api/deployment-address.txt
@@ -61,15 +62,9 @@ election-system/frontend/.env.production
 election-system/frontend/.env.development
 election-system/frontend/.env.test
 .vscode
-.gitignore
 
-election-system/api/Election.json
-election-system/frontend/src/results/aggregated.json
 election-system/hardhat.config.js
-election-system/frontend/src/artifacts/contracts/Election.sol/Election.dbg.json
-election-system/frontend/src/artifacts/contracts/Election.sol/Election.json
-election-system/frontend/src/artifacts/contracts/Election.sol/Election.tally.json
-election-system/frontend/src/artifacts/contracts/Election.sol/Election.tally.dbg.json
-
 election-system/admin-ui/src/reportWebVitals.js
 election-system/frontend/src/artifacts/index.text
+
+

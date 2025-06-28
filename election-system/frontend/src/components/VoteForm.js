@@ -1,9 +1,11 @@
+import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
-import Election from "../artifacts/contracts/Election.sol/Election.json";
+import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 import scanner from "../assets/scan-59.png";
+
 
 const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2
@@ -15,37 +17,68 @@ XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+gls
 iQIDAQAB
 -----END PUBLIC KEY-----`;
 
-async function encryptVote(candidateId) {
+async function encryptVote(toVoted) {
   const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
-  const encrypted = pubKey.encrypt(candidateId.toString(), "RSA-OAEP");
+  const encrypted = pubKey.encrypt(toVoted.toString(), "RSA-OAEP");
   return forge.util.encode64(encrypted);
 };
 
 function VoteForm() {
+ 
+  let { ed } = useParams();
+  if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
+  {
+    ed = 1;
+  }
+  const [wahlbezirk, setWahlbezirk] = useState(ed);
   const [candidates, setCandidates] = useState([]);
+  const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
+  const [selectedParty, setSelectedParty] = useState("");
   const [error, setError] = useState("");
-  const [tokenInput, setTokenInput] = useState("");
-  const [wahlbezirk, setWahlbezirk] = useState(1);  
-      
+  const [tokenInput, setTokenInput] = useState(""); 
+
   useEffect(() => {
     async function fetchCandidates() {
-        try {
-          if (window.ethereum) {
-            const provider = new BrowserProvider(window.ethereum);
-            const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-            const candidatesList = await contract.getCandidates(wahlbezirk);
-            setCandidates(candidatesList);
-          }
-       }
-        catch (error) {
-            console.error("Fehler beim Abrufen der Kandidaten:", error);
-        }        
+      try {
+        if (window.ethereum) {
+          const provider = new BrowserProvider(window.ethereum);
+          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
+          const _electionDistricts = await contract.getElectionDistricts();
+          // wenn wahlkreis nicht enthalten in _electionDistricts throw error
+          const candidatesList = await contract.getCandidates(wahlbezirk);
+          setCandidates(candidatesList);
+        }
+      }
+      catch (error) {
+          console.error("Fehler beim Abrufen der Kandidaten:", error);
+      }        
+    }
+
+    async function fetchParties() {
+      try {
+         
+        if (window.ethereum) {
+          const provider = new BrowserProvider(window.ethereum);
+          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);           
+          const partiesList = await contract.getParties();
+          setParties(partiesList);
+        }
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Parteien:", error);
+      }
     }
 
     fetchCandidates();
-  }, [wahlbezirk]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
-
+    fetchParties();
+  }, [wahlbezirk, selectedCandidate, selectedParty]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
+  //console.log("WB: " + wahlbezirk + " SC: " + selectedCandidate);
+  /*
+   * function vote
+   * Aktion 33: Verschlüsselt Stimmen aus Formular und sendet 
+   * diese an den RPC-Knoten der Blockchain.
+   * @return string (tx hash or error)
+   */
   const vote = async () => {
       
     if (!window.ethereum) return alert("MetaMask erforderlich!");
@@ -55,12 +88,11 @@ function VoteForm() {
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
-      const encrypted = encryptVote(selectedCandidate);
-      const tx = await contract.castEncryptedVote(encrypted, tokenInput, wahlbezirk);
-   
+      const encrypted1 = encryptVote(selectedCandidate);
+      const encrypted2 = encryptVote(selectedParty);
+      const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);
       await tx.wait();
       console.log(tx.data);
-      
       setError("✅ Erfolgreich! Transaction: " + tx.hash); 
 
     } catch (err) {
@@ -70,7 +102,9 @@ function VoteForm() {
 
   return (
   <div>
-    <div class="row">   
+    
+    <div class="row">
+      
       <div class="col-50">
         <p>Ihr Token</p>
         <p>
@@ -81,25 +115,40 @@ function VoteForm() {
       <div class="col-50">
         <p>Ihr Wahlbezirk</p>
         <p>
-          <input type="number" placeholder="Wahlbezirk" name="wahlbezirk" value={wahlbezirk} onChange={(e) => setWahlbezirk(e.target.value)} />
+          {wahlbezirk}
       </p>      
       </div>
     </div>
-  
-    <div  id="ballot">    
-        <h2>Stimmzettel</h2>
-          {candidates.map((candidate, index ) => (
-          <div class="row">
-            <div class="col-95">
-              <span class="left">{candidate.name} &nbsp; {candidate.partei}</span>
-            </div>
-            <div class="col-5"><input type="radio" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+    <div id="ballot">
+      <div  id="erststimme">    
+        <h2>Erststimme</h2>
+        {candidates.map((candidate, index ) => (
+        <div class="row" key={index}>
+          <div class="col-95">
+            <span class="left">{candidate.name}</span><span class="right">{candidate.partei}</span>
           </div>
-          ))}      
+          <div class="col-5"><input type="radio" disabled={!wahlbezirk} class="vote" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+        </div>
+        ))}    
+      </div>
+      <div id="zweitstimme">
+          <h2>Zweitstimme</h2>
+          {parties.map((party, index ) => (
+            <div class="row" key={index}>
+              <div class="col-95">
+                <span class="left">{party.name} &nbsp; {party.shortname}</span>
+              </div> 
+                <div class="col-5">
+                      <input type="radio" disabled={!wahlbezirk} class="radio" key={index} value={party.shortname} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
+                </div>
+            </div>
+          ))}
+      </div>
     </div>
-      <div class="center"><button onClick={vote} disabled={!selectedCandidate || !tokenInput}>Absenden</button>
-      <p>{error}</p>
-    </div>
+      <div class="center"><button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+        <p>{error}</p>
+      </div>
+      
   </div>
   );
 }
