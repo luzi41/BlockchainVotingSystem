@@ -28,6 +28,13 @@ prompt.get(['PathToQuorum'], function (err, result) {
       const signer = wallet.connect(provider);
       return new ethers.Contract(contractAddress, abi, signer);
     }
+    /*
+    function decryptBytes(_bytes) {
+      const encryptedBytes = Buffer.from(_bytes, "base64");
+      const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
+      return decrypted;
+    }
+    */
 
     app.post("/registerElectionDistrict", async (req, res) => {
       const {name, nummer} = req.body;
@@ -109,31 +116,43 @@ prompt.get(['PathToQuorum'], function (err, result) {
         const contract = await loadContract();
         const encryptedVotes = await contract.getEncryptedVotes(wahlbezirk);
         console.log("Anzahl Stimmen: " + encryptedVotes.length);
-        const decryptedVotes = [];  
+        const decryptedVotes1 = [];
+        //const decryptedVotes2 = [];  
         
         for (let i = 0; i < encryptedVotes.length; i++) {
           const encryptedVote = encryptedVotes[i];
-          const eVote = encryptedVote.vote;
+          // Erststimme
+          const eVote1 = encryptedVote.vote1;
+          // in eigene Hilfsfunktion?!
+          const encryptedBytes = Buffer.from(eVote1, "base64");
+          const decrypted1 = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
+          //const decrypted1 = decryptBytes(eVote1); // <- das auch in die Hilfsfunktion?
+          console.log("Stimme " + i + "= " + decrypted1) // <- das auch in die Hilfsfunktion?
+          decryptedVotes1[i] = decrypted1; // <- das auch in die Hilfsfunktion? (return)
 
-          const encryptedBytes = Buffer.from(eVote, "base64");
-          const decrypted = privateKey.decrypt(encryptedBytes.toString("binary"), "RSA-OAEP");
-          console.log("Stimme " + i + "= " + decrypted)
-          decryptedVotes[i] = decrypted;
+          // Zweitstimme
+          /*
+          const eVote2 = encryptedVote.vote2;
+          const decrypted2 = decryptBytes(eVote2);
+          console.log("Stimme " + i + "= " + decrypted2)
+          decryptedVotes2[i] = decrypted2;
+          */
         }
         
-        const tally = {};
-
-        for (const name of decryptedVotes) {
-          tally[name] = (tally[name] || 0) + 1;
+        // Erststimme Tally
+        const tally1 = {};
+        for (const name of decryptedVotes1) {
+          tally1[name] = (tally1[name] || 0) + 1;
         }
-
         const timestamp = new Date().toISOString();
         const md = forge.md.sha1.create();
-        md.update(JSON.stringify(tally), 'utf8');
+        md.update(JSON.stringify(tally1), 'utf8');
         const signature = forge.util.encode64(privateKey.sign(md));  
-        const tx = await contract.storeElectionResult(JSON.stringify(tally), signature, wahlbezirk);
+        const tx = await contract.storeElectionResult(JSON.stringify(tally1), signature, wahlbezirk);
         await tx.wait() 
         console.log("✅ Ergebnisse gespeichert und Transaktion gesendet:", tx.hash);
+
+        // Zweitstimme ... kommt noch
         
         res.send({ status: "success" });     
       } catch (err) {

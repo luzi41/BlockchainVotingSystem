@@ -13,14 +13,14 @@ code {
     monospace;
 }
 
-nav {
+nav.main {
   font-size: 1em;
   margin: 0;
   border: 0;
   width: 100%;
 }
 
-nav ul {
+nav.main ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -28,11 +28,11 @@ nav ul {
   background-color: #000;  
 }
 
-nav ul li {
+nav.main ul li {
   float: left;
 }
 
-nav ul li a {
+nav.main ul li a {
   display: block;
   color: white;
   padding: 14px 16px;  
@@ -40,7 +40,7 @@ nav ul li a {
   text-decoration: none;  
 }
 
-nav ul li.title {
+nav.main ul li.title {
   float: right;
   color: white;
   text-align: right;

@@ -1,5 +1,5 @@
-// V 0.15.4
-import React, { useState, useEffect } from "react";
+// V 0.18.7
+import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
@@ -7,7 +7,6 @@ import { CONTRACT_ADDRESSES } from "../config";
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
-  //const [electionDistricts, setElectionDistricts] = useState("");
   
   useEffect(() => {
       async function fetchResults() {
@@ -22,10 +21,20 @@ function Results() {
         const results = [];
 
         for (var i = 0; i < _electionDistricts.length; i++) {
-          let j = i + 1;
+          let j = i + 1;          
           const newResult = await contract.getElectionResultsDistrict(j);
-          results[i] = JSON.parse(newResult.tally);    
-          console.log(results[i]);
+          /*
+          if (newResult.tally !== "") {
+            results[i] = JSON.parse(newResult.tally)
+            console.log(results[i]);
+          } 
+          else {
+            console.log("Fehler WK: " + j);
+            break;
+          }
+          */
+            results[i] = JSON.parse(newResult.tally)
+            console.log(results[i]);
         }
              
         const htmlED = (
@@ -51,6 +60,7 @@ function Results() {
                             </tr>
                           </thead>
                           <tbody>
+                            
                             {Object.entries(results[ID]).map(([name, value]) => (
                               <tr key={name}>
                                 <td>{name}</td>

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.18.6
+// V 0.18.7
 
 import "./Registry.sol";
 
@@ -15,16 +15,23 @@ contract Bundestagswahl is Registry {
         uint nummer;
     }
 
+    ElectionDistrict[] public electionDistricts;
+    event ElectionDistrictCreated(string name, uint _electionDistrict);    
+
     struct Party {
         uint256 uid;
         string name;
         string shortname;
     }
 
+    Party[] public parties;
+    event PartyCreated(uint256 uid, string name, string shortname);
+
     struct Candidate {
         string name;
         uint wahlbezirk;
         string partei;
+        string url;
     }
 
     struct ElectionResult {
@@ -43,10 +50,6 @@ contract Bundestagswahl is Registry {
     //array to store encrypted votes
     EncryptedVote[] public encryptedVotes;
 
-    ElectionDistrict[] public electionDistricts;
-
-    Party[] public parties;
-
     // Array to store candidates
     Candidate[] public candidates;
 
@@ -60,6 +63,7 @@ contract Bundestagswahl is Registry {
 
     function registerElectionDistrict(string memory _name, uint _nummer) public Registry.onlyAdmin Registry.onlyBeforeVoting {
         electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer}));
+        emit ElectionDistrictCreated(_name, _nummer);
     }
 
     function getParties() public view returns (Party[] memory) {
@@ -132,13 +136,12 @@ contract Bundestagswahl is Registry {
                 count++;
             }
         }
-
-        // Create a new array with the correct size
-        EncryptedVote[] memory filteredEncryptedVotes = new EncryptedVote[](count);
         if (count == 0) {
             return new EncryptedVote[](0); // Return an empty array if no candidates found
         }
-        
+        // Create a new array with the correct size
+        EncryptedVote[] memory filteredEncryptedVotes = new EncryptedVote[](count);
+
         uint index = 0;
         for (uint i = 0; i < encryptedVotes.length; i++) {
             if (encryptedVotes[i].electionDistrict == _wahlbezirk) {

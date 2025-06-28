@@ -274,3 +274,12 @@ election-system/scripts$
 ### 4.7.3 See results in the browser
 
 Navigate to http://localhost:3002/results
+
+# 5. Changes
+
+- V 0.17: Smart Contract: Bundestagswahl (Germany)
+- V 0.18: German Bundestagswahl: Zweitstimme
+
+# 6. Todo
+
+- Election templates: different kinds of elections and surveys (V 1.0)

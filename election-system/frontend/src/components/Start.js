@@ -1,6 +1,35 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import { BrowserProvider, Contract} from "ethers";
+import { CONTRACT_ADDRESSES } from "../config";
+import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
+import { useParams } from 'react-router-dom'
 
 function Start() {
+  let { ed } = useParams();
+  if (isNaN(ed))
+  {
+    ed = 1;
+  }  
+  const [wahlbezirk, setWahlbezirk] = useState(ed);
+  const [candidates, setCandidates] = useState([]);
+  useEffect(() => {
+    async function fetchCandidates() {
+      try {
+        if (window.ethereum) {
+          const provider = new BrowserProvider(window.ethereum);
+          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);            
+          const candidatesList = await contract.getCandidates(wahlbezirk);
+          setCandidates(candidatesList);
+        }
+      }
+      catch (error) {
+          console.error("Fehler beim Abrufen der Kandidaten:", error);
+      }        
+    }
+    fetchCandidates()
+  }, []);
+
   return (
     <div>
       <h3>Registrieren für die Online-Wahl</h3>
@@ -14,9 +43,11 @@ function Start() {
         Bei dieser Wahl werden die Mitglieder des Deutschen Bundestages gewählt. Mit der ersten Stimme wählen SIe den Direktkanidaten Ihres Wahlbezirkes und mit der zweiten Stimme eine Partei.
       </div>
       <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlbezirk</h3>
-      -
-      -
-      -
+        {candidates.map((candidate, index ) => (
+        <div key={index}>
+          <a href="#">{candidate.name}</a> &nbsp; {candidate.partei}
+        </div>
+        ))}
       <h3>Die Partien und ihre Wahlprogramme</h3>
       -
       -
