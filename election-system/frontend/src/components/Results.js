@@ -1,4 +1,4 @@
-// V 0.18.7
+// V 0.19.2
 import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
@@ -34,23 +34,29 @@ function Results() {
              
         const htmlED = (
           <div>
-            <h2>Wahlkreise</h2>
+            <h1>Wahlergebnisse</h1>
+            <p>
+              <select>
+                <option value="1">Wahlkreise</option>
+                <option value="2">Gesamt</option>
+              </select>
+            </p>
             <table border="1" cellPadding="5" cellSpacing="0">
               <thead></thead>
               <tbody>
                 {Object.entries(_electionDistricts).map(([ID, value]) => (
                   <>
                     <tr key={ID}> 
-                      <td>{value.name} {value.nummer}</td>
+                      <td><h2>{value.name} {value.nummer}</h2></td>
                     </tr>
                     <tr>
                       <td>
-                        <tr><td><b>Erststimmen</b></td></tr>
+                        <b>Erststimmen</b>
                         <table border="0" cellPadding="5" cellSpacing="0">
                           <thead>
                             <tr>
-                              <th>Name</th>
-                              <th>Stimmen</th>
+                              <th width="50%">Name</th>
+                              <th width="50%">Stimmen</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -62,12 +68,12 @@ function Results() {
                             ))}
                           </tbody>
                         </table>
-                        <tr><td><b>Zweitstimmen</b></td></tr>
+                        <b>Zweitstimmen</b>
                         <table border="0" cellPadding="5" cellSpacing="0">
                           <thead>
                             <tr>
-                              <th>Partei</th>
-                              <th>Stimmen</th>
+                              <th width="50%">Partei</th>
+                              <th width="50%">Stimmen</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -84,18 +90,12 @@ function Results() {
                   </>
                 ))}
               </tbody>
-            </table> 
-            {status}
+            </table>
           </div>           
         );
-        
-        
-        //setElectionDistricts(htmlED);
-        
+             
         setHtml(htmlED); // Wiederholung anfügen
-        // Wiederholung Ende
-
-        
+        setStatus("")
       } catch (err) {
         
         console.error('Fehler beim Laden des Moduls:', err);

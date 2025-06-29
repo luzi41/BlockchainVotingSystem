@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.19.1
+// V 0.19.2
 
 import "./Registry.sol";
 
@@ -43,6 +43,16 @@ contract Bundestagswahl is Registry {
     // Array to store candidates
     Candidate[] public candidates;
     event CandidateCreated(uint256 uid, string name, uint wahlbezirk);    
+ 
+
+    struct EncryptedVote {
+        string vote1;
+        string vote2;
+        uint electionDistrict;
+    }
+
+    //array to store encrypted votes
+    EncryptedVote[] public encryptedVotes;
 
     struct ElectionResult1 {
         string tally;
@@ -56,20 +66,14 @@ contract Bundestagswahl is Registry {
         string signature;
         uint timestamp;
         uint electionDistrict;
-    }    
-
-    struct EncryptedVote {
-        string vote1;
-        string vote2;
-        uint electionDistrict;
-    }
-
-    //array to store encrypted votes
-    EncryptedVote[] public encryptedVotes;
+    }       
 
     // Arrays to store decrypted results
     ElectionResult1[] public electionResults1;
     ElectionResult2[] public electionResults2;
+
+    event StoreElectionResult1(address sender, uint electionDistrict, uint256 timestamp);
+    event StoreElectionResult2(address sender, uint electionDistrict, uint256 timestamp);
 
     // fkt. Wahlbezirke (ElectionDistricts)
     function getElectionDistricts() public view returns (ElectionDistrict[] memory){
