@@ -40,6 +40,9 @@ contract Bundestagswahl is Registry {
         string url;
         uint256 votes;
     }
+    // Array to store candidates
+    Candidate[] public candidates;
+    event CandidateCreated(uint256 uid, string name, uint wahlbezirk);    
 
     struct ElectionResult1 {
         string tally;
@@ -63,9 +66,6 @@ contract Bundestagswahl is Registry {
 
     //array to store encrypted votes
     EncryptedVote[] public encryptedVotes;
-
-    // Array to store candidates
-    Candidate[] public candidates;
 
     // Arrays to store decrypted results
     ElectionResult1[] public electionResults1;
