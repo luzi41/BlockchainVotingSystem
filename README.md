@@ -98,7 +98,7 @@ The prototype refers to a parliamentary election such as the federal election in
 - Node.js (LTS)
 - npm
 - Git
-- Docker & Docker Compose
+- [Docker & Docker Compose] (https://docker.com) (running service user access)
 - curl command line
 - MetaMask Browser Extension
 
