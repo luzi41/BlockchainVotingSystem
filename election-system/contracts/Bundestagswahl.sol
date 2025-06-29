@@ -9,6 +9,7 @@ import "./Registry.sol";
 contract Bundestagswahl is Registry {
     uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
     uint256 currentPartyId;
+    uint256 currentCandidateId;
 
     struct ElectionDistrict {
         string name;
@@ -22,16 +23,22 @@ contract Bundestagswahl is Registry {
         uint256 uid;
         string name;
         string shortname;
+        string color;
+        string bgcolor;
+        string url;
+        uint256 votes;
     }
 
     Party[] public parties;
     event PartyCreated(uint256 uid, string name, string shortname);
 
     struct Candidate {
+        uint256 uid;
         string name;
         uint wahlbezirk;
         string partei;
-        //string url;
+        string url;
+        uint256 votes;
     }
 
     struct ElectionResult1 {
@@ -78,18 +85,45 @@ contract Bundestagswahl is Registry {
         return parties;
     }
 
-    function registerParty(string memory _name, string memory _shortname) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function registerParty(
+        string memory _name, 
+        string memory _shortname
+        ) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+
         currentPartyId++;
-        parties.push(Party({uid: currentPartyId, name: _name, shortname: _shortname}));
+        parties.push(Party({
+            uid: currentPartyId, 
+            name: _name, 
+            shortname: _shortname,
+            color: "",
+            bgcolor: "",
+            url: "",
+            votes: 0
+            }));
     }
   
     // fkt. Kandidaten
-    function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function registerCandidate(
+        string memory _name, 
+        uint _wahlbezirk, 
+        string memory _partei
+        ) 
+        public Registry.onlyAdmin Registry.onlyBeforeVoting {
+
         bool found = false;
         for (uint i = 0; i < electionDistricts.length; i++)
         {
             if (electionDistricts[i].nummer == _wahlbezirk) {
-                candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+                currentCandidateId++;
+                candidates.push(Candidate({
+                    uid: currentCandidateId,
+                    name: _name, 
+                    wahlbezirk: _wahlbezirk, 
+                    partei: _partei,
+                    url: "",
+                    votes: 0
+                }));
+
                 found = true;
                 break;
             }
