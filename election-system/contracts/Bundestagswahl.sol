@@ -91,7 +91,11 @@ contract Bundestagswahl is Registry {
 
     function registerParty(
         string memory _name, 
-        string memory _shortname
+        string memory _shortname,
+        string memory _color,
+        string memory _bgcolor,
+        string memory _url
+
         ) public Registry.onlyAdmin Registry.onlyBeforeVoting {
 
         currentPartyId++;
@@ -99,9 +103,9 @@ contract Bundestagswahl is Registry {
             uid: currentPartyId, 
             name: _name, 
             shortname: _shortname,
-            color: "",
-            bgcolor: "",
-            url: "",
+            color: _color,
+            bgcolor: _bgcolor,
+            url: _url,
             votes: 0
             }));
     }
@@ -110,7 +114,8 @@ contract Bundestagswahl is Registry {
     function registerCandidate(
         string memory _name, 
         uint _wahlbezirk, 
-        string memory _partei
+        string memory _partei,
+        string memory _url
         ) 
         public Registry.onlyAdmin Registry.onlyBeforeVoting {
 
@@ -124,7 +129,7 @@ contract Bundestagswahl is Registry {
                     name: _name, 
                     wahlbezirk: _wahlbezirk, 
                     partei: _partei,
-                    url: "",
+                    url: _url,
                     votes: 0
                 }));
 

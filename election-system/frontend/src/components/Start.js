@@ -45,7 +45,7 @@ function Start() {
       <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlbezirk</h3>
         {candidates.map((candidate, index ) => (
         <div key={index}>
-          <a href="#">{candidate.name}</a> &nbsp; {candidate.partei}
+          <a href={candidate.url}>{candidate.name}</a> &nbsp; {candidate.partei}
         </div>
         ))}
       <h3>Die Partien und ihre Wahlprogramme</h3>
