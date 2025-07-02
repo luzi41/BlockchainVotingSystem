@@ -7,6 +7,7 @@ import { CONTRACT_ADDRESSES } from "../config";
 const fmt3 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 let Stimmen = 0;
 
+
 function aggregateObjects(_object) {
   const summe = {};
   let total = 0;
@@ -27,6 +28,8 @@ function aggregateObjects(_object) {
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
+  const [display1, setDisplay1] = useState("none");
+  const [display2, setDisplay2] = useState("block");
     
   useEffect(() => {
       async function fetchResults() {
@@ -58,74 +61,93 @@ function Results() {
           <div>
             <h1>Wahlergebnisse</h1>
             <p>
-              <select>
+              <select
+                onChange={e => {
+                  if (e.target.value === "1") {
+                    setDisplay1("block");
+                    setDisplay2("none");
+                  } else {
+                    setDisplay2("block");
+                    setDisplay1("none");
+                  }
+                }}
+              >
+                <option value="0">Ansicht wählen</option>
                 <option value="1">Wahlkreise</option>
                 <option value="2">Gesamt</option>
               </select>
             </p>
-            <table border="1" cellPadding="5" cellSpacing="0">
-              <thead></thead>
-              <tbody>
-                {Object.entries(_electionDistricts).map(([ID, value]) => (
-                  <>
-                    <tr key={ID}> 
-                      <td><h2>{value.name} {value.nummer}</h2></td>
-                    </tr>
-                    <tr>
+            <div id="ed" style={{ display: display1 }}>
+              <table border="1" cellPadding="5" cellSpacing="0">
+                <thead></thead>
+                <tbody>
+                  {Object.entries(_electionDistricts).map(([ID, value]) => (
+                    <>
+                      <tr key={ID}> 
+                        <td><h2>{value.name} {value.nummer}</h2></td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b>Erststimmen</b>
+                          <table border="0" cellPadding="5" cellSpacing="0">
+                            <thead>
+                              <tr>
+                                <th width="50%">Name</th>
+                                <th width="50%">Stimmen</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {Object.entries(results_1[ID]).map(([name, value]) => (
+                                <tr key={name}>
+                                  <td>{name}</td>
+                                  <td>{value}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <b>Zweitstimmen</b>
+                          <table border="0" cellPadding="5" cellSpacing="0">
+                            <thead>
+                              <tr>
+                                <th width="50%">Partei</th>
+                                <th width="50%">Stimmen</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {Object.entries(results_2[ID]).map(([name, value]) => (
+                                <tr key={name}>
+                                  <td>{name}</td>
+                                  <td>{value}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>                                         
+                        </td>
+                      </tr>
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div id="total" style={{ display: display2 }}>
+              <h2>Parteien insgesamt</h2>
+              <table border="1" cellPadding="5" cellSpacing="0">
+                <thead></thead>
+                <tbody>
+                  {Object.entries(resultsParties).map(([name, value]) => (
+                    <tr key={name}>
+                      <td>{name}</td>
                       <td>
-                        <b>Erststimmen</b>
-                        <table border="0" cellPadding="5" cellSpacing="0">
-                          <thead>
-                            <tr>
-                              <th width="50%">Name</th>
-                              <th width="50%">Stimmen</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Object.entries(results_1[ID]).map(([name, value]) => (
-                              <tr key={name}>
-                                <td>{name}</td>
-                                <td>{value}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        <b>Zweitstimmen</b>
-                        <table border="0" cellPadding="5" cellSpacing="0">
-                          <thead>
-                            <tr>
-                              <th width="50%">Partei</th>
-                              <th width="50%">Stimmen</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Object.entries(results_2[ID]).map(([name, value]) => (
-                              <tr key={name}>
-                                <td>{name}</td>
-                                <td>{value}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>                                         
+                        <div style={{ color:'#fff', backgroundColor: '#ff0000', width: `${(100 * value / Stimmen).toString()}%` }}>
+                          {fmt3.format(100 * value / Stimmen)}
+                        </div>
                       </td>
                     </tr>
-                  </>
-                ))}
-              </tbody>
-            </table>
-            <h2>Parteien insgesamt</h2>
-            <table border="1" cellPadding="5" cellSpacing="0">
-              <thead></thead>
-              <tbody>
-                {Object.entries(resultsParties).map(([name, value]) => (
-                  <tr key={name}>
-                    <td>{name}</td>
-                    <td>{fmt3.format(100*value/Stimmen.toString())}</td>
-                  </tr>
-                ))}         
-              </tbody>
-            </table>
-            <div>Stimmen: {Stimmen}</div>
+                  ))}         
+                </tbody>
+              </table>
+              <div>Stimmen: {Stimmen}</div>
+            </div>
           </div>
           
         );
@@ -144,7 +166,7 @@ function Results() {
       }
     };
     fetchResults();
-  }, [status]);
+  }, [status, display1, display2]);
   return (<div>{html}</div>);
 }
 
