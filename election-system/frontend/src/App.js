@@ -13,8 +13,6 @@ function App() {
   const [status, setStatus] = useState(CONTRACT_ADDRESSES.registry);
   const [title, setTitle] = useState("Wahl 2026");
   
-
-  
   useEffect(() =>  {
     async function fetchStatus() {
         try {

@@ -4,10 +4,30 @@ import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.j
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 
+const fmt3 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+let Stimmen = 0;
+
+function aggregateObjects(_object) {
+  const summe = {};
+  let total = 0;
+  
+  for (const eintrag of _object) {
+    for (const partei in eintrag) {
+      if (!summe[partei]) {
+        summe[partei] = 0;
+      }
+      summe[partei] += eintrag[partei];
+      total += eintrag[partei];
+    }
+  }
+  Stimmen = total;
+  return summe;
+}
+
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
   const [html, setHtml] = useState("");
-  
+    
   useEffect(() => {
       async function fetchResults() {
       try {
@@ -29,8 +49,10 @@ function Results() {
 
           const newResult_2 = await contract.getElectionResultsDistrict2(j);
           results_2[i] = JSON.parse(newResult_2.tally);
-          console.log(results_2[i]);          
+          console.log(results_2[i]);
         }
+        
+        const resultsParties = aggregateObjects(results_2);
              
         const htmlED = (
           <div>
@@ -84,14 +106,28 @@ function Results() {
                               </tr>
                             ))}
                           </tbody>
-                        </table>                                             
+                        </table>                                         
                       </td>
                     </tr>
                   </>
                 ))}
               </tbody>
             </table>
-          </div>           
+            <h2>Parteien insgesamt</h2>
+            <table border="1" cellPadding="5" cellSpacing="0">
+              <thead></thead>
+              <tbody>
+                {Object.entries(resultsParties).map(([name, value]) => (
+                  <tr key={name}>
+                    <td>{name}</td>
+                    <td>{fmt3.format(100*value/Stimmen.toString())}</td>
+                  </tr>
+                ))}         
+              </tbody>
+            </table>
+            <div>Stimmen: {Stimmen}</div>
+          </div>
+          
         );
              
         setHtml(htmlED); // Wiederholung anfügen
