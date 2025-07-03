@@ -1,3 +1,4 @@
+// v0.19.8
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { BrowserProvider, Contract } from "ethers";
@@ -5,7 +6,7 @@ import { CONTRACT_ADDRESSES} from "./config";
 import Election from "./artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import Start from "./components/Start"
 import VoteForm from "./components/VoteForm";
-import Results from "./components/Results";
+import Results from "./components/Results.tsx";
 import Extras from "./components/Extras";
 import Log from "./components/Log";
 
@@ -29,7 +30,7 @@ function App() {
             setStatus(CONTRACT_ADDRESSES.registry + ": " + status);
             
             const electionTitle = await contract.getElectionTitle();
-            setTitle(electionTitle);
+            if (electionTitle !== "") setTitle(electionTitle);
           }
         }
         catch (error) {

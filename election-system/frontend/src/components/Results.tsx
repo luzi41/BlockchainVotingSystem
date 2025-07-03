@@ -4,6 +4,13 @@ import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.j
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 
+// Add this declaration to inform TypeScript about window.ethereum
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 const fmt3 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 let Stimmen = 0;
 
@@ -27,9 +34,10 @@ function aggregateObjects(_object) {
 
 function Results() {
   const [status, setStatus] = useState("Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.");
-  const [html, setHtml] = useState("");
-  const [display1, setDisplay1] = useState("none");
-  const [display2, setDisplay2] = useState("block");
+  const [html, setHtml] = useState<React.ReactNode>("");
+  const [parties, setParties] = useState<any[]>([]);
+  const [display1, setDisplay1] = useState<string>("none");
+  const [display2, setDisplay2] = useState<string>("block");
     
   useEffect(() => {
       async function fetchResults() {
@@ -41,20 +49,22 @@ function Results() {
         const provider = new BrowserProvider(window.ethereum);
         const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
         const _electionDistricts = await contract.getElectionDistricts();
-        const results_1 = [];
-        const results_2 = [];
+        const _parties = await contract.getParties();
+        setParties(_parties);
+        //console.log(parties[0].name);
+        const results_1: Record<string, any>[] = [];
+        const results_2: Record<string, any>[] = [];
 
         for (var i = 0; i < _electionDistricts.length; i++) {
           let j = i + 1;          
           const newResult_1 = await contract.getElectionResultsDistrict1(j);
           results_1[i] = JSON.parse(newResult_1.tally);
-          console.log(results_1[i]);
+          //console.log(results_1[i]);
 
           const newResult_2 = await contract.getElectionResultsDistrict2(j);
           results_2[i] = JSON.parse(newResult_2.tally);
-          console.log(results_2[i]);
+          //console.log(results_2[i]);
         }
-        
         const resultsParties = aggregateObjects(results_2);
              
         const htmlED = (
@@ -78,46 +88,46 @@ function Results() {
               </select>
             </p>
             <div id="ed" style={{ display: display1 }}>
-              <table border="1" cellPadding="5" cellSpacing="0">
+              <table border={1} cellPadding="5" cellSpacing="0">
                 <thead></thead>
                 <tbody>
                   {Object.entries(_electionDistricts).map(([ID, value]) => (
                     <>
                       <tr key={ID}> 
-                        <td><h2>{value.name} {value.nummer}</h2></td>
+                        <td><h2>{(value as { name: string; nummer: string }).name} {(value as { name: string; nummer: string }).nummer}</h2></td>
                       </tr>
                       <tr>
                         <td>
                           <b>Erststimmen</b>
-                          <table border="0" cellPadding="5" cellSpacing="0">
+                          <table border={0} cellPadding="5" cellSpacing="0">
                             <thead>
                               <tr>
-                                <th width="50%">Name</th>
-                                <th width="50%">Stimmen</th>
+                                <th style={{ width: "50%" }}>Name</th>
+                                <th style={{ width: "50%" }}>Stimmen</th>
                               </tr>
                             </thead>
                             <tbody>
                               {Object.entries(results_1[ID]).map(([name, value]) => (
                                 <tr key={name}>
                                   <td>{name}</td>
-                                  <td>{value}</td>
+                                  <td>{String(value)}</td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                           <b>Zweitstimmen</b>
-                          <table border="0" cellPadding="5" cellSpacing="0">
+                          <table border={0} cellPadding="5" cellSpacing="0">
                             <thead>
                               <tr>
-                                <th width="50%">Partei</th>
-                                <th width="50%">Stimmen</th>
+                                <th style={{ width: "50%" }}>Partei</th>
+                                <th style={{ width: "50%" }}>Stimmen</th>
                               </tr>
                             </thead>
                             <tbody>
                               {Object.entries(results_2[ID]).map(([name, value]) => (
                                 <tr key={name}>
                                   <td>{name}</td>
-                                  <td>{value}</td>
+                                  <td>{String(value)}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -131,19 +141,27 @@ function Results() {
             </div>
             <div id="total" style={{ display: display2 }}>
               <h2>Parteien insgesamt</h2>
-              <table border="1" cellPadding="5" cellSpacing="0">
+              <table border={1} cellPadding="5" cellSpacing="0">
                 <thead></thead>
                 <tbody>
-                  {Object.entries(resultsParties).map(([name, value]) => (
-                    <tr key={name}>
-                      <td>{name}</td>
-                      <td>
-                        <div style={{ color:'#fff', backgroundColor: '#ff0000', width: `${(100 * value / Stimmen).toString()}%` }}>
-                          {fmt3.format(100 * value / Stimmen)}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}         
+                  {Object.entries(resultsParties).map(([name, value]) => {
+                    return (
+                      <tr key={name}>
+                        <td>{name}</td>
+                        <td>
+                            <div
+                            style={{
+                              color: getPartyColor(name),
+                              backgroundColor: getPartyBgColor(name),
+                              width: (100 * Number(value) / Stimmen).toString() + '%'
+                            }}
+                            >
+                            {fmt3.format(100 * Number(value) / Stimmen)}
+                            </div>
+                        </td>
+                      </tr>
+                    );
+                  })}         
                 </tbody>
               </table>
               <div>Stimmen: {Stimmen}</div>
@@ -158,15 +176,34 @@ function Results() {
         
         console.error('Fehler beim Laden des Moduls:', err);
         setHtml (
-          <div class="border">
+          <div className="border">
             <h2>Wahlergebnisse</h2>
             <p>{status}</p>
           </div>
         );
       }
     };
-    fetchResults();
-  }, [status, display1, display2]);
+
+  function getPartyBgColor(_party: string) {
+    for (let i = 0; i < parties.length; i++) {
+      if (parties[i].shortname === _party) {
+        return parties[i].bgcolor;
+      }
+    }
+    return "#fff"; // fallback color if not found
+  }
+
+  function getPartyColor(_party: string) {
+    for (let i = 0; i < parties.length; i++) {
+      if (parties[i].shortname === _party) {
+        return parties[i].color;
+      }
+    }
+    return "#000"; // fallback color if not found
+  }
+
+  fetchResults();
+  }, [status, display1, display2, parties]);
   return (<div>{html}</div>);
 }
 
