@@ -13,6 +13,8 @@ function Start() {
   }  
   const [wahlbezirk, setWahlbezirk] = useState(ed);
   const [candidates, setCandidates] = useState([]);
+  const [parties, setParties] = useState([]);
+
   useEffect(() => {
     async function fetchCandidates() {
       try {
@@ -27,7 +29,21 @@ function Start() {
           console.error("Fehler beim Abrufen der Kandidaten:", error);
       }        
     }
-    fetchCandidates()
+    async function fetchParties() {
+      try {
+         
+        if (window.ethereum) {
+          const provider = new BrowserProvider(window.ethereum);
+          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);           
+          const partiesList = await contract.getParties();
+          setParties(partiesList);
+        }
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Parteien:", error);
+      }
+    }
+    fetchCandidates();
+    fetchParties();
   }, []);
 
   return (
@@ -43,15 +59,21 @@ function Start() {
         Bei dieser Wahl werden die Mitglieder des Deutschen Bundestages gewählt. Mit der ersten Stimme wählen SIe den Direktkanidaten Ihres Wahlbezirkes und mit der zweiten Stimme eine Partei.
       </div>
       <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlbezirk</h3>
+        <ul>
         {candidates.map((candidate, index ) => (
-        <div key={index}>
-          <a href="#">{candidate.name}</a> &nbsp; {candidate.partei}
-        </div>
+        <li key={index}>
+          <a href={candidate.url} target="_blank">{candidate.name}</a>,&nbsp; {candidate.partei}
+        </li>
         ))}
+        </ul>
       <h3>Die Partien und ihre Wahlprogramme</h3>
-      -
-      -
-      -
+        <ul>
+        {parties.map((party, index ) => (
+        <li key={index}>
+          <a href={party.url} target="_blank">{party.name}</a>&nbsp;-&nbsp;{party.shortname}
+        </li>
+        ))}
+        </ul>
       <h3>Das neue Wahlgesetz</h3>
       Sie finden hier ausführliche Informationen zum <a href="https://www.gesetze-im-internet.de/bwahlg/" target="blank">Wahlgesetz</a>.
     </div>

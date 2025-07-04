@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.18.7
+// V 0.19.2
 
 import "./Registry.sol";
 
 contract Bundestagswahl is Registry {
     uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
     uint256 currentPartyId;
+    uint256 currentCandidateId;
 
     struct ElectionDistrict {
         string name;
@@ -22,17 +23,36 @@ contract Bundestagswahl is Registry {
         uint256 uid;
         string name;
         string shortname;
+        string color;
+        string bgcolor;
+        string url;
+        uint256 votes;
     }
 
     Party[] public parties;
     event PartyCreated(uint256 uid, string name, string shortname);
 
     struct Candidate {
+        uint256 uid;
         string name;
         uint wahlbezirk;
         string partei;
-        //string url;
+        string url;
+        uint256 votes;
     }
+    // Array to store candidates
+    Candidate[] public candidates;
+    event CandidateCreated(uint256 uid, string name, uint wahlbezirk);    
+ 
+
+    struct EncryptedVote {
+        string vote1;
+        string vote2;
+        uint electionDistrict;
+    }
+
+    //array to store encrypted votes
+    EncryptedVote[] public encryptedVotes;
 
     struct ElectionResult1 {
         string tally;
@@ -46,23 +66,14 @@ contract Bundestagswahl is Registry {
         string signature;
         uint timestamp;
         uint electionDistrict;
-    }    
-
-    struct EncryptedVote {
-        string vote1;
-        string vote2;
-        uint electionDistrict;
-    }
-
-    //array to store encrypted votes
-    EncryptedVote[] public encryptedVotes;
-
-    // Array to store candidates
-    Candidate[] public candidates;
+    }       
 
     // Arrays to store decrypted results
     ElectionResult1[] public electionResults1;
     ElectionResult2[] public electionResults2;
+
+    event StoreElectionResult1(address sender, uint electionDistrict, uint256 timestamp);
+    event StoreElectionResult2(address sender, uint electionDistrict, uint256 timestamp);
 
     // fkt. Wahlbezirke (ElectionDistricts)
     function getElectionDistricts() public view returns (ElectionDistrict[] memory){
@@ -78,18 +89,50 @@ contract Bundestagswahl is Registry {
         return parties;
     }
 
-    function registerParty(string memory _name, string memory _shortname) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function registerParty(
+        string memory _name, 
+        string memory _shortname,
+        string memory _color,
+        string memory _bgcolor,
+        string memory _url
+
+        ) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+
         currentPartyId++;
-        parties.push(Party({uid: currentPartyId, name: _name, shortname: _shortname}));
+        parties.push(Party({
+            uid: currentPartyId, 
+            name: _name, 
+            shortname: _shortname,
+            color: _color,
+            bgcolor: _bgcolor,
+            url: _url,
+            votes: 0
+            }));
     }
   
     // fkt. Kandidaten
-    function registerCandidate(string memory _name, uint _wahlbezirk, string memory _partei) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function registerCandidate(
+        string memory _name, 
+        uint _wahlbezirk, 
+        string memory _partei,
+        string memory _url
+        ) 
+        public Registry.onlyAdmin Registry.onlyBeforeVoting {
+
         bool found = false;
         for (uint i = 0; i < electionDistricts.length; i++)
         {
             if (electionDistricts[i].nummer == _wahlbezirk) {
-                candidates.push(Candidate({name: _name, wahlbezirk: _wahlbezirk, partei: _partei}));
+                currentCandidateId++;
+                candidates.push(Candidate({
+                    uid: currentCandidateId,
+                    name: _name, 
+                    wahlbezirk: _wahlbezirk, 
+                    partei: _partei,
+                    url: _url,
+                    votes: 0
+                }));
+
                 found = true;
                 break;
             }

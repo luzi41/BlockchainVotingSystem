@@ -44,8 +44,7 @@ function VoteForm() {
         if (window.ethereum) {
           const provider = new BrowserProvider(window.ethereum);
           const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-          const _electionDistricts = await contract.getElectionDistricts();
-          // wenn wahlkreis nicht enthalten in _electionDistricts throw error
+
           const candidatesList = await contract.getCandidates(wahlbezirk);
           setCandidates(candidatesList);
         }

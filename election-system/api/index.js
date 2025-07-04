@@ -70,10 +70,10 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/registerParty", async (req, res) => {
-      const { name, shortname } = req.body;
+      const { name, shortname, color, bgcolor, url } = req.body;
       try {
         const contract = await loadContract();
-        const tx = await contract.registerParty(name, shortname);
+        const tx = await contract.registerParty(name, shortname, color, bgcolor, url);
         await tx.wait();
         res.send({status: "success", tx: tx.hash});
       } catch (err) {
@@ -82,10 +82,10 @@ prompt.get(['PathToQuorum'], function (err, result) {
     });
 
     app.post("/registerCandidate", async (req, res) => {
-      const { name, wahlbezirk, partei } = req.body;
+      const { name, wahlbezirk, partei, url } = req.body;
       try {
         const contract = await loadContract();
-        const tx = await contract.registerCandidate(name, wahlbezirk, partei);
+        const tx = await contract.registerCandidate(name, wahlbezirk, partei, url);
         await tx.wait();
         res.send({ status: "success", tx: tx.hash });     
       } catch (err) {
