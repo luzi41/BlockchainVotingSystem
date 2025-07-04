@@ -52,7 +52,7 @@ function App() {
             <li><Link to="/vote">Abstimmen</Link></li>
             <li><Link to="/results">Ergebnisse</Link></li>
             <li><Link to="/extras">Extras</Link></li>
-            <li className="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.18</Link></li>
+            <li className="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.19</Link></li>
           </ul>
         </nav>
 

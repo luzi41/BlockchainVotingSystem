@@ -1,4 +1,4 @@
-// V 0.19.2
+// V 0.19.9
 import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
@@ -156,8 +156,7 @@ function Results() {
                               width: (100 * Number(value) / Stimmen).toString() + '%'
                             }}
                             >
-                            {fmt3.format(100 * Number(value) / Stimmen)}
-                            </div>
+                            {fmt3.format(100 * Number(value) / Stimmen)}&nbsp;%                              </div>
                         </td>
                       </tr>
                     );
