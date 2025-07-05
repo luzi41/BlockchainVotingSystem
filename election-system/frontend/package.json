@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.19.8",
+  "version": "0.20",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",

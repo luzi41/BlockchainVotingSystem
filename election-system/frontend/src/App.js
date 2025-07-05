@@ -1,4 +1,4 @@
-// v0.19.8
+// v0.20
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { BrowserProvider, Contract } from "ethers";
@@ -9,6 +9,7 @@ import VoteForm from "./components/VoteForm";
 import Results from "./components/Results.tsx";
 import Extras from "./components/Extras";
 import Log from "./components/Log";
+import Signature from "./components/Signature";
 
 function App() {
   const [status, setStatus] = useState(CONTRACT_ADDRESSES.registry);
@@ -52,7 +53,7 @@ function App() {
             <li><Link to="/vote">Abstimmen</Link></li>
             <li><Link to="/results">Ergebnisse</Link></li>
             <li><Link to="/extras">Extras</Link></li>
-            <li className="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.19</Link></li>
+            <li className="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.20</Link></li>
           </ul>
         </nav>
 
@@ -70,6 +71,7 @@ function App() {
           <Route path="/results" element={<Results />} />
           <Route path="/extras" element={<Extras />} />
           <Route path="/extras/log" element={<Log />} />
+          <Route path="/results/signature/:ed/:id" element={<Signature />} />
         </Routes>
       </Router>
     </>
