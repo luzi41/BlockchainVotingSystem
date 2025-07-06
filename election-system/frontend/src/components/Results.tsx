@@ -60,11 +60,11 @@ function Results() {
           let j = i + 1;          
           const newResult_1 = await contract.getElectionResultsDistrict1(j);
           results_1[i] = JSON.parse(newResult_1.tally);
-          console.log(results_1[i]);
+          //console.log(results_1[i]);
 
           const newResult_2 = await contract.getElectionResultsDistrict2(j);
           results_2[i] = JSON.parse(newResult_2.tally);
-          console.log(results_2[i]);
+          //console.log(results_2[i]);
         }
         const resultsParties = aggregateObjects(results_2);
              
