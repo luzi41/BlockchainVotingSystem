@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
+import { Link } from "react-router-dom";
 
 // Add this declaration to inform TypeScript about window.ethereum
 declare global {
@@ -98,7 +99,7 @@ function Results() {
                       </tr>
                       <tr>
                         <td>
-                          <b>Erststimmen</b>
+                          <b>Erststimmen</b> <span className="right"><Link to={`./signature/${(value as { name: string; nummer: string }).nummer}/1`}>Signatur</Link></span>
                           <table border={0} cellPadding="5" cellSpacing="0">
                             <thead>
                               <tr>
@@ -115,7 +116,7 @@ function Results() {
                               ))}
                             </tbody>
                           </table>
-                          <b>Zweitstimmen</b>
+                          <b>Zweitstimmen</b><span className="right"><Link to={`./signature/${(value as { name: string; nummer: string }).nummer}/2`}>Signatur</Link></span>
                           <table border={0} cellPadding="5" cellSpacing="0">
                             <thead>
                               <tr>

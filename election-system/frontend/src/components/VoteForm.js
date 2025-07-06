@@ -1,3 +1,4 @@
+// V 0.20.1
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -6,20 +7,12 @@ import { BrowserProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 import scanner from "../assets/scan-59.png";
 
+//const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RPuK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JShIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+glsiQIDAQAB-----END PUBLIC KEY-----`;
 
-const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2
-AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb
-4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RP
-uK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JS
-hIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0
-XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+gls
-iQIDAQAB
------END PUBLIC KEY-----`;
-
-async function encryptVote(toVoted) {
-  const pubKey = forge.pki.publicKeyFromPem(PUBLIC_KEY_PEM);
-  const encrypted = pubKey.encrypt(toVoted.toString(), "RSA-OAEP");
+async function encryptVote(_toVoted, _publicKey) {
+  //console.log("PubKey: " + _publicKey);
+  const pubKey = forge.pki.publicKeyFromPem(_publicKey);
+  const encrypted = pubKey.encrypt(_toVoted.toString(), "RSA-OAEP");
   return forge.util.encode64(encrypted);
 };
 
@@ -44,7 +37,6 @@ function VoteForm() {
         if (window.ethereum) {
           const provider = new BrowserProvider(window.ethereum);
           const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-
           const candidatesList = await contract.getCandidates(wahlbezirk);
           setCandidates(candidatesList);
         }
@@ -87,8 +79,10 @@ function VoteForm() {
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
-      const encrypted1 = encryptVote(selectedCandidate);
-      const encrypted2 = encryptVote(selectedParty);
+      const electionDistrict = await contract.getElectionDistrictByNumber(wahlbezirk);
+      //console.log("ed: " + electionDistrict.name + ", " + electionDistrict.publicKey);
+      const encrypted1 = encryptVote(selectedCandidate, electionDistrict.publicKey);
+      const encrypted2 = encryptVote(selectedParty, electionDistrict.publicKey);
       const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);
       await tx.wait();
       console.log(tx.data);
@@ -112,7 +106,7 @@ function VoteForm() {
         </p>
       </div>
       <div class="col-50">
-        <p>Ihr Wahlbezirk</p>
+        <p>Ihr Wahlkreis</p>
         <p>
           {wahlbezirk}
       </p>      
