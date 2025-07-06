@@ -58,10 +58,10 @@ prompt.get(['PathToQuorum'], function (err, result) {
     }
 
     app.post("/registerElectionDistrict", async (req, res) => {
-      const {name, nummer} = req.body;
+      const {name, nummer, publicKey} = req.body;
       try {
         const contract = await loadContract();
-        const tx = await contract.registerElectionDistrict(name, nummer);
+        const tx = await contract.registerElectionDistrict(name, nummer, publicKey);
         await tx.wait();
         res.send({status: "success", tx: tx.hash });
       } catch (error) {

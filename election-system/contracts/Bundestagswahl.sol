@@ -14,6 +14,7 @@ contract Bundestagswahl is Registry {
     struct ElectionDistrict {
         string name;
         uint nummer;
+        string publicKey;
     }
 
     ElectionDistrict[] public electionDistricts;
@@ -80,8 +81,15 @@ contract Bundestagswahl is Registry {
         return electionDistricts;
     }
 
-    function registerElectionDistrict(string memory _name, uint _nummer) public Registry.onlyAdmin Registry.onlyBeforeVoting {
-        electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer}));
+    function getElectionDistrictByNumber(uint _number) public view returns (ElectionDistrict memory){
+        for (uint i = 0; i < electionDistricts.length; i++) {
+            if (electionDistricts[i].nummer == _number) return electionDistricts[i];
+        }
+        revert("No election district with the given number found");
+    }
+
+    function registerElectionDistrict(string memory _name, uint _nummer, string memory _publicKey) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+        electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer, publicKey: _publicKey}));
         emit ElectionDistrictCreated(_name, _nummer);
     }
 
