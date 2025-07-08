@@ -160,7 +160,7 @@ election-system$
      npx hardhat run scripts/deployElection.js --network quorum 
 
 - Save contract address in api/deployment-address.txt
-- Replace also the contract address in frontend/src/config.js
+- Replace also the contract address in frontend/.env
 
 ## 4.3 Backend API
 

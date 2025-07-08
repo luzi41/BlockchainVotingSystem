@@ -21,9 +21,10 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 });
-
+/*
 // Wallet-Setup
 //console.log("PRIVATE_KEY:", process.env.REACT_APP_PRIVATE_KEY);
+
 const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY?.trim();
 
 if (!PRIVATE_KEY || !PRIVATE_KEY.startsWith("0x") || PRIVATE_KEY.length !== 66) {
@@ -34,7 +35,8 @@ const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
 const wallet = new Wallet(PRIVATE_KEY, provider);
 
 // IPC-Handler für Transaktionen
-ipcMain.on('send-eth', async (event, data) => {
+
+ipcMain.on('castEncryptedVote', async (event, data) => {
   try {
     const tx = await wallet.sendTransaction({
       to: data.to,
@@ -48,3 +50,4 @@ ipcMain.on('send-eth', async (event, data) => {
     event.reply('tx-response', "Fehler: " + err.message);
   }
 });
+*/

@@ -1,6 +1,6 @@
 {
-  "name": "frontend",
-  "version": "0.20",
+  "name": "bvs",
+  "version": "0.21.2",
   "main": "electron/main.js",
   "homepage": "./",
   "private": true,

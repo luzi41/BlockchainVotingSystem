@@ -1,9 +1,9 @@
-// V 0.20.1
+// V 0.21.2
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-import { BrowserProvider, Contract} from "ethers";
+import { JsonRpcProvider, Wallet, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 import scanner from "../assets/scan-59.png";
 
@@ -17,13 +17,7 @@ async function encryptVote(_toVoted, _publicKey) {
 };
 
 function VoteForm() {
- 
-  let { ed } = useParams();
-  if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
-  {
-    ed = 1;
-  }
-  const [wahlbezirk, setWahlbezirk] = useState(ed);
+  const [wahlbezirk] = useState(process.env.REACT_APP_ELECTION_DISTRICT);
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
@@ -31,39 +25,27 @@ function VoteForm() {
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState(""); 
 
+  const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
+  const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
+  const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY?.trim();
+  const signer = new Wallet(PRIVATE_KEY, provider);  
+
   useEffect(() => {
-    async function fetchCandidates() {
+    async function fetchData() {
       try {
-        if (window.ethereum) {
-          const provider = new BrowserProvider(window.ethereum);
-          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
-          const candidatesList = await contract.getCandidates(wahlbezirk);
-          setCandidates(candidatesList);
-        }
+        const candidatesList = await contract.getCandidates(wahlbezirk);
+        setCandidates(candidatesList);
+        const partiesList = await contract.getParties();
+        setParties(partiesList);
+
       }
       catch (error) {
           console.error("Fehler beim Abrufen der Kandidaten:", error);
       }        
     }
-
-    async function fetchParties() {
-      try {
-         
-        if (window.ethereum) {
-          const provider = new BrowserProvider(window.ethereum);
-          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);           
-          const partiesList = await contract.getParties();
-          setParties(partiesList);
-        }
-      } catch (error) {
-        console.error("Fehler beim Abrufen der Parteien:", error);
-      }
-    }
-
-    fetchCandidates();
-    fetchParties();
+    fetchData();
   }, [wahlbezirk, selectedCandidate, selectedParty]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
-  //console.log("WB: " + wahlbezirk + " SC: " + selectedCandidate);
+
   /*
    * function vote
    * Aktion 33: Verschlüsselt Stimmen aus Formular und sendet 
@@ -72,15 +54,9 @@ function VoteForm() {
    */
   const vote = async () => {
       
-    if (!window.ethereum) return alert("MetaMask erforderlich!");
-
     try {
-      const provider = new BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, signer);
+      const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, signer);
       const electionDistrict = await contract.getElectionDistrictByNumber(wahlbezirk);
-      //console.log("ed: " + electionDistrict.name + ", " + electionDistrict.publicKey);
       const encrypted1 = encryptVote(selectedCandidate, electionDistrict.publicKey);
       const encrypted2 = encryptVote(selectedParty, electionDistrict.publicKey);
       const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);

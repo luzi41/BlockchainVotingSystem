@@ -1,49 +1,39 @@
-import React from "react";
+// V 0.21.2
 import { useState, useEffect } from "react";
-import { BrowserProvider, Contract} from "ethers";
-import { CONTRACT_ADDRESSES } from "../config";
+import { JsonRpcProvider, Contract} from "ethers";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { useParams } from 'react-router-dom'
 
 function Start() {
-  let { ed } = useParams();
-  if (isNaN(ed))
-  {
-    ed = 1;
-  }  
-  const [wahlbezirk, setWahlbezirk] = useState(ed);
+
+  const [wahlbezirk] = useState(process.env.REACT_APP_ELECTION_DISTRICT);
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
 
+  // Wallet
+  //console.log("PRIVATE_KEY:", process.env.REACT_APP_PRIVATE_KEY);
+  const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
+  //console.log("Contract address: ", process.env.REACT_APP_CONTRACT_ADDRESS); 
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+
+  // SmartContract
+  const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider); 
+  
   useEffect(() => {
-    async function fetchCandidates() {
+    async function fetchData() {
       try {
-        if (window.ethereum) {
-          const provider = new BrowserProvider(window.ethereum);
-          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);            
-          const candidatesList = await contract.getCandidates(wahlbezirk);
-          setCandidates(candidatesList);
-        }
+        const candidatesList = await contract.getCandidates(wahlbezirk);
+        setCandidates(candidatesList);
+
+        const partiesList = await contract.getParties();
+        setParties(partiesList);
       }
       catch (error) {
-          console.error("Fehler beim Abrufen der Kandidaten:", error);
+          console.error("Fehler beim Abrufen der Daten: ", error);
       }        
     }
-    async function fetchParties() {
-      try {
-         
-        if (window.ethereum) {
-          const provider = new BrowserProvider(window.ethereum);
-          const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);           
-          const partiesList = await contract.getParties();
-          setParties(partiesList);
-        }
-      } catch (error) {
-        console.error("Fehler beim Abrufen der Parteien:", error);
-      }
-    }
-    fetchCandidates();
-    fetchParties();
+    fetchData();
+
   }, []);
 
   return (
