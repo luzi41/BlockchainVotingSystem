@@ -174,7 +174,7 @@ Save the ABI in the election-system directory (replace filenames with your corre
 ### 4.3.2 Generate OpenSSL RSA private.pem and  public.pem
 
 - Store private.pem in election-system/keys,
-- Replace public.key ascii-text in election-system/frontend/src/components/voteForm.js.
+- The public key is stored in the smart contract via the API (see 4.4 ".../registerElectionDistrict").
 
 ### 4.3.3 Install and start API
 
@@ -271,15 +271,11 @@ election-system/scripts$
     curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "2"}' &&
     curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "3"}'
 
-### 4.7.3 See results in the browser
+### 4.7.3 See results 
 
-Navigate to http://localhost:3002/results
+- Navigate to http://localhost:3002/results (Browser app)
+- or go to "Results" (Ergebnisse) (Desktop/Mobile app)
 
-# 5. Changes
-
-- V 0.17: Smart Contract: Bundestagswahl (Germany)
-- V 0.18: German Bundestagswahl: Zweitstimme
-
-# 6. Todo
+# 5. Todo
 
 - Election templates: different kinds of elections and surveys (V 1.0)
