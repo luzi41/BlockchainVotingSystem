@@ -9,13 +9,14 @@ import Results from "./components/Results.tsx";
 import Extras from "./components/Extras";
 import Log from "./components/Log";
 import Signature from "./components/Signature";
+import SettingsForm from "./components/SettingsForm";
 
 function App() {
   const [status, setStatus] = useState(process.env.REACT_APP_CONTRACT_ADDRESS);
   const [title, setTitle] = useState("Wahl 2026");
+  const [showSettings, setShowSettings] = useState(false);
 
   // Wallet
-  //console.log("PRIVATE_KEY:", process.env.REACT_APP_PRIVATE_KEY);
   const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
   //console.log("Contract address: ", process.env.REACT_APP_CONTRACT_ADDRESS); 
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
@@ -25,7 +26,7 @@ function App() {
   
   useEffect(() =>  {
     async function fetchStatus() {
-        try {
+      try {
             const status = await contract.getElectionStatus();
             setStatus(process.env.REACT_APP_CONTRACT_ADDRESS + ": " + status);
             
@@ -37,9 +38,12 @@ function App() {
             console.error("Fehler beim Abrufen des Wahlstatus:", error);
         }        
     }
-
     fetchStatus();
-  }, []);
+
+    //const { ipcRenderer } = window.require("electron");
+    //ipcRenderer.on("open-settings", () => setShowSettings(true));
+    //return () => ipcRenderer.removeAllListeners("open-settings");
+  }, [status , title]);
 
   
   return (
@@ -58,6 +62,7 @@ function App() {
         <div id="app">
           <h1>{title}</h1>
           <span id="ContractAddress">{status}</span>
+        
         </div>
       
         <Routes>
@@ -68,6 +73,7 @@ function App() {
           <Route path="/results" element={<Results />} />
           <Route path="/extras" element={<Extras />} />
           <Route path="/extras/log" element={<Log />} />
+          <Route path="/extras/settings" element={<SettingsForm />} />
           <Route path="/results/signature/:ed/:id" element={<Signature />} />
         </Routes>
       </Router>

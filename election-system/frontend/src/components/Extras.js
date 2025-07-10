@@ -10,6 +10,7 @@ function Extras() {
           <li><Link to="http://localhost:25000" target="_blank">Explorer</Link></li>
           <li><Link to="/extras/log">Log</Link></li>
           <li>Verify</li>
+          <li><Link to="/extras/settings">Einstellungen</Link></li>
         </ul>
       </nav>
     </div>

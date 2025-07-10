@@ -7,8 +7,6 @@ import { JsonRpcProvider, Wallet, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 import scanner from "../assets/scan-59.png";
 
-//const PUBLIC_KEY_PEM = `-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RPuK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JShIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+glsiQIDAQAB-----END PUBLIC KEY-----`;
-
 async function encryptVote(_toVoted, _publicKey) {
   //console.log("PubKey: " + _publicKey);
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
