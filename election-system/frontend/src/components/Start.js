@@ -1,12 +1,20 @@
 // V 0.21.5
 import { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom'
 import { JsonRpcProvider, Contract} from "ethers";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 
 function Start() {
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
-  const [wahlbezirk] = useState(process.env.REACT_APP_ELECTION_DISTRICT);
+  let { ed } = useParams();
+  const [wahlbezirk] = useState(() => {  
+    if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
+      {
+        return process.env.REACT_APP_ELECTION_DISTRICT
+      }
+      return ed;
+    });
   
   useEffect(() => {
     async function fetchData() {
@@ -43,7 +51,7 @@ function Start() {
       <div>
         Bei dieser Wahl werden die Mitglieder des Deutschen Bundestages gewählt. Mit der ersten Stimme wählen SIe den Direktkanidaten Ihres Wahlbezirkes und mit der zweiten Stimme eine Partei.
       </div>
-      <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlbezirk</h3>
+      <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlkreis</h3>
         <ul>
         {candidates.map((candidate, index ) => (
         <li key={index}>
@@ -51,6 +59,7 @@ function Start() {
         </li>
         ))}
         </ul>
+      <h3>Andere Wahlkreise</h3>
       <h3>Die Partien und ihre Wahlprogramme</h3>
         <ul>
         {parties.map((party, index ) => (

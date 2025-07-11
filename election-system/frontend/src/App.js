@@ -1,4 +1,4 @@
-// v0.21
+// v0.21.8
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { JsonRpcProvider, Contract } from "ethers";
@@ -30,7 +30,7 @@ function App() {
 
       }
       catch (error) {
-          console.error("Fehler beim Abrufen des Wahlstatus:", error);
+        console.error("Fehler beim Abrufen des Wahlstatus:", error);
       }        
     }
     fetchStatus();
@@ -57,6 +57,7 @@ function App() {
       
         <Routes>
           <Route path="/start" element={<Start />} />
+          <Route path="/start/:ed" element={<Start />} />
           <Route path="/vote" element={<VoteForm />} />
           <Route path="/vote/:ed" element={<VoteForm />} />
           <Route path="/vote/:ed/:token" element={<VoteForm />} />

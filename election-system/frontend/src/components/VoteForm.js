@@ -1,10 +1,12 @@
-// V 0.21.7
+// V 0.21.8
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { JsonRpcProvider, Wallet, Contract} from "ethers";
 import scanner from "../assets/scan-59.png";
+
+const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
 async function encryptVote(_toVoted, _publicKey) {
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
@@ -13,9 +15,8 @@ async function encryptVote(_toVoted, _publicKey) {
 };
 
 function VoteForm() {
-    let { ed } = useParams();
-
-  const [wahlbezirk] = useState(() => {  
+  let { ed } = useParams();
+  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {  
     if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
       {
         return process.env.REACT_APP_ELECTION_DISTRICT
@@ -36,6 +37,20 @@ function VoteForm() {
     return process.env.REACT_APP_PRIVATE_KEY?.trim();
   });
 
+  if(isElectron) {
+    const ipcRenderer = window.ipcRenderer;
+    ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
+      if (val !== undefined && val !== null) {
+       setElectionDistrictNo(val);
+      }
+    });   
+    ipcRenderer.invoke('settings:get', 'privateKey').then((val) => {
+      if (val !== undefined && val !== null) {
+        setPrivateKey(val);
+      }
+    });
+  }
+
   const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
   const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
   //const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY?.trim();
@@ -45,7 +60,7 @@ function VoteForm() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const candidatesList = await contract.getCandidates(wahlbezirk);
+        const candidatesList = await contract.getCandidates(electionDistrictNo);
         setCandidates(candidatesList);
         const partiesList = await contract.getParties();
         setParties(partiesList);
@@ -56,7 +71,7 @@ function VoteForm() {
       }        
     }
     fetchData();
-  }, [wahlbezirk, selectedCandidate, selectedParty]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
+  }, [electionDistrictNo, selectedCandidate, selectedParty]); // Abhängigkeit hinzufügen, damit die Kandidaten bei Änderung des Wahlbezirks neu geladen werden
 
   /*
    * function vote
@@ -68,12 +83,12 @@ function VoteForm() {
       
     try {
       const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, signer);
-      const electionDistrict = await contract.getElectionDistrictByNumber(wahlbezirk);
+      const electionDistrict = await contract.getElectionDistrictByNumber(electionDistrictNo);
       const encrypted1 = encryptVote(selectedCandidate, electionDistrict.publicKey);
       const encrypted2 = encryptVote(selectedParty, electionDistrict.publicKey);
-      const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, wahlbezirk);
+      const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, electionDistrictNo);
       await tx.wait();
-      console.log(tx.data);
+      //console.log(tx.data);
       setError("✅ Erfolgreich! Transaction: " + tx.hash); 
 
     } catch (err) {
@@ -83,9 +98,7 @@ function VoteForm() {
 
   return (
   <div>
-    
     <div class="row">
-      
       <div class="col-50">
         <p>Ihr Token</p>
         <p>
@@ -96,7 +109,7 @@ function VoteForm() {
       <div class="col-50">
         <p>Ihr Wahlkreis</p>
         <p>
-          {wahlbezirk}
+          {electionDistrictNo}
       </p>      
       </div>
     </div>
@@ -108,7 +121,7 @@ function VoteForm() {
           <div class="col-95">
             <span class="left">{candidate.name}</span><span class="right">{candidate.partei}</span>
           </div>
-          <div class="col-5"><input type="radio" disabled={!wahlbezirk} class="vote" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
+          <div class="col-5"><input type="radio" disabled={!electionDistrictNo} class="vote" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
         </div>
         ))}    
       </div>
@@ -120,7 +133,7 @@ function VoteForm() {
                 <span class="left">{party.name} &nbsp; {party.shortname}</span>
               </div> 
                 <div class="col-5">
-                      <input type="radio" disabled={!wahlbezirk} class="radio" key={index} value={party.shortname} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
+                      <input type="radio" disabled={!electionDistrictNo} class="radio" key={index} value={party.shortname} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
                 </div>
             </div>
           ))}
