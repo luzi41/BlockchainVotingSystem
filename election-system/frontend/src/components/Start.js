@@ -1,27 +1,22 @@
-// V 0.21.2
+// V 0.21.5
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract} from "ethers";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-import { useParams } from 'react-router-dom'
 
 function Start() {
-
-  const [wahlbezirk] = useState(process.env.REACT_APP_ELECTION_DISTRICT);
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
-
-  // Wallet
-  //console.log("PRIVATE_KEY:", process.env.REACT_APP_PRIVATE_KEY);
-  const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
-  //console.log("Contract address: ", process.env.REACT_APP_CONTRACT_ADDRESS); 
-  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-
-  // SmartContract
-  const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider); 
+  const [wahlbezirk] = useState(process.env.REACT_APP_ELECTION_DISTRICT);
   
   useEffect(() => {
     async function fetchData() {
       try {
+        // Wallet
+        const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
+        const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+
+        // SmartContract
+        const contract = new Contract(contractAddress, Election.abi, provider);         
         const candidatesList = await contract.getCandidates(wahlbezirk);
         setCandidates(candidatesList);
 
@@ -34,7 +29,7 @@ function Start() {
     }
     fetchData();
 
-  }, []);
+  }, [wahlbezirk]);
 
   return (
     <div>
@@ -52,7 +47,7 @@ function Start() {
         <ul>
         {candidates.map((candidate, index ) => (
         <li key={index}>
-          <a href={candidate.url} target="_blank">{candidate.name}</a>,&nbsp; {candidate.partei}
+          <a href={candidate.url} target="_blank" rel="noreferrer">{candidate.name}</a>,&nbsp; {candidate.partei}
         </li>
         ))}
         </ul>
@@ -60,7 +55,7 @@ function Start() {
         <ul>
         {parties.map((party, index ) => (
         <li key={index}>
-          <a href={party.url} target="_blank">{party.name}</a>&nbsp;-&nbsp;{party.shortname}
+          <a href={party.url} target="_blank" rel="noreferrer">{party.name}</a>&nbsp;-&nbsp;{party.shortname}
         </li>
         ))}
         </ul>

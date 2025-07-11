@@ -5,14 +5,6 @@ const dotenv = require('dotenv');
 const Store = require('electron-store');
 const store = new Store();
 
-// Werte speichern
-//store.set('username', 'Max Mustermann');
-//store.set('settings.privateKey', 'dark');
-
-// Werte lesen
-//const user = store.get('username');
-//const theme = store.get('settings.privateKey');
-
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 require('dotenv').config();
 function createWindow() {
@@ -35,13 +27,13 @@ app.whenReady().then(() => {
 
 ipcMain.handle('settings:get', (event, key) => {
   const value = store.get(key);
-  console.log('GET:', key, value);
+  //console.log('GET:', key, value);
   return value;
 });
 
 ipcMain.handle('settings:set', (event, key, value) => {
-  console.log('Einstellung speichern:', key, value); 
-  console.log('Store path:', store.path);
+  //console.log('Einstellung speichern:', key, value); 
+  //console.log('Store path:', store.path);
   if (value === undefined || value === null) {
     store.delete(key); // ✅ explizit löschen
   } else {

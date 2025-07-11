@@ -1,14 +1,12 @@
-// V 0.21.2
+// V 0.21.4
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 import { JsonRpcProvider, Wallet, Contract} from "ethers";
-import { CONTRACT_ADDRESSES } from "../config";
 import scanner from "../assets/scan-59.png";
 
 async function encryptVote(_toVoted, _publicKey) {
-  //console.log("PubKey: " + _publicKey);
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
   const encrypted = pubKey.encrypt(_toVoted.toString(), "RSA-OAEP");
   return forge.util.encode64(encrypted);

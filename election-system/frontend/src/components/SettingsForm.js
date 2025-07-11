@@ -4,6 +4,7 @@ const ipcRenderer = window.ipcRenderer;
 function SettingsForm({ onClose }) {
   const [language, setLanguage] = useState("de");
   const [privateKey, setPrivateKey] = useState("");
+  const [electionDistrict, setElectionDistrict] = useState(0);
 
   useEffect(() => {
     // Nur beim ersten Laden aufrufen
@@ -14,26 +15,28 @@ function SettingsForm({ onClose }) {
       }
     });
     ipcRenderer.invoke('settings:get', 'privateKey').then((val) => {
-      console.log('GELADEN privateKey:', val);
       if (val !== undefined && val !== null) {
         setPrivateKey(val);
       }
     });
+    ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
+      if (val !== undefined && val !== null) {
+        setElectionDistrict(val);
+      }
+    });    
   }, []); // ✅ Wichtig: nur einmal ausführen
 
-  function handleSave(language, privateKey) {
-    console.log("Speichern:", language, privateKey);
+  function handleSave(language, privateKey, electionDistrict) {
     ipcRenderer.invoke("settings:set", "language", language);
     ipcRenderer.invoke("settings:set", "privateKey", privateKey);
+    ipcRenderer.invoke("settings:set", "electionDistrict", electionDistrict);
   }
 
   return (
     <div className="settings">
       <h2>Einstellungen</h2>
       <div>
-        <label>Sprache:</label>
-      </div>
-      <div>
+        <label>Sprache:</label><br />
         <select 
           value={language} 
           onChange={(e) => setLanguage(e.target.value)} 
@@ -43,9 +46,7 @@ function SettingsForm({ onClose }) {
         </select>
       </div>
       <div>
-        <label>Privater Schlüssel:</label>
-      </div>
-      <div>
+        <label>Privater Schlüssel:</label><br />
         <textarea
           name="privateKey"
           value={privateKey}
@@ -55,7 +56,18 @@ function SettingsForm({ onClose }) {
         />
       </div>
       <div>
-        <button onClick={() => handleSave(language, privateKey)}>Speichern</button>
+        <label>Wahlkreis:</label><br />
+        <input 
+          type="number" 
+          size={3} 
+          value={electionDistrict}
+          onChange={(e) => setElectionDistrict(e.target.value)}
+          name="electionDistrict" 
+        />
+      </div>
+      
+      <div>
+        <button onClick={() => handleSave(language, privateKey, electionDistrict)}>Speichern</button>
       </div>
     </div>
   );
