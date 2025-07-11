@@ -1,10 +1,12 @@
+// V0.21.6
 import { useState, useEffect } from "react";
 const ipcRenderer = window.ipcRenderer;
+const { Wallet } = require('ethers');
 
 function SettingsForm({ onClose }) {
   const [language, setLanguage] = useState("de");
   const [privateKey, setPrivateKey] = useState("");
-  const [electionDistrict, setElectionDistrict] = useState(0);
+  //const [electionDistrict, setElectionDistrict] = useState(0);
 
   useEffect(() => {
     // Nur beim ersten Laden aufrufen
@@ -19,17 +21,24 @@ function SettingsForm({ onClose }) {
         setPrivateKey(val);
       }
     });
+    /*
     ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
       if (val !== undefined && val !== null) {
         setElectionDistrict(val);
       }
-    });    
+    });
+    */    
   }, []); // ✅ Wichtig: nur einmal ausführen
 
-  function handleSave(language, privateKey, electionDistrict) {
+  function handleSave(language, privateKey) {
     ipcRenderer.invoke("settings:set", "language", language);
     ipcRenderer.invoke("settings:set", "privateKey", privateKey);
-    ipcRenderer.invoke("settings:set", "electionDistrict", electionDistrict);
+    //ipcRenderer.invoke("settings:set", "electionDistrict", electionDistrict);
+  }
+
+  function createNewKey() {
+    const wallet = Wallet.createRandom();
+    setPrivateKey(wallet.privateKey)
   }
 
   return (
@@ -53,21 +62,13 @@ function SettingsForm({ onClose }) {
           onChange={(e) => setPrivateKey(e.target.value)}
           placeholder="0x..."
           rows={4}
-        />
+        /><br />
+        <button onClick={() => createNewKey()}>Neuen Schlüssel generieren</button>
       </div>
-      <div>
-        <label>Wahlkreis:</label><br />
-        <input 
-          type="number" 
-          size={3} 
-          value={electionDistrict}
-          onChange={(e) => setElectionDistrict(e.target.value)}
-          name="electionDistrict" 
-        />
-      </div>
+
       
       <div>
-        <button onClick={() => handleSave(language, privateKey, electionDistrict)}>Speichern</button>
+        <button onClick={() => handleSave(language, privateKey)}>Speichern</button>
       </div>
     </div>
   );

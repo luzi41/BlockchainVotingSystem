@@ -13,18 +13,34 @@ async function encryptVote(_toVoted, _publicKey) {
 };
 
 function VoteForm() {
-  const [wahlbezirk] = useState(process.env.REACT_APP_ELECTION_DISTRICT);
+    let { ed } = useParams();
+
+  const [wahlbezirk] = useState(() => {  
+    if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
+      {
+        return process.env.REACT_APP_ELECTION_DISTRICT
+      }
+      return ed;
+    });
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [selectedParty, setSelectedParty] = useState("");
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState(""); 
+  const [privateKey, setPrivateKey] = useState(() => {
+    if (!process.env.REACT_APP_PRIVATE_KEY?.trim() || process.env.REACT_APP_PRIVATE_KEY === null) {
+      const wallet = Wallet.createRandom();
+      return wallet.privateKey;
+    }
+    return process.env.REACT_APP_PRIVATE_KEY?.trim();
+  });
 
   const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
   const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
-  const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY?.trim();
-  const signer = new Wallet(PRIVATE_KEY, provider);  
+  //const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY?.trim();
+  console.log("PK: ", privateKey);
+  const signer = new Wallet(privateKey, provider);  
 
   useEffect(() => {
     async function fetchData() {

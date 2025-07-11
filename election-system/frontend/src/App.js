@@ -34,14 +34,13 @@ function App() {
       }        
     }
     fetchStatus();
-
   }, [status , title]);
 
   
   return (
     <>
       <Router>
-        <nav className="main">
+        <nav className="main" id="nav">
           <ul>
             <li><Link to="/start">Informationen zur Wahl</Link></li>
             <li><Link to="/vote">Abstimmen</Link></li>
@@ -53,8 +52,8 @@ function App() {
 
         <div id="app">
           <h1>{title}</h1>
-          <span id="ContractAddress">{status}</span>
-        </div>
+        </div>  
+        <div id="footer"><span id="ContractAddress">{status}</span></div>
       
         <Routes>
           <Route path="/start" element={<Start />} />
