@@ -1,4 +1,4 @@
-// V 0.21.4
+// V 0.21.7
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -39,7 +39,7 @@ function VoteForm() {
   const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
   const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
   //const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY?.trim();
-  console.log("PK: ", privateKey);
+  //console.log("PK: ", privateKey);
   const signer = new Wallet(privateKey, provider);  
 
   useEffect(() => {
