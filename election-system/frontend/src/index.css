@@ -1,3 +1,5 @@
+/* v0.21.9 */
+
 body {
   margin: 0;
   padding: 0;
@@ -128,6 +130,7 @@ th, td {
   position:absolute;
   width: 100%;
   bottom: 0px;
+  z-index: -1;
 }
 
 div .row {
@@ -185,6 +188,6 @@ div .border {
 
 #ContractAddress {
   display: inline;
-  color: lightgray;
+  color: silver;
 }
 
