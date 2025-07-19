@@ -1,21 +1,34 @@
-// V 0.21.5
+// V 0.22.1
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom'
 import { JsonRpcProvider, Contract} from "ethers";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 
+const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+
 function Start() {
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   let { ed } = useParams();
-  const [wahlbezirk] = useState(() => {  
+  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {  
     if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
       {
         return process.env.REACT_APP_ELECTION_DISTRICT
       }
       return ed;
     });
-  
+
+  if(isElectron) {
+    const ipcRenderer = window.ipcRenderer;
+    ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
+      if (val !== undefined && val !== null) {
+       setElectionDistrictNo(val);
+      }
+    });   
+  }
+
+  console.log("Wahlkreis: ", electionDistrictNo);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -25,7 +38,7 @@ function Start() {
 
         // SmartContract
         const contract = new Contract(contractAddress, Election.abi, provider);         
-        const candidatesList = await contract.getCandidates(wahlbezirk);
+        const candidatesList = await contract.getCandidates(electionDistrictNo);
         setCandidates(candidatesList);
 
         const partiesList = await contract.getParties();
@@ -37,7 +50,7 @@ function Start() {
     }
     fetchData();
 
-  }, [wahlbezirk]);
+  }, [electionDistrictNo]);
 
   return (
     <div>

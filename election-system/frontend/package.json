@@ -1,6 +1,6 @@
 {
   "name": "bvs",
-  "version": "0.21.2",
+  "version": "0.22.1",
   "description": "Blockchain Voting System",
   "author": "Louis Göttertz <louis.goettertz@gmail.com>",
   "main": "electron/main.js",
@@ -46,6 +46,12 @@
         "AppImage",
         "deb"
       ]
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
     }
   },
   "eslintConfig": {
