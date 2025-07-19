@@ -1,6 +1,8 @@
 {
   "name": "bvs",
   "version": "0.21.2",
+  "description": "Blockchain Voting System",
+  "author": "Louis Göttertz <louis.goettertz@gmail.com>",
   "main": "electron/main.js",
   "homepage": "./",
   "private": true,
@@ -27,7 +29,24 @@
     "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "electron": "electron .",
-    "desktop": "npm run build && npm run electron"
+    "desktop": "npm run build && npm run electron",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build" : {
+    "appId": "com.bvs.app",
+    "productName": "BVS",
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "package.json"
+    ],   
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -48,6 +67,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^37.2.0"
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12"
   }
 }
