@@ -34,7 +34,7 @@ The problem of potential blackmail extends the requirement of mere secrecy: the 
 
 ## A Frontend
 
-Platforms: Web & Mobile 
+Platforms: Web, Desktop & Mobile 
 Functions: 
 - Authentication
 - Display of the ballot paper

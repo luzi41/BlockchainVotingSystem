@@ -1,4 +1,4 @@
-// V0.21.8
+// V0.22.2
 import { useState, useEffect } from "react";
 const ipcRenderer = window.ipcRenderer;
 const { Wallet } = require('ethers');
@@ -7,6 +7,7 @@ function SettingsForm({ onClose }) {
   const [language, setLanguage] = useState("de");
   const [privateKey, setPrivateKey] = useState("");
   const [electionDistrict, setElectionDistrict] = useState(0);
+  const [rdpServer, setRdpServer] = useState("");
 
   useEffect(() => {
     // Nur beim ersten Laden aufrufen
@@ -27,13 +28,21 @@ function SettingsForm({ onClose }) {
         setElectionDistrict(val);
       }
     });
-      
+    ipcRenderer.invoke('settings:get', 'rdpServer').then((val) => {
+      if (val !== undefined && val !== null) {
+        setRdpServer(val);
+      }
+      else {
+        setRdpServer(process.env.REACT_APP_RPC_URL);
+      }
+    });      
   }, []); // ✅ Wichtig: nur einmal ausführen
 
-  function handleSave(language, privateKey, electionDistrict) {
+  function handleSave(language, privateKey, electionDistrict, rdpServer) {
     ipcRenderer.invoke("settings:set", "language", language);
     ipcRenderer.invoke("settings:set", "privateKey", privateKey);
     ipcRenderer.invoke("settings:set", "electionDistrict", electionDistrict);
+    ipcRenderer.invoke("settings:set", "rdpServer", rdpServer);
   }
 
   function createNewKey() {
@@ -74,7 +83,15 @@ function SettingsForm({ onClose }) {
           onChange={(e) => setElectionDistrict(e.target.value)} />
       </div>
       <div>
-        <button onClick={() => handleSave(language, privateKey, electionDistrict)}>Speichern</button>
+        <label>RDP-Server</label><br />
+        <input
+          type="text"
+          value={rdpServer}
+          name="rdpServer"
+          onChange={(e) => setRdpServer(e.target.value)} />
+      </div>
+      <div>
+        <button onClick={() => handleSave(language, privateKey, electionDistrict, rdpServer)}>Speichern</button>
       </div>
     </div>
   );
