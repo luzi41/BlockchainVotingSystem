@@ -90,7 +90,8 @@ Functions:
 - Results publicly viewable via a dashboard (verified via blockchain)
 
 
-# 4. Installation Prototypes (see doc/installation)
+# 4. Installation development version of BVS 
+go to: doc/installation
 
 
 # 5. Todo

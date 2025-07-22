@@ -4,10 +4,11 @@ const prompt = require('prompt');
 
 prompt.start();
 
-prompt.get(['PathToQuorum'], function (err, result) {
+prompt.get(['PathToQuorum','Contract'], function (err, result) {
     if (err) { return onErr(err); }
     console.log('Command-line input received:');
     console.log('  PathToQuorum: ' + result.PathToQuorum);
+    console.log(' Contract: ' + result.Contract);
 
     async function main() {
     // Admin-Wallet laden
@@ -20,7 +21,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     const admin = wallet.connect(provider);
 
     // Contract factory und Deployment
-    const Election = await hre.ethers.getContractFactory("Bundestagswahl", admin);
+    const Election = await hre.ethers.getContractFactory(result.Contract, admin);
     const election = await Election.deploy();
     
     console.log("Contract address: " + election.target);

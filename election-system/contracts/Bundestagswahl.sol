@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.19.2
+// V 0.22.3
 
 import "./Registry.sol";
 
@@ -10,6 +10,10 @@ contract Bundestagswahl is Registry {
     uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
     uint256 currentPartyId;
     uint256 currentCandidateId;
+
+    function getModus() public view returns (uint) {
+        return modus;
+    }
 
     struct ElectionDistrict {
         string name;

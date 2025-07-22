@@ -1,4 +1,23 @@
 This part refers to a parliamentary election with two votes such as the federal election in Germany.
+## 4 Backend API
+
+### 4.1
+
+Save the ABI in the election-system directory (replace filenames with your correct filenames) e.g.:
+
+    cp artifacts/contracts/Registry.sol/Registry.json api/Registry.json &&
+    cp artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json api/Bundestagswahl.json
+
+### 4.2 Generate OpenSSL RSA private.pem and  public.pem
+
+- Store private.pem in election-system/keys,
+- The public key is stored in the smart contract via the API (see 5).
+
+### 4.3 Install and start API
+
+    cd api
+    npm install express ethers node-forge // (once)
+    node apiBundestagswahl.js
 
 # 5 Fill blockchain with test data (candidates, voter hashs)
 

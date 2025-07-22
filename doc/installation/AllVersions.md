@@ -1,12 +1,13 @@
-# 1 Preconditions
+# Installation dev-version of BVS 
+## 1 Preconditions
 - Node.js (LTS)
 - npm
 - Git
 - [Docker & Docker Compose](https://docker.com) (running as service, user access)
 - curl command line
-- MetaMask Browser Extension
+- MetaMask Browser Extension (only Web)
 
-# 2 Quorum blockchain network
+## 2 Quorum blockchain network
 
 To create the tutorial docker-compose files and artifacts, run:
   
@@ -17,25 +18,27 @@ To start the network, go to the installation directory (quorum-test-network if y
 
     ./run.sh
     
-# 3 SmartContract and Frontend
+## 3 SmartContract and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
 
-## 3.1 Install Hardhat (only once)
+### 3.1 Install Hardhat (only once)
+
+Hardhat is a development environment for Ethereum software. It consists of different components for editing, compiling, debugging and deploying your smart contracts and dApps, all of which work together to create a complete development environment. see: https://hardhat.org/hardhat-runner/docs/getting-started#overview
 
     cd BlockchainVotingSystem/election-system
     npm init 
     npm install --save-dev hardhat prompt
     npx hardhat init 
 
-## 3.2 Customize hardhat config
+### 3.2 Customize hardhat config
 
 election-system$ 
 
     nano hardhat.config.js
     
 If necessary, replace the account with suitable private keys or encrypted keystore of the account 
-Member1 from quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (the network must be started).
+Member1 from quorum-test-network/config/nodes/Member1/accountPrivateKey.txt. (the network must be started).
 
     require("@nomicfoundation/hardhat-toolbox");
     module.exports = {
@@ -49,14 +52,14 @@ Member1 from quorum-test-network/config/nodes/Member1/accountPivateKey.txt. (the
       }
      }
     };
-## 3.3 Compile SmartContract
+### 3.3 Compile SmartContract
 
 election-system$
 
     cd contracts
     npx hardhat compile
 
-## 3.4 Deploy contract
+### 3.4 Deploy contract
 
 election-system$
 
@@ -65,22 +68,3 @@ election-system$
 - Save contract address in api/deployment-address.txt
 - Replace also the contract address in frontend/.env
 
-# 4 Backend API
-
-## 4.1
-
-Save the ABI in the election-system directory (replace filenames with your correct filenames) e.g.:
-
-    cp artifacts/contracts/Registry.sol/Registry.json api/Registry.json &&
-    cp artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json api/Bundestagswahl.json
-
-## 4.2 Generate OpenSSL RSA private.pem and  public.pem
-
-- Store private.pem in election-system/keys,
-- The public key is stored in the smart contract via the API (see 4.4 ".../registerElectionDistrict").
-
-## 4.3 Install and start API
-
-    cd api
-    npm install express ethers node-forge // (once)
-    node index.js
