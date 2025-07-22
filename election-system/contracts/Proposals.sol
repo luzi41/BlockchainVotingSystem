@@ -42,7 +42,6 @@ contract Proposals is Registry {
         publicKey = _publicKey;
     }
 
-    // fkt. Kandidaten
     function registerProposal(
         string memory _name, 
         string memory _text,
@@ -56,6 +55,13 @@ contract Proposals is Registry {
             text: _text,
             url: _url
         }));
+    }
+
+    function registerAnswer(string memory _qtype, uint256 _proposal) public Registry.onlyAdmin Registry.onlyBeforeVoting {
+        Answer memory answer;
+        answer.qtype = _qtype;
+        answer.proposal = _proposal;
+        answers.push(answer);
     }
 
     function castEncryptedVote(string memory _encryptedVote, string memory _token) public Registry.onlyDuringVoting {

@@ -69,6 +69,18 @@ prompt.get(['PathToQuorum'], function (err, result) {
       }
     });
 
+    app.post("/registerAnswer", async (req, res) => {
+      const { qtype, proposal } = req.body;
+      try {
+        const contract = await loadContract();
+        const tx = await contract.registerAnswer(qtype, proposal);
+        await tx.wait();
+        res.send({ status: "success", tx: tx.hash });     
+      } catch (err) {
+        res.status(500).send({ error: err.message });
+      }
+    });
+
     app.post("/storePublicKey", async (req, res) => {
       const { publicKey } = req.body;
       try {
