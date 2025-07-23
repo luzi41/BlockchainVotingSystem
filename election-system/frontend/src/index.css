@@ -1,4 +1,4 @@
-/* v0.22.2 */
+/* v0.22.7 */
 
 body {
   margin: 0;
@@ -145,7 +145,6 @@ th, td {
   position:sticky; 
 }
 
-
 div .row {
   border: 1px dotted black;
   /* margin: -1px 0 0 -1px; */
@@ -177,14 +176,12 @@ div .row {
   width: 50%;
 }
 
-
 /* Clear floats after the columns */
 .row:after {
   content: "";
   display: table;
   clear: both;
 }
-
 
 div .border {
   width: 100%;
@@ -203,4 +200,3 @@ div .border {
   display: inline;
   color: silver;
 }
-

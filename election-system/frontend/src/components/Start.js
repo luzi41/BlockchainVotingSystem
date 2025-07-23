@@ -62,7 +62,7 @@ function Start() {
       </div>
       <h3>Was wird gewählt</h3>
       <div>
-        Bei dieser Wahl werden die Mitglieder des Deutschen Bundestages gewählt. Mit der ersten Stimme wählen SIe den Direktkanidaten Ihres Wahlbezirkes und mit der zweiten Stimme eine Partei.
+        Bei dieser Wahl werden die Mitglieder des Deutschen Bundestages gewählt. Mit der ersten Stimme wählen Sie den Direktkanidaten Ihres Wahlbezirkes und mit der zweiten Stimme eine Partei.
       </div>
       <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlkreis</h3>
         <ul>
