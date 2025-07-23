@@ -1,4 +1,4 @@
-// V 0.22.1
+// V 0.22.4
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom'
 import { JsonRpcProvider, Contract} from "ethers";
@@ -53,7 +53,7 @@ function Start() {
   }, [electionDistrictNo]);
 
   return (
-    <div>
+    <div id="content">
       <h3>Registrieren für die Online-Wahl</h3>
       <div>
         Sie können auf der Rückseite Ihrer Wahlbenachrichtigung ankreuzen, dass Sie an der Online-Wahl teilnehmen möchten und diese dann kostenfrei zurück schicken - genauso wie bei der Briefwahl. <br />
@@ -83,7 +83,11 @@ function Start() {
         </ul>
       <h3>Das neue Wahlgesetz</h3>
       Sie finden hier ausführliche Informationen zum <a href="https://www.gesetze-im-internet.de/bwahlg/" target="blank">Wahlgesetz</a>.
-    </div>
+      &nbsp;  <br />
+      &nbsp;  <br />
+      &nbsp;  <br />
+      &nbsp;  <br />
+    </div> 
   );
 }
 

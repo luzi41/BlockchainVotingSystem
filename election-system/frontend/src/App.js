@@ -51,7 +51,9 @@ function App() {
         </nav>
 
         <div id="app">
+          <div id="title">
           <h1>{title}</h1>
+          </div>
         </div>  
         <div id="footer"><span id="ContractAddress">{status}</span></div>
       

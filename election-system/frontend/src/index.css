@@ -92,6 +92,24 @@ th, td {
   padding: 0 15px;
 }
 
+#content {
+  padding: 0 15px;
+}
+
+#title {
+  padding-left: 0;
+  padding-bottom: 0;
+}
+
+#footer {
+  flex: auto;
+  position:fixed;
+  width: 100%;
+  bottom: -10px;
+  height: 20px;
+  background-color: white;
+}
+
 #ballot {
   display: flex;
   margin: 0;
@@ -124,15 +142,9 @@ th, td {
 
 #nav {
   top: 0;
-  position:sticky;
+  position:sticky; 
 }
 
-#footer {
-  position:absolute;
-  width: 100%;
-  bottom: 0px;
-  z-index: -1;
-}
 
 div .row {
   border: 1px dotted black;
