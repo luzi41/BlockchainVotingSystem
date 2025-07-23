@@ -7,6 +7,8 @@ The motivation for developing a new system for conducting online elections and s
 
 The second point (voters' independence from time and place) seems particularly crucial to me; this function has so far been represented in conventional elections primarily by the option of postal voting. Using an online voting system could make elections possible even in places where conventional elections can only be held under very difficult conditions. The advantages of independence from time and place would be particularly evident in countries with weak infrastructure or in countries suffering from civil war or terrorism, since it is precisely in places where there is a weak or destroyed infrastructure that mobile internet use is already widespread among all segments of the population and is growing faster than in developed industrialized countries.
 
+![Voting](./images/Voting_V0.22.png)
+
 # 1. Objectives 
 
 A secure, privacy-compliant and traceable online voting system for surveys and elections that: 
