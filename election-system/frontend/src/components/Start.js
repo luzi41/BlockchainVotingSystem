@@ -57,8 +57,8 @@ function Start() {
       <h3>Registrieren für die Online-Wahl</h3>
       <div>
         Sie können auf der Rückseite Ihrer Wahlbenachrichtigung ankreuzen, dass Sie an der Online-Wahl teilnehmen möchten und diese dann kostenfrei zurück schicken - genauso wie bei der Briefwahl. <br />
-        Dann werden SIe aus dem Präsenzwahllisten entfernt und können nur noch an der Online-Wahl teilnehmen.<br />
-        Anschließend bekommen SIe die Unterlagen für die Online-Wahl.
+        Dann werden Sie aus dem Präsenzwahllisten entfernt und können nur noch an der Online-Wahl teilnehmen.<br />
+        Anschließend bekommen Sie die Unterlagen für die Online-Wahl.
       </div>
       <h3>Was wird gewählt</h3>
       <div>
