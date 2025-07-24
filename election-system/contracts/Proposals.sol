@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.22.3
+// V 0.22.6
 
 import "./Registry.sol";
 
@@ -15,18 +15,12 @@ contract Proposals is Registry {
         string name;
         string text;
         string url;
+        uint qtype; // 1=Boolean
+        string answer1;
+        string answer2;
     }
 
     Proposal[] public proposals;
-
-    struct Answer {
-        uint256 uid;
-        uint256 proposal;
-        string qtype;
-
-    }
-
-    Answer[] public answers;
 
     struct EncryptedVote {
         string vote;
@@ -45,7 +39,10 @@ contract Proposals is Registry {
     function registerProposal(
         string memory _name, 
         string memory _text,
-        string memory _url
+        string memory _url,
+        uint _qtype,
+        string memory _answer1,
+        string memory _answer2
         ) 
         public Registry.onlyAdmin Registry.onlyBeforeVoting {
         currentProposalId++;
@@ -53,15 +50,11 @@ contract Proposals is Registry {
             uid: currentProposalId,
             name: _name,  
             text: _text,
-            url: _url
+            url: _url,
+            qtype: _qtype,
+            answer1: _answer1,
+            answer2: _answer2
         }));
-    }
-
-    function registerAnswer(string memory _qtype, uint256 _proposal) public Registry.onlyAdmin Registry.onlyBeforeVoting {
-        Answer memory answer;
-        answer.qtype = _qtype;
-        answer.proposal = _proposal;
-        answers.push(answer);
     }
 
     function castEncryptedVote(string memory _encryptedVote, string memory _token) public Registry.onlyDuringVoting {

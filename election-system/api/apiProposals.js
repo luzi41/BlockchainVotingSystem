@@ -1,4 +1,4 @@
-//V 0.22.3
+//V 0.22.7
 
 const express = require("express");
 const fs = require("fs");
@@ -21,7 +21,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     const keystore = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountKeystore", "utf8");
     const password = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountPassword", "utf8").trim();
     const contractAddress = fs.readFileSync("deployment-address.txt", "utf8").trim();
-    const abi = require("./Proposal.json").abi;
+    const abi = require("./Proposals.json").abi;
 
     async function loadContract() {
       const provider = new ethers.JsonRpcProvider("http://localhost:8545");
@@ -58,22 +58,10 @@ prompt.get(['PathToQuorum'], function (err, result) {
     }
 
     app.post("/registerProposal", async (req, res) => {
-      const { name, text, url } = req.body;
+      const { name, text, url, qtype, answer1, answer2 } = req.body;
       try {
         const contract = await loadContract();
-        const tx = await contract.registerProposal(name, text, url);
-        await tx.wait();
-        res.send({ status: "success", tx: tx.hash });     
-      } catch (err) {
-        res.status(500).send({ error: err.message });
-      }
-    });
-
-    app.post("/registerAnswer", async (req, res) => {
-      const { qtype, proposal } = req.body;
-      try {
-        const contract = await loadContract();
-        const tx = await contract.registerAnswer(qtype, proposal);
+        const tx = await contract.registerProposal(name, text, url, qtype, answer1, answer2);
         await tx.wait();
         res.send({ status: "success", tx: tx.hash });     
       } catch (err) {

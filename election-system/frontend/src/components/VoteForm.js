@@ -1,4 +1,4 @@
-// V 0.22.3
+// V 0.22.7
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -19,6 +19,19 @@ async function encryptVote(_toVoted, _publicKey) {
 
 function VoteForm() {
   let { ed } = useParams();
+
+  //general
+  const [error, setError] = useState("");
+  const [tokenInput, setTokenInput] = useState(""); 
+  const [privateKey, setPrivateKey] = useState(() => {
+    if (!process.env.REACT_APP_PRIVATE_KEY?.trim() || process.env.REACT_APP_PRIVATE_KEY === null) {
+      const wallet = Wallet.createRandom();
+      return wallet.privateKey;
+    }
+    return process.env.REACT_APP_PRIVATE_KEY?.trim();
+  });
+
+  // only mode 1
   const [electionDistrictNo, setElectionDistrictNo] = useState(() => {  
     if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
       {
@@ -30,17 +43,8 @@ function VoteForm() {
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [selectedParty, setSelectedParty] = useState("");
-  const [error, setError] = useState("");
-  const [tokenInput, setTokenInput] = useState(""); 
   
-  const [privateKey, setPrivateKey] = useState(() => {
-    if (!process.env.REACT_APP_PRIVATE_KEY?.trim() || process.env.REACT_APP_PRIVATE_KEY === null) {
-      const wallet = Wallet.createRandom();
-      return wallet.privateKey;
-    }
-    return process.env.REACT_APP_PRIVATE_KEY?.trim();
-  });
-  
+  // only mode 2
   const [proposals, setProposals] = useState([]);
 
   if(isElectron) {
@@ -73,7 +77,7 @@ function VoteForm() {
           setCandidates(candidatesList);
           const partiesList = await contract.getParties();
           setParties(partiesList);
-        } else if (modus.toString() === 2) {
+        } else if (modus.toString() === "2") {
           const proposalList = await contract.getProposals();
           setProposals(proposalList);
         }
@@ -81,17 +85,16 @@ function VoteForm() {
       catch (error) {
         console.error("Fehler:", error);
       }        
-    }
+    } 
     fetchData();
-  }, [electionDistrictNo, selectedCandidate, selectedParty, proposals]); // Abhängigkeit hinzufügen, damit die Werte neu geladen werden
+  }, [electionDistrictNo, selectedCandidate, selectedParty]); // Abhängigkeit hinzufügen, damit die Werte neu geladen werden
 
-  //if (modus.toString === "1") {
-    /*
-    * const vote Bundestagswahl
-    * Aktion 33: Verschlüsselt Stimmen aus Formular und sendet 
-    * diese an den RPC-Knoten der Blockchain.
-    * @return string (tx hash or error)
-    */
+  /*
+   * const vote Bundestagswahl
+   * Aktion 33: Verschlüsselt Stimmen aus Formular und sendet 
+   * diese an den RPC-Knoten der Blockchain.
+   * @return string (tx hash or error)
+   */
   const vote = async () => {
     try {
       const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, signer);
@@ -165,8 +168,26 @@ function VoteForm() {
     </div>    
   );
 
-return htmlBundestagswahl;
-  
+  const htmlProposal = (
+    <div>
+      <div><h2>Petition</h2></div>
+      <div>Das $Parlament möge beschließen, dass</div>
+        {proposals.map((proposal, index) => (
+          <div class="row" key={index}>
+            <div class="col-95">{proposal.text}</div>
+            <div class="col-5">{proposal.answer1}</div>
+          </div>
+        ))}
+    </div>
+  );
+
+  if (modus.toString() === "1")
+  {
+    return htmlBundestagswahl;
+  } else
+  {
+    return htmlProposal;
+  }
 }
 
 export default VoteForm;

@@ -5,7 +5,7 @@ This tutorial refers to the installation of voting system for proposals.
 
 Save the ABI in the election-system directory (replace filenames with your correct filenames) e.g.:
     cp artifacts/contracts/Registry.sol/Registry.json api/Registry.json &&
-    cp artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json api/Proposal.json
+    cp artifacts/contracts/Proposals.sol/Proposals.json api/Proposal.json
 
 ### 4.2 Generate OpenSSL RSA private.pem and  public.pem
 
@@ -22,8 +22,7 @@ Save the ABI in the election-system directory (replace filenames with your corre
 
 Open a new terminal and exec:
         curl -X POST http://localhost:3001/storePublicKey -H "Content-Type: application/json" -d '{"publicKey" : "`-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RPuK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JShIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+glsiQIDAQAB-----END PUBLIC KEY-----`"}' &&
-        curl -X POST http://localhost:3001/registerProposal -H "Content-Type: application/json" -d '{"name" : "Wasserversorgung privatisieren?", "text" : "Soll die Wasserversorgung in Entenhausen privatisiert werden?", "url": "https://www.entenhausen.gov/water"}' &&
-        curl -X POST http://localhost:3001/registerAnswer -H "Content-Type: application/json" -d '{"qtype" : "bool", "proposal" : "1"}' &&
+        curl -X POST http://localhost:3001/registerProposal -H "Content-Type: application/json" -d '{"name" : "Wasserversorgung privatisieren?", "text" : "Soll die Wasserversorgung in Entenhausen privatisiert werden?", "url" : "https://www.entenhausen.gov/water", "qtype" : "1", "answer1" : "Ja", "answer2" : "Nein"}' &&
         curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken1", "electionDistrict" : "1"}' &&
         curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken2", "electionDistrict" : "1"}' &&
         curl -X POST http://localhost:3001/registerToken -H "Content-Type: application/json" -d '{"token" : "SecretToken3", "electionDistrict" : "1"}' &&
