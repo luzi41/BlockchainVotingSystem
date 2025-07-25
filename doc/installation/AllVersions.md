@@ -68,3 +68,8 @@ election-system$
 - Save contract address in api/deployment-address.txt
 - Replace also the contract address in frontend/.env
 
+for further inststructions look at:
+ 
+- Bundestagswahl.md for parlamentary elections or
+- Proposal.md for voting about proposal
+- ...
