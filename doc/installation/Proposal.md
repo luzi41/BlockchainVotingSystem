@@ -4,8 +4,9 @@ This tutorial refers to the installation of voting system for proposals.
 ### 4.1
 
 Save the ABI in the election-system directory (replace filenames with your correct filenames) e.g.:
-    cp artifacts/contracts/Registry.sol/Registry.json api/Registry.json &&
-    cp artifacts/contracts/Proposals.sol/Proposals.json api/Proposal.json
+
+        cp artifacts/contracts/Registry.sol/Registry.json api/Registry.json &&
+        cp artifacts/contracts/Proposals.sol/Proposals.json api/Proposal.json
 
 ### 4.2 Generate OpenSSL RSA private.pem and  public.pem
 

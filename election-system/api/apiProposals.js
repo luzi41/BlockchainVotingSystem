@@ -60,6 +60,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     app.post("/registerProposal", async (req, res) => {
       const { name, text, url, qtype, answer1, answer2 } = req.body;
       try {
+        console.log("Arg Text: ", text );
         const contract = await loadContract();
         const tx = await contract.registerProposal(name, text, url, qtype, answer1, answer2);
         await tx.wait();
