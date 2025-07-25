@@ -1,193 +1,203 @@
-// V 0.22.7
-import { useParams } from 'react-router-dom'
+// V 0.22.11
+import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
-import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-import { JsonRpcProvider, Wallet, Contract} from "ethers";
+import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
-const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
-let modus = 0;
 
 async function encryptVote(_toVoted, _publicKey) {
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
   const encrypted = pubKey.encrypt(_toVoted.toString(), "RSA-OAEP");
   return forge.util.encode64(encrypted);
-};
+}
 
 function VoteForm() {
   let { ed } = useParams();
 
-  //general
+  const [contractABI, setContractABI] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [modus, setModus] = useState(0);
   const [error, setError] = useState("");
-  const [tokenInput, setTokenInput] = useState(""); 
+  const [tokenInput, setTokenInput] = useState("");
+
   const [privateKey, setPrivateKey] = useState(() => {
-    if (!process.env.REACT_APP_PRIVATE_KEY?.trim() || process.env.REACT_APP_PRIVATE_KEY === null) {
-      const wallet = Wallet.createRandom();
-      return wallet.privateKey;
+    if (!process.env.REACT_APP_PRIVATE_KEY?.trim()) {
+      return Wallet.createRandom().privateKey;
     }
-    return process.env.REACT_APP_PRIVATE_KEY?.trim();
+    return process.env.REACT_APP_PRIVATE_KEY.trim();
   });
 
-  // only mode 1
-  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {  
-    if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
-      {
-        return process.env.REACT_APP_ELECTION_DISTRICT
-      }
-      return ed;
-    });
+  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
+    if (isNaN(ed)) return process.env.REACT_APP_ELECTION_DISTRICT;
+    return ed;
+  });
+
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [selectedParty, setSelectedParty] = useState("");
-  
-  // only mode 2
+
   const [proposals, setProposals] = useState([]);
 
-  if(isElectron) {
-    const ipcRenderer = window.ipcRenderer;
-    ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
-      if (val !== undefined && val !== null) {
-       setElectionDistrictNo(val);
-      }
-    });
-    
-    ipcRenderer.invoke('settings:get', 'privateKey').then((val) => {
-      if (val !== undefined && val !== null) {
-        setPrivateKey(val);
-      }
-    });
-    
-  }
-  const signer = new Wallet(privateKey, provider);  
+  const signer = new Wallet(privateKey, provider);
 
+  // Dynamischen ABI-Import aus .env
   useEffect(() => {
-    /*
-     * fetchData
-     */
+    async function loadABI() {
+      try {
+        const module = await import(`${process.env.REACT_APP_ELECTION}`);
+        setContractABI(module.default);
+      } catch (err) {
+        console.error("Fehler beim Laden des ABI:", err);
+      }
+    }
+    loadABI();
+  }, []);
+
+  // Wenn ABI geladen: Contract initialisieren
+  useEffect(() => {
+    if (!contractABI) return;
+    const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, contractABI.abi, provider);
+    setContract(ctr);
+  }, [contractABI]);
+
+  // Electron Settings laden
+  useEffect(() => {
+    if (!isElectron) return;
+    const ipcRenderer = window.ipcRenderer;
+
+    ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
+      if (val) setElectionDistrictNo(val);
+    });
+
+    ipcRenderer.invoke('settings:get', 'privateKey').then((val) => {
+      if (val) setPrivateKey(val);
+    });
+  }, []);
+
+  // Daten abrufen
+  useEffect(() => {
+    if (!contract) return;
+
     async function fetchData() {
       try {
-        modus = await contract.getModus();
-        console.log("Modus: ", modus.toString());
-        if (modus.toString() === "1") {
-          const candidatesList = await contract.getCandidates(electionDistrictNo);
-          setCandidates(candidatesList);
-          const partiesList = await contract.getParties();
-          setParties(partiesList);
-        } else if (modus.toString() === "2") {
-          const proposalList = await contract.getProposals();
-          setProposals(proposalList);
-        }
-      }
-      catch (error) {
-        console.error("Fehler:", error);
-      }        
-    } 
-    fetchData();
-  }, [electionDistrictNo, selectedCandidate, selectedParty]); // Abhängigkeit hinzufügen, damit die Werte neu geladen werden
+        const m = await contract.getModus();
+        setModus(Number(m));
 
-  /*
-   * const vote Bundestagswahl
-   * Aktion 33: Verschlüsselt Stimmen aus Formular und sendet 
-   * diese an den RPC-Knoten der Blockchain.
-   * @return string (tx hash or error)
-   */
+        if (Number(m) === 1) {
+          const cand = await contract.getCandidates(electionDistrictNo);
+          setCandidates(cand);
+          const part = await contract.getParties();
+          setParties(part);
+        } else if (Number(m) === 2) {
+          const prop = await contract.getProposals();
+          setProposals(prop);
+        }
+      } catch (error) {
+        console.error("Fehler beim Abrufen:", error);
+      }
+    }
+
+    fetchData();
+  }, [contract, electionDistrictNo]);
+
   const vote = async () => {
     try {
-      const contract = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, signer);
-      if (modus.toString() === "1") {      
-        const electionDistrict = await contract.getElectionDistrictByNumber(electionDistrictNo);
-        const encrypted1 = encryptVote(selectedCandidate, electionDistrict.publicKey);
-        const encrypted2 = encryptVote(selectedParty, electionDistrict.publicKey);
-        const tx = await contract.castEncryptedVote(encrypted1, encrypted2, tokenInput, electionDistrictNo);
-        await tx.wait();
-        setError("✅ Erfolgreich! Transaction: " + tx.hash); 
-      } else if (modus.toString() === "1") {
-        const publicKey = await contract.getPublicKey();
-        const encrypted = encryptVote(selectedCandidate, publicKey);
-        const tx = await contract.castEncryptedVote(encrypted, tokenInput);
-        await tx.wait();
-        setError("✅ Erfolgreich! Transaction: " + tx.hash); 
-      }
+      const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, contractABI.abi, signer);
 
+      if (modus === 1) {
+        const ed = await ctr.getElectionDistrictByNumber(electionDistrictNo);
+        const encrypted1 = await encryptVote(selectedCandidate, ed.publicKey);
+        const encrypted2 = await encryptVote(selectedParty, ed.publicKey);
+        const tx = await ctr.castEncryptedVote(encrypted1, encrypted2, tokenInput, electionDistrictNo);
+        await tx.wait();
+        setError("✅ Erfolgreich! Transaction: " + tx.hash);
+      } else if (modus === 2) {
+        const publicKey = await ctr.getPublicKey();
+        const encrypted = await encryptVote(selectedCandidate, publicKey);
+        const tx = await ctr.castEncryptedVote(encrypted, tokenInput);
+        await tx.wait();
+        setError("✅ Erfolgreich! Transaction: " + tx.hash);
+      }
     } catch (err) {
-        setError("❌ Fehler: " + err.message);
+      setError("❌ Fehler: " + err.message);
     }
   };
 
+  if (!contract) return <p>Lade Vertrag...</p>;
+
+  // Bundestagswahl-Formular
   const htmlBundestagswahl = (
-  // Form für Bundestagswahl
     <div>
-      <div class="row">
-        <div class="col-50">
+      <div className="row">
+        <div className="col-50">
           <p>Ihr Token</p>
           <p>
-            <input type="text" placeholder="Token" name="token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-            <button class=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+            <input type="text" placeholder="Token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>
-        <div class="col-50">
+        <div className="col-50">
           <p>Ihr Wahlkreis</p>
-          <p>
-            {electionDistrictNo}
-        </p>      
+          <p>{electionDistrictNo}</p>
         </div>
       </div>
-      <div id="ballot">
-        <div  id="erststimme">    
-          <h2>Erststimme</h2>
-          {candidates.map((candidate, index ) => (
-          <div class="row" key={index}>
-            <div class="col-95">
-              <span class="left">{candidate.name}</span><span class="right">{candidate.partei}</span>
-            </div>
-            <div class="col-5"><input type="radio" disabled={!electionDistrictNo} class="vote" key={index} value={candidate.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} /></div>
-          </div>
-          ))}    
-        </div>
-        <div id="zweitstimme">
-            <h2>Zweitstimme</h2>
-            {parties.map((party, index ) => (
-              <div class="row" key={index}>
-                <div class="col-95">
-                  <span class="left">{party.name} &nbsp; {party.shortname}</span>
-                </div> 
-                  <div class="col-5">
-                        <input type="radio" disabled={!electionDistrictNo} class="radio" key={index} value={party.shortname} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
-                  </div>
-              </div>
-            ))}
-        </div>
-      </div>
-        <div class="center"><button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
-          <p>{error}</p>
-        </div>
-    </div>    
-  );
 
-  const htmlProposal = (
-    <div>
-      <div><h2>Petition</h2></div>
-      <div>Das $Parlament möge beschließen, dass</div>
-        {proposals.map((proposal, index) => (
-          <div class="row" key={index}>
-            <div class="col-95">{proposal.text}</div>
-            <div class="col-5">{proposal.answer1}</div>
-          </div>
-        ))}
+      <div id="ballot">
+        <div id="erststimme">
+          <h2>Erststimme</h2>
+          {candidates.map((c, i) => (
+            <div className="row" key={i}>
+              <div className="col-95">
+                <span className="left">{c.name}</span><span className="right">{c.partei}</span>
+              </div>
+              <div className="col-5">
+                <input type="radio" className="vote" value={c.name} name="candidate" onChange={(e) => setSelectedCandidate(e.target.value)} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div id="zweitstimme">
+          <h2>Zweitstimme</h2>
+          {parties.map((p, i) => (
+            <div className="row" key={i}>
+              <div className="col-95">
+                <span className="left">{p.name} &nbsp; {p.shortname}</span>
+              </div>
+              <div className="col-5">
+                <input type="radio" className="radio" value={p.shortname} name="party" onChange={(e) => setSelectedParty(e.target.value)} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="center">
+        <button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+        <p>{error}</p>
+      </div>
     </div>
   );
 
-  if (modus.toString() === "1")
-  {
-    return htmlBundestagswahl;
-  } else
-  {
-    return htmlProposal;
-  }
+  // Petitions-Formular
+  const htmlProposal = (
+    <div>
+      <h2>Petition</h2>
+      <p>Das $Parlament möge beschließen, dass</p>
+      {proposals.map((p, i) => (
+        <div className="row" key={i}>
+          <div className="col-95">{p.text}</div>
+          <div className="col-5">{p.answer1}</div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }
 
 export default VoteForm;

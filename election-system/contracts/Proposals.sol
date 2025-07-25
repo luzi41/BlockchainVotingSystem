@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.22.6
+// V 0.22.10
 
 import "./Registry.sol";
 
@@ -9,6 +9,10 @@ contract Proposals is Registry {
     uint public modus = 2;
     uint256 currentProposalId;
     string  publicKey;
+
+    function getModus() public view returns (uint) {
+        return modus;
+    }    
 
     struct Proposal {
         uint256 uid;
@@ -57,6 +61,10 @@ contract Proposals is Registry {
         }));
     }
 
+    function getProposals() public view returns (Proposal[] memory) {
+        return proposals;
+    }
+
     function castEncryptedVote(string memory _encryptedVote, string memory _token) public Registry.onlyDuringVoting {
         require(Registry.isTokenValid(_token, 1), "Invalid or used token");
         Registry.markTokenUsed(_token, 1);
@@ -68,5 +76,4 @@ contract Proposals is Registry {
     function getEncryptedVotes() public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
         return encryptedVotes;
     }
-
 }
