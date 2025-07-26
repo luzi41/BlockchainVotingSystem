@@ -160,6 +160,13 @@ div .row {
   width: 95%;
 }
 
+.col-90 {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 90%;
+}
+
 /* Floating column for labels: 5% width */
 .col-5 {
   margin: 0;

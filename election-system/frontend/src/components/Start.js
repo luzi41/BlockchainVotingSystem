@@ -1,12 +1,12 @@
-// V 0.22.4
+// V 0.22.11
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom'
 import { JsonRpcProvider, Contract} from "ethers";
-import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
 function Start() {
+  const [contractABI, setContractABI] = useState(null);
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   let { ed } = useParams();
@@ -30,6 +30,18 @@ function Start() {
   console.log("Wahlkreis: ", electionDistrictNo);
 
   useEffect(() => {
+    async function loadABI() {
+      try {
+        const module = await import(`${process.env.REACT_APP_ELECTION}`);
+        setContractABI(module.default);
+      } catch (err) {
+        console.error("Fehler beim Laden des ABI:", err);
+      }
+    }
+    loadABI();
+
+  }, [contractABI]);
+
     async function fetchData() {
       try {
         // Wallet
@@ -37,7 +49,7 @@ function Start() {
         const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
         // SmartContract
-        const contract = new Contract(contractAddress, Election.abi, provider);         
+        const contract = new Contract(contractAddress, contractABI, provider);         
         const candidatesList = await contract.getCandidates(electionDistrictNo);
         setCandidates(candidatesList);
 
@@ -49,8 +61,6 @@ function Start() {
       }        
     }
     fetchData();
-
-  }, [electionDistrictNo]);
 
   return (
     <div id="content">

@@ -190,8 +190,9 @@ function VoteForm() {
       <p>Das $Parlament möge beschließen, dass</p>
       {proposals.map((p, i) => (
         <div className="row" key={i}>
-          <div className="col-95">{p.text}</div>
+          <div className="col-90">{p.text}</div>
           <div className="col-5">{p.answer1}</div>
+          <div className="col-5">{p.answer2}</div>
         </div>
       ))}
     </div>
