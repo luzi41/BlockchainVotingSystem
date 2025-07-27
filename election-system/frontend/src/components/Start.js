@@ -1,4 +1,4 @@
-//V 0.22.12
+//V 0.22.13
 
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
@@ -49,7 +49,7 @@ function Start() {
 
   if (!contract) return <p>Lade Vertrag...</p>;
 
-  return (
+  const htmlBundestagswahl = (
     <div id="content">
       <h3>Registrieren für die Online-Wahl</h3>
       <div>
@@ -73,6 +73,12 @@ function Start() {
       </ul>
     </div>
   );
+
+  const htmlProposal = (
+    <div>Proposal</div>
+  );
+
+  return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }
 
 export default Start;
