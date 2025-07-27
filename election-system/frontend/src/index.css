@@ -159,12 +159,26 @@ div .row {
   float: left;
   width: 95%;
 }
-
 .col-90 {
   margin: 0;
   padding: 0;
   float: left;
   width: 90%;
+}
+
+.col-80 {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 80%;
+}
+
+/* Floating column for labels: 5% width */
+.col-10 {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 10%;
 }
 
 /* Floating column for labels: 5% width */

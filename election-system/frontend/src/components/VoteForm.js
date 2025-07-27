@@ -1,12 +1,11 @@
-// V 0.22.11
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
+import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
-const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
 
 async function encryptVote(_toVoted, _publicKey) {
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
@@ -16,97 +15,108 @@ async function encryptVote(_toVoted, _publicKey) {
 
 function VoteForm() {
   let { ed } = useParams();
+  if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
+  {
+    ed = 1;
+  }
 
-  const [contractABI, setContractABI] = useState(null);
+  const [contractAddress, setContractAddress] = useState("");
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
-
-  const [privateKey, setPrivateKey] = useState(() => {
-    if (!process.env.REACT_APP_PRIVATE_KEY?.trim()) {
-      return Wallet.createRandom().privateKey;
-    }
-    return process.env.REACT_APP_PRIVATE_KEY.trim();
-  });
-
-  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
-    if (isNaN(ed)) return process.env.REACT_APP_ELECTION_DISTRICT;
-    return ed;
-  });
-
+  const [privateKey, setPrivateKey] = useState("");
+  const [electionDistrictNo, setElectionDistrictNo] = useState(ed);
+  const [rpcURL, setRpcURL] = useState("");
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [selectedParty, setSelectedParty] = useState("");
-
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [proposals, setProposals] = useState([]);
 
-  const signer = new Wallet(privateKey, provider);
-
-  // Dynamischen ABI-Import aus .env
+  // Dynamischen ABI + Settings laden
   useEffect(() => {
-    async function loadABI() {
+    async function fetchContractAndSettings() {
       try {
-        const module = await import(`${process.env.REACT_APP_ELECTION}`);
-        setContractABI(module.default);
+
+        let _privateKey, _rpcURL, _electionDistrict;
+
+        if (isElectron) {
+          const ipc = window.electronAPI;
+
+          _privateKey = await ipc.settings.get('privateKey');
+          if (!_privateKey) {
+            throw new Error("Fehlende Einstellungen (_privateKey) im Electron Store");
+          }          
+          _rpcURL = await ipc.settings.get('rpcURL');
+          if (!_rpcURL) {
+            throw new Error("Fehlende Einstellungen (_rpcURL) im Electron Store");
+          }
+
+          _electionDistrict = await ipc.settings.get('electionDistrict');
+
+        } else {
+          _privateKey = process.env.REACT_APP_PRIVATE_KEY || Wallet.createRandom().privateKey;
+          _rpcURL = process.env.REACT_APP_RPC_URL;
+          _electionDistrict = process.env.REACT_APP_ELECTION_DISTRICT || 0;
+
+          if (!_privateKey || !_rpcURL) {
+            throw new Error("Fehlende Einstellungen in .env");
+          }
+
+        }
+
+        setPrivateKey(_privateKey);
+        setRpcURL(_rpcURL);
+        setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
+        setElectionDistrictNo(Number(_electionDistrict));
+
       } catch (err) {
-        console.error("Fehler beim Laden des ABI:", err);
+        console.error("Fehler beim Laden des Vertrags und der Einstellungen:", err);
+        setError("❌ Fehler beim Laden der Konfiguration");
       }
     }
-    loadABI();
+
+    fetchContractAndSettings();
   }, []);
 
-  // Wenn ABI geladen: Contract initialisieren
+  // Vertragsdaten laden
   useEffect(() => {
-    if (!contractABI) return;
-    const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, contractABI.abi, provider);
-    setContract(ctr);
-  }, [contractABI]);
-
-  // Electron Settings laden
-  useEffect(() => {
-    if (!isElectron) return;
-    const ipcRenderer = window.ipcRenderer;
-
-    ipcRenderer.invoke('settings:get', 'electionDistrict').then((val) => {
-      if (val) setElectionDistrictNo(val);
-    });
-
-    ipcRenderer.invoke('settings:get', 'privateKey').then((val) => {
-      if (val) setPrivateKey(val);
-    });
-  }, []);
-
-  // Daten abrufen
-  useEffect(() => {
-    if (!contract) return;
-
     async function fetchData() {
       try {
-        const m = await contract.getModus();
+        if (!rpcURL || !contractAddress) return;
+
+        const provider = new JsonRpcProvider(rpcURL);
+        const ctr = new Contract(contractAddress, Election.abi, provider);
+        setContract(ctr);
+        
+        const m = await ctr.getModus();
         setModus(Number(m));
 
         if (Number(m) === 1) {
-          const cand = await contract.getCandidates(electionDistrictNo);
+          const cand = await ctr.getCandidates(electionDistrictNo);
           setCandidates(cand);
-          const part = await contract.getParties();
+          const part = await ctr.getParties();
           setParties(part);
         } else if (Number(m) === 2) {
-          const prop = await contract.getProposals();
+          const prop = await ctr.getProposals();
           setProposals(prop);
         }
       } catch (error) {
         console.error("Fehler beim Abrufen:", error);
+        setError("❌ Fehler beim Abrufen des Vertrags");
       }
     }
 
     fetchData();
-  }, [contract, electionDistrictNo]);
+  }, [rpcURL, contractAddress, electionDistrictNo]);
 
   const vote = async () => {
     try {
-      const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, contractABI.abi, signer);
+      const provider = new JsonRpcProvider(rpcURL);
+      const signer = new Wallet(privateKey, provider);
+      const ctr = new Contract(contractAddress, Election.abi, signer);
 
       if (modus === 1) {
         const ed = await ctr.getElectionDistrictByNumber(electionDistrictNo);
@@ -117,13 +127,13 @@ function VoteForm() {
         setError("✅ Erfolgreich! Transaction: " + tx.hash);
       } else if (modus === 2) {
         const publicKey = await ctr.getPublicKey();
-        const encrypted = await encryptVote(selectedCandidate, publicKey);
+        const encrypted = await encryptVote(selectedAnswer, publicKey);
         const tx = await ctr.castEncryptedVote(encrypted, tokenInput);
         await tx.wait();
         setError("✅ Erfolgreich! Transaction: " + tx.hash);
       }
     } catch (err) {
-      setError("❌ Fehler: " + err.message);
+      setError("❌ Fehler beim Absenden: " + err.message);
     }
   };
 
@@ -186,13 +196,41 @@ function VoteForm() {
   // Petitions-Formular
   const htmlProposal = (
     <div>
+      <div className="row">
+        <div className="col-50">
+          <p>Ihr Token</p>
+          <p>
+            <input type="text" placeholder="Token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+          </p>
+        </div>
+        <div className="col-50">
+        </div>
+      </div>
       <h2>Petition</h2>
       <p>Das $Parlament möge beschließen, dass</p>
       {proposals.map((p, i) => (
         <div className="row" key={i}>
-          <div className="col-90">{p.text}</div>
-          <div className="col-5">{p.answer1}</div>
-          <div className="col-5">{p.answer2}</div>
+          <div className="col-80">{p.text}</div>
+          <div className="col-10">{p.answer1}                
+            <input type="radio" 
+              className="radio" 
+              value={p.answer1} 
+              name="accepted" 
+              onChange={(e) => setSelectedAnswer(e.target.value)} />
+          </div>
+          <div className="col-10">{p.answer2}
+            <input type="radio" 
+              className="radio" 
+              value={p.answer2} 
+              name="accepted" 
+              onChange={(e) => setSelectedAnswer(e.target.value)} />
+          </div>
+          <div>&nbsp;</div>
+          <div className="center">
+            <button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+            <p>{error}</p>
+          </div>          
         </div>
       ))}
     </div>
