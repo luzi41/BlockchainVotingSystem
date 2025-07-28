@@ -92,10 +92,6 @@ Functions:
 - Results publicly viewable via a dashboard (verified via blockchain)
 
 
-# 4. Installation development version of BVS 
-go to: doc/installation
-
-
 # 5. Todo
 
 - Election templates: different kinds of elections and surveys (V 1.0)
