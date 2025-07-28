@@ -1,9 +1,9 @@
-// V 0.20
+// V 0.21.3
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-import { CONTRACT_ADDRESSES } from "../config";
-import { BrowserProvider, Contract} from "ethers";
+//import { CONTRACT_ADDRESSES } from "../config";
+import { JsonRpcProvider, Contract} from "ethers";
 
 function Signature() {
     const [html, setHtml] = useState("");
@@ -20,11 +20,14 @@ function Signature() {
         id = 1;
         }
 
+    const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
+    const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS; 
+    const contract = new Contract(contractAddress, Election.abi, provider);
+
     useEffect(() => {
         async function fetchResults() {
             try {
-                const provider = new BrowserProvider(window.ethereum);
-                const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);                  
+                
                 let newResult = {};
                 
                 if (id === "1") {

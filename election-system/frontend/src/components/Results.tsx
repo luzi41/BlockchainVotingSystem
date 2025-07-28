@@ -1,7 +1,7 @@
-// V 0.19.9
+// V 0.21.3
 import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-import { BrowserProvider, Contract} from "ethers";
+import { JsonRpcProvider, Contract} from "ethers";
 import { CONTRACT_ADDRESSES } from "../config";
 import { Link } from "react-router-dom";
 
@@ -39,20 +39,20 @@ function Results() {
   const [parties, setParties] = useState<any[]>([]);
   const [display1, setDisplay1] = useState<string>("none");
   const [display2, setDisplay2] = useState<string>("block");
+
+  const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  if (!contractAddress) {
+    throw new Error("REACT_APP_CONTRACT_ADDRESS is not defined");
+  }
+  const contract = new Contract(contractAddress, Election.abi, provider);
     
   useEffect(() => {
       async function fetchResults() {
       try {
-        if (!window.ethereum) {
-          setStatus("MetaMask ist nicht installiert.");
-          return;
-        }
-        const provider = new BrowserProvider(window.ethereum);
-        const contract = new Contract(CONTRACT_ADDRESSES.registry, Election.abi, provider);
         const _electionDistricts = await contract.getElectionDistricts();
         const _parties = await contract.getParties();
         setParties(_parties);
-        //console.log(parties[0].name);
         const results_1: Record<string, any>[] = [];
         const results_2: Record<string, any>[] = [];
 
@@ -60,11 +60,9 @@ function Results() {
           let j = i + 1;          
           const newResult_1 = await contract.getElectionResultsDistrict1(j);
           results_1[i] = JSON.parse(newResult_1.tally);
-          //console.log(results_1[i]);
 
           const newResult_2 = await contract.getElectionResultsDistrict2(j);
           results_2[i] = JSON.parse(newResult_2.tally);
-          //console.log(results_2[i]);
         }
         const resultsParties = aggregateObjects(results_2);
              

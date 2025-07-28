@@ -1,4 +1,4 @@
-//V 0.18.9
+//V 0.22.10
 
 const express = require("express");
 const fs = require("fs");
@@ -21,7 +21,7 @@ prompt.get(['PathToQuorum'], function (err, result) {
     const keystore = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountKeystore", "utf8");
     const password = fs.readFileSync(result.PathToQuorum + "/config/nodes/member1/accountPassword", "utf8").trim();
     const contractAddress = fs.readFileSync("deployment-address.txt", "utf8").trim();
-    const abi = require("./Bundestagswahl.json").abi;
+    const abi = require("./Proposals.json").abi;
 
     async function loadContract() {
       const provider = new ethers.JsonRpcProvider("http://localhost:8545");
@@ -57,37 +57,26 @@ prompt.get(['PathToQuorum'], function (err, result) {
       return signature;
     }
 
-    app.post("/registerElectionDistrict", async (req, res) => {
-      const {name, nummer, publicKey} = req.body;
+    app.post("/registerProposal", async (req, res) => {
+      const { name, text, url, qtype, answer1, answer2 } = req.body;
       try {
+        console.log("Arg Text: ", text );
         const contract = await loadContract();
-        const tx = await contract.registerElectionDistrict(name, nummer, publicKey);
+        const tx = await contract.registerProposal(name, text, url, qtype, answer1, answer2);
         await tx.wait();
-        res.send({status: "success", tx: tx.hash });
-      } catch (error) {
-        res.status(500).send({ error: err.message });
-      }
-    });
-
-    app.post("/registerParty", async (req, res) => {
-      const { name, shortname, color, bgcolor, url } = req.body;
-      try {
-        const contract = await loadContract();
-        const tx = await contract.registerParty(name, shortname, color, bgcolor, url);
-        await tx.wait();
-        res.send({status: "success", tx: tx.hash});
+        res.send({ status: "success", tx: tx.hash });     
       } catch (err) {
         res.status(500).send({ error: err.message });
       }
     });
 
-    app.post("/registerCandidate", async (req, res) => {
-      const { name, wahlbezirk, partei, url } = req.body;
+    app.post("/storePublicKey", async (req, res) => {
+      const { publicKey } = req.body;
       try {
         const contract = await loadContract();
-        const tx = await contract.registerCandidate(name, wahlbezirk, partei, url);
+        const tx = await contract.storePublicKey(publicKey);
         await tx.wait();
-        res.send({ status: "success", tx: tx.hash });     
+        res.send({ status: "success", tx: tx.hash });
       } catch (err) {
         res.status(500).send({ error: err.message });
       }
@@ -130,36 +119,23 @@ prompt.get(['PathToQuorum'], function (err, result) {
       }
     });
 
-    app.post("/storeElectionResult", async (req, res) => {
-      const { wahlbezirk } = req.body;
-      
+    app.post("/storeProposalResult", async (req, res) => {
       try {
         const contract = await loadContract();
-        const encryptedVotes = await contract.getEncryptedVotes(wahlbezirk);
+        const encryptedVotes = await contract.getEncryptedVotes();
         console.log("Anzahl Stimmen: " + encryptedVotes.length);
-        const decryptedVotes1 = [];
-        const decryptedVotes2 = [];  
+        const decryptedVotes = []; 
         
         for (let i = 0; i < encryptedVotes.length; i++) {         
           const encryptedVote = encryptedVotes[i];
-          decryptedVotes1[i] = decryptStringVote(encryptedVote.vote1);
-          decryptedVotes2[i] = decryptStringVote(encryptedVote.vote2);
+          decryptedVotes[i] = decryptStringVote(encryptedVote.vote);
         }
 
-        // Erststimme
-        const tally1 = tally(decryptedVotes1);
-        const signature1 = signature(tally1);
-        const tx1 = await contract.storeElectionResult1(tally1, signature1, wahlbezirk);
-        await tx1.wait() 
-        console.log("✅ Erststimmen gespeichert und Transaktion gesendet:", tx1.hash);
-
-        // Zweitstimme        
-        const tally2 = tally(decryptedVotes2);
-        const signature2 = signature(tally2);
-        const tx2 = await contract.storeElectionResult2(tally2, signature2, wahlbezirk);
-        await tx2.wait() 
-        console.log("✅ Zweitstimmen gespeichert und Transaktion gesendet:", tx2.hash);        
-        
+        const tally = tally(decryptedVotes);
+        const signature = signature(tally);
+        const tx = await contract.storeElectionResult1(tally, signature);
+        await tx.wait() 
+        console.log("✅ Stimmen gespeichert und Transaktion gesendet:", tx.hash);
         res.send({ status: "success" });     
       } catch (err) {
         res.status(500).send({ error: err.message });
