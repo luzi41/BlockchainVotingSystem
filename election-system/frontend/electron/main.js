@@ -24,6 +24,8 @@ function createWindow() {
   });
 
   win.loadFile(path.join(__dirname, '../build/index.html'));
+  // Entfernt das Standardmenü
+  win.removeMenu()  
 }
 
 app.whenReady().then(createWindow);
