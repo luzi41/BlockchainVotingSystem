@@ -1,11 +1,9 @@
-//V 0.22.13
+// V0.22.15
 
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
-
-const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
 
 function Start() {
 
@@ -15,15 +13,18 @@ function Start() {
   const [parties, setParties] = useState([]);
   const [proposals, setProposals] = useState([]);
   const { ed } = useParams();
+  const [rpcURL, setRpcURL] = useState("");
 
   const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
     return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
   });
 
+  // fetchSettings: rpc und electionDistrictNo
+
   useEffect(() => {
     async function fetchData() {
       try {
-
+        const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL); // flex???
         const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
         setContract(ctr);
 

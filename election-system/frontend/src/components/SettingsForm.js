@@ -1,4 +1,4 @@
-// V0.22.12
+// V0.22.15
 import { useState, useEffect } from "react";
 const { Wallet } = require('ethers');
 
@@ -90,6 +90,7 @@ function SettingsForm({ onClose }) {
         <input
           type="text"
           value={rpcURL}
+          placeholder="http://localhost:8545"
           onChange={(e) => setRpcURL(e.target.value)}
         />
       </div>

@@ -1,3 +1,4 @@
+// V0.22.15
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -20,7 +21,7 @@ function VoteForm() {
     ed = 1;
   }
 
-  const [contractAddress, setContractAddress] = useState("");
+  const [contractAddress, setContractAddress] = useState(""); // mit .env vorbelegen?
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
   const [error, setError] = useState("");
