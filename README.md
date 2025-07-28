@@ -94,7 +94,7 @@ Functions:
 
 # 4. Installation development version of BVS
 
-go to: [doc/installation and configuration](,/doc/installation%20and%20Configuration)
+go to: [doc/installation and configuration](./doc/installation%20and%20Configuration)
 
 
 # 5. Todo
