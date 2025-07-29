@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.22.10
+// V 0.23.3
 
 import "./Registry.sol";
 
@@ -31,6 +31,17 @@ contract Proposals is Registry {
     }    
 
     EncryptedVote[] public encryptedVotes;
+
+    struct VotingResult {
+        string tally;
+        string signature;
+        uint timestamp;
+        uint electionDistrict;
+    }
+
+    // Array to store decrypted results
+    VotingResult[] public votingResults;
+    event StoreVotingResult(address sender, uint electionDistrict, uint256 timestamp);    
 
     function getPublicKey() public view returns (string memory) {
         return publicKey;
@@ -76,4 +87,13 @@ contract Proposals is Registry {
     function getEncryptedVotes() public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
         return encryptedVotes;
     }
+
+    function storeVotingResult(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
+        VotingResult memory result;
+        result.tally = _tally;
+        result.signature = _signature;
+        result.timestamp = block.timestamp;
+        result.electionDistrict = _wahlbezirk;
+        votingResults.push(result);
+    }    
 }

@@ -1,20 +1,30 @@
-//V 0.22.10
+// V 0.23.3
 
 const express = require("express");
 const fs = require("fs");
 const forge = require("node-forge");
-const privateKeyPem = fs.readFileSync("../keys/private.pem", "utf8");
-const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
+const path = require("path");
+//const privateKeyPem = fs.readFileSync("../keys/private.pem", "utf8");
+//const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
 const { ethers } = require("ethers");
 const app = express();
 const prompt = require('prompt');
 
 prompt.start();
+  // 🔐 Private Key laden
+  const privateKeyPem = fs.readFileSync(path.join(__dirname, "../keys/private.pem"), "utf8");
+  const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
 
 prompt.get(['PathToQuorum'], function (err, result) {
     if (err) { return onErr(err); }
     console.log('Command-line input received:');
     console.log('  PathToQuorum: ' + result.PathToQuorum);
+
+    // 🧾 Zentrales Logging für alle Requests
+    app.use((req, res, next) => {
+      console.log(`📥 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+      next();
+    });
 
     app.use(express.json());
 
@@ -119,27 +129,46 @@ prompt.get(['PathToQuorum'], function (err, result) {
       }
     });
 
-    app.post("/storeProposalResult", async (req, res) => {
-      try {
-        const contract = await loadContract();
-        const encryptedVotes = await contract.getEncryptedVotes();
-        console.log("Anzahl Stimmen: " + encryptedVotes.length);
-        const decryptedVotes = []; 
-        
-        for (let i = 0; i < encryptedVotes.length; i++) {         
-          const encryptedVote = encryptedVotes[i];
-          decryptedVotes[i] = decryptStringVote(encryptedVote.vote);
-        }
+  app.post("/storeVotingResult", async (req, res) => {
+    try {
+      console.log("🟡 StoreVotingResult gestartet...");
 
-        const tally = tally(decryptedVotes);
-        const signature = signature(tally);
-        const tx = await contract.storeElectionResult1(tally, signature);
-        await tx.wait() 
-        console.log("✅ Stimmen gespeichert und Transaktion gesendet:", tx.hash);
-        res.send({ status: "success" });     
-      } catch (err) {
-        res.status(500).send({ error: err.message });
+      const contract = await loadContract();
+
+      console.log("🔄 Rufe verschlüsselte Stimmen vom Smart Contract ab...");
+      const encryptedVotes = await contract.getEncryptedVotes();
+      console.log("🔢 Anzahl verschlüsselter Stimmen: " + encryptedVotes.length);
+
+      const decryptedVotes = [];
+
+      for (let i = 0; i < encryptedVotes.length; i++) {
+        const encryptedVote = encryptedVotes[i];
+        try {
+          const decrypted = decryptStringVote(encryptedVote.vote); // oder encryptedVote, je nach Typ
+          decryptedVotes.push(decrypted);
+        } catch (err) {
+          console.error(`❌ Fehler beim Entschlüsseln der Stimme ${i}:`, err.message);
+        }
       }
-    });
+
+      console.log("✅ Entschlüsselte Stimmen:", decryptedVotes);
+
+      const resultTally = tally(decryptedVotes);
+      console.log("📊 Auswertung:", resultTally);
+
+      const resultSignature = signature(resultTally);
+      console.log("✍️ Signatur:", resultSignature);
+
+      console.log("📤 Sende Ergebnis an Smart Contract...");
+      const tx = await contract.storeVotingResult(resultTally, resultSignature, 1);
+      await tx.wait();
+      console.log("✅ Stimmen gespeichert, Transaktion:", tx.hash);
+
+      res.send({ status: "success", tx: tx.hash });
+    } catch (err) {
+      console.error("❗ Fehler in /storeVotingResult:", err.message);
+      res.status(500).send({ error: err.message });
+    }
+  });
     app.listen(3001, () => console.log("API läuft auf Port 3001!"));
 });

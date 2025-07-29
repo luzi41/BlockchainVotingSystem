@@ -1,4 +1,4 @@
-// v0.22.11
+// v0.23.3
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { JsonRpcProvider, Contract } from "ethers";
@@ -46,7 +46,7 @@ function App() {
             <li><Link to="/vote">Abstimmen</Link></li>
             <li><Link to="/results">Ergebnisse</Link></li>
             <li><Link to="/extras">Extras</Link></li>
-            <li className="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.22</Link></li>
+            <li className="title"><Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">Blockchain Voting System 0.23</Link></li>
           </ul>
         </nav>
 

@@ -1,12 +1,13 @@
-// V0.22.15
+// V0.23.3
 
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
+import description from "../htmlContent/votingDescription.md";
 
 function Start() {
-
+  const [data, setData] = useState(null);
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
   const [candidates, setCandidates] = useState([]);
@@ -39,6 +40,7 @@ function Start() {
         } else if (Number(m) === 2) {
           const proposalList = await ctr.getProposals();
           setProposals(proposalList);
+
         }
       } catch (err) {
         console.error("Fehler beim Abrufen der Daten: ", err);
@@ -74,11 +76,19 @@ function Start() {
       </ul>
     </div>
   );
-
+  /*
   const htmlProposal = (
-    <div>Proposal</div>
+    <div id="content">
+      <h1>Volksentscheid: Wasserversorgung in Entenhausen</h1>
+      <p>Soll die Wasserversorgung in Entenhausen privatisiert werden?</p>
+      <h3>Registrieren für die Teilnahme:</h3>
+      <div>
+        ...
+      </div>      
+    </div>
   );
-
+  */
+  const htmlProposal = (<div>{description}</div>);
   return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }
 
