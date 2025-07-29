@@ -76,18 +76,7 @@ function Start() {
       </ul>
     </div>
   );
-  /*
-  const htmlProposal = (
-    <div id="content">
-      <h1>Volksentscheid: Wasserversorgung in Entenhausen</h1>
-      <p>Soll die Wasserversorgung in Entenhausen privatisiert werden?</p>
-      <h3>Registrieren für die Teilnahme:</h3>
-      <div>
-        ...
-      </div>      
-    </div>
-  );
-  */
+
   const htmlProposal = (<div>{description}</div>);
   return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }

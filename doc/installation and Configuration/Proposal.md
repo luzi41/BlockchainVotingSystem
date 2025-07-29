@@ -18,7 +18,7 @@ Save the ABI in the election-system directory (replace filenames with your corre
 
     cd api
     npm install express ethers node-forge // (once)
-    node apiProposal.js
+    node apiProposals.js
 
 ### 4.4 Fill blockchain with test data (candidates, voter hashs)
 
@@ -53,7 +53,7 @@ Open a new terminal and exec:
 
 ## 4.5 Start voting phase:
 
-    curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Test-Election 2025"}'
+    curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Test 2025"}'
 
 ## 4.6 Install and start frontend-UI
 
