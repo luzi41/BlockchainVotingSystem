@@ -82,7 +82,7 @@ Start frontend:
 
 election-system/scripts$
 
-    curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" 
+    curl -X POST http://localhost:3001/storeVotingResult -H "Content-Type: application/json" 
 
 ### 4.7.3 See results in the browser
 
