@@ -1,11 +1,9 @@
-// V 0.23.4
+// V 0.23.5
 
 const express = require("express");
 const fs = require("fs");
 const forge = require("node-forge");
 const path = require("path");
-//const privateKeyPem = fs.readFileSync("../keys/private.pem", "utf8");
-//const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
 const { ethers } = require("ethers");
 const app = express();
 const prompt = require('prompt');

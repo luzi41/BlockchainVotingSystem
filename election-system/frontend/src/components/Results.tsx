@@ -1,4 +1,4 @@
-// Results.tsx V 0.24.0
+// Results.tsx V 0.23.5
 import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
 import { JsonRpcProvider, Contract } from "ethers";
@@ -181,7 +181,8 @@ function Results() {
           console.log("📋 Proposals erhalten:", proposalList);
 
           const rawResult = await contract.getVotingResult();
-          const result = JSON.parse(rawResult.tally);                    
+          const result = JSON.parse(rawResult.tally); 
+          const voteNumber = await contract.getNumberOfVotes();
 
           const htmlProposals = (
             <div>
@@ -191,15 +192,28 @@ function Results() {
                   <div>{item.text} {item.answer1}/{item.answer2}</div>
                   <div>
                     <table>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "60%" }}>Antwort</th>
+                          <th style={{ width: "40%" }}>Stimmen</th>
+                        </tr>
+                      </thead>                      
                       <tbody>
-                    {Object.entries(result).map(([name, value]) => (
-                      <>
-                      <tr>
-                        <td>{name}</td>
-                        <td>{String(value)}</td>
-                      </tr>
-                      </>
-                    ))}
+                      {Object.entries(result).map(([name, value]) => (
+                        <>
+                        <tr key={name}>
+                          <td>{name}</td>
+                          <td>
+                            <div
+                              style={{color: "ffcc00" ,
+                              backgroundColor: "#ccc", 
+                              width: (100 * Number(value) / Number(voteNumber)).toString() + '%'}}>
+                              {fmt3.format(100*Number(value)/Number(voteNumber))} %
+                            </div>
+                          </td>
+                        </tr>
+                        </>
+                      ))}
                       </tbody>
                     </table>
                   </div>

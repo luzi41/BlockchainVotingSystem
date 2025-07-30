@@ -70,6 +70,6 @@ election-system$
 
 for further inststructions look at:
  
-- Bundestagswahl.md for parlamentary elections or
-- Proposal.md for voting about proposal
-- ...
+- go to: [Bundestagswahl.md](./Bundestagswahl.md) for parlamentary elections or
+- go to: [Proposal.md](./Proposal.md) for voting about proposal
+- ... (work in progress)
