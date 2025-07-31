@@ -1,4 +1,4 @@
-// V0.23.7
+// V0.23.8
 
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
@@ -65,15 +65,15 @@ function Start() {
     fetchData();
   }, [electionDistrictNo]);
 
-  if (!contract) return <p>Lade Vertrag...</p>;
+  if (!contract || !texts) return <p>Load data ...</p>;
 
   const htmlBundestagswahl = (
     <div id="content">
-      <h3>Registrieren für die Online-Wahl</h3>
-      <div>
-        Sie können auf der Rückseite Ihrer Wahlbenachrichtigung ankreuzen, dass Sie an der Online-Wahl teilnehmen möchten...
+      <h3 id="titleRegistration">{texts.titleRegistration}</h3>
+      <div id="textRegistration">
+        {texts.textRegistration}
       </div>
-      <h3>Wer steht zur Wahl - KandidatInnen in Ihrem Wahlkreis</h3>
+      <h3 id="titleCandidates">{texts.titleCandidates}</h3>
       <ul>
         {candidates.map((candidate, index) => (
           <li key={index}>
@@ -81,7 +81,7 @@ function Start() {
           </li>
         ))}
       </ul>
-      <h3>Die Partien und ihre Wahlprogramme</h3>
+      <h3 id="titleParties">{texts.titleParties}</h3>
       <ul>
         {parties.map((party, index) => (
           <li key={index}>
