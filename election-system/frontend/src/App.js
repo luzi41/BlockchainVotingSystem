@@ -1,4 +1,4 @@
-// v0.23.6
+// v0.23.7
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { JsonRpcProvider, Contract } from "ethers";
@@ -13,7 +13,7 @@ const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
 function App() {
   const [status, setStatus] = useState(process.env.REACT_APP_CONTRACT_ADDRESS);
-  const [title, setTitle] = useState("Wahl 2026");
+  const [title, setTitle] = useState("Blockchain Voting System");
   const [html, setHtml] = useState("");
 
   useEffect(() =>  {
@@ -37,7 +37,10 @@ function App() {
           throw new Error("Fehler 36");
         }
         const electionTitle = await contract.getElectionTitle();
-        if (electionTitle !== "") setTitle(electionTitle); 
+        if (electionTitle !== "") setTitle(electionTitle);
+
+        const electionStatus = await contract.getElectionStatus();
+        setStatus(process.env.REACT_APP_CONTRACT_ADDRESS + ": " + electionStatus);
       }
       catch (error) {
         console.error("Fehler beim Abrufen des Wahlstatus:", error);
@@ -68,6 +71,7 @@ function App() {
           <div id="footer"><span id="ContractAddress">{status}</span></div>
         
           <Routes>
+            <Route path="/" element={<Start />} />
             <Route path="/start" element={<Start />} />
             <Route path="/start/:ed" element={<Start />} />
             <Route path="/vote" element={<VoteForm />} />

@@ -1,31 +1,48 @@
-// V0.23.3
+// V0.23.7
 
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
-import description from "../htmlContent/votingDescription.md";
+const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
 function Start() {
-  const [data, setData] = useState(null);
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [proposals, setProposals] = useState([]);
+  const [texts, setTexts] = useState(null);
   const { ed } = useParams();
-  const [rpcURL, setRpcURL] = useState("");
-
-  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
+  const [electionDistrictNo] = useState(() => {
     return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
-  });
+  });  
 
-  // fetchSettings: rpc und electionDistrictNo
+  // Texte laden
+  useEffect(() => {
+    fetch("/texts/results-texts.de.json")
+      .then(res => res.json())
+      .then(data => {
+        setTexts(data);
+      })
+      .catch(err => {
+        console.error("❌ ", err);
+      });
+  }, []);  
 
+  // fetchData: rpc und electionDistrictNo
   useEffect(() => {
     async function fetchData() {
       try {
-        const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL); // flex???
+        let _rpcURL = process.env.REACT_APP_RPC_URL;
+        if (isElectron) {
+          const ipc = window.electronAPI;
+          _rpcURL = await ipc.settings.get('rpcURL');
+          if (!_rpcURL) {
+            throw new Error("❌ Error RPC-URL");
+          }          
+        }        
+        const provider = new JsonRpcProvider(_rpcURL);
         const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
         setContract(ctr);
 
@@ -40,13 +57,11 @@ function Start() {
         } else if (Number(m) === 2) {
           const proposalList = await ctr.getProposals();
           setProposals(proposalList);
-
         }
       } catch (err) {
-        console.error("Fehler beim Abrufen der Daten: ", err);
+        console.error("❌ ", err);
       }
     }
-
     fetchData();
   }, [electionDistrictNo]);
 
@@ -77,7 +92,16 @@ function Start() {
     </div>
   );
 
-  const htmlProposal = (<div>{description}</div>);
+  const htmlProposal = (
+    <div>
+        {proposals.map((candidate, index) => (
+          <div key={index}>
+            <p>{candidate.name} - <a href={candidate.url} target="_blank" rel="noreferrer">{texts.details}</a> {candidate.partei}</p>
+            {candidate.text}
+          </div>
+        ))}
+    </div>
+  );
   return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }
 
