@@ -1,4 +1,4 @@
-// v0.23.7
+// v0.23.10
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { JsonRpcProvider, Contract } from "ethers";
