@@ -58,7 +58,7 @@ yarn-error.log*
 lerna-debug.log*
 
 # Data
-*.json
+election-system/api*.json
 
 # misc
 /cache

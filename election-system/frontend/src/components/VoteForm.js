@@ -5,6 +5,7 @@ import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
+import Texts from "../assets/texts/voteForm-texts.de.json";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
@@ -35,6 +36,7 @@ function VoteForm() {
   const [selectedParty, setSelectedParty] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [proposals, setProposals] = useState([]);
+  const [texts, setTexts] = useState(null);
 
   // Dynamischen ABI + Settings laden
   useEffect(() => {
@@ -42,6 +44,7 @@ function VoteForm() {
       try {
 
         let _privateKey, _rpcURL, _electionDistrict;
+        setTexts(Texts);
 
         if (isElectron) {
           const ipc = window.electronAPI;
@@ -199,17 +202,16 @@ function VoteForm() {
     <div>
       <div className="row">
         <div className="col-50">
-          <p>Ihr Token</p>
+          <p>{texts.yourToken}</p>
           <p>
-            <input type="text" placeholder="Token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <input type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
             <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>
         <div className="col-50">
         </div>
       </div>
-      <h2>Petition</h2>
-      <p>Das $Parlament möge beschließen, dass</p>
+      <h2>{texts.survey}</h2>
       {proposals.map((p, i) => (
         <div className="row" key={i}>
           <div className="col-80">{p.text}</div>
@@ -229,7 +231,7 @@ function VoteForm() {
           </div>
           <div>&nbsp;</div>
           <div className="center">
-            <button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+            <button type="submit" onClick={vote} disabled={!tokenInput}>{texts.btnSend}</button>
             <p>{error}</p>
           </div>          
         </div>

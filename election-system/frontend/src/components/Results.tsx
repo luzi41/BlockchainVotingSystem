@@ -1,8 +1,9 @@
-// Results.tsx V 0.23.6
+// Results.tsx V 0.23.9
 import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
+import Texts from "../assets/texts/results-texts.de.json";
 
 declare global {
   interface Window {
@@ -23,7 +24,6 @@ function aggregateObjects(_object: any[]): Record<string, number> {
       total += eintrag[partei];
     }
   }
-
   Stimmen = total;
   return summe;
 }
@@ -37,6 +37,8 @@ function Results() {
   const [display1, setDisplay1] = useState<string>("none");
   const [display2, setDisplay2] = useState<string>("block");
 
+  
+
   const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
   if (!provider) {        
     throw new Error("Netzwerkfehler!");
@@ -47,28 +49,15 @@ function Results() {
     }
     const contract = new Contract(contractAddress, Election.abi, provider);
 
-    // Texte laden
-    useEffect(() => {
-      fetch("/texts/results-texts.de.json")
-        .then(res => res.json())
-        .then(data => {
-          setTexts(data);
-          setStatus(data.intro || "Ergebnisse werden geladen …");
-        })
-        .catch(err => {
-          console.error("❌ Fehler beim Laden der Texte:", err);
-          setStatus("Ergebnisse werden geladen …");
-        });
-    }, []);
-
     useEffect(() => {
       async function fetchResults() {
         try {
+          setTexts(Texts);
           if (!contract) return;
           const m = await contract.getModus();
           setModus(Number(m));
 
-          if (Number(m) === 1) {
+          if (modus === 1) {
             const _electionDistricts = await contract.getElectionDistricts();
             const _parties = await contract.getParties();
             setParties(_parties);
@@ -92,7 +81,7 @@ function Results() {
                 <p>
                   <select
                     onChange={e => {
-                      if (e.target.value === "1") {
+                      if (e.target.value === "1") { // bestimmt, ob Elemente ausgeblendet werden
                         setDisplay1("block");
                         setDisplay2("none");
                       } else {
@@ -143,7 +132,7 @@ function Results() {
                             <table border={0} cellPadding="5" cellSpacing="0">
                               <thead>
                                 <tr>
-                                  <th style={{ width: "50%" }}>Partei</th>
+                                  <th style={{ width: "50%" }}>{texts.party}</th>
                                   <th style={{ width: "50%" }}>{texts.votes}</th>
                                 </tr>
                               </thead>
@@ -196,7 +185,7 @@ function Results() {
 
           } else if (Number(m) === 2) {
             const proposalList = await contract.getProposals();
-            if (!proposalList || proposalList.length === 0) throw new Error("Proposals nicht geladen!");
+            if (!proposalList || proposalList.length === 0) throw new Error(texts.errorProposals);
 
             const rawResult = await contract.getVotingResult();
             const result = JSON.parse(rawResult.tally); 
@@ -240,7 +229,7 @@ function Results() {
             setStatus("");
           }
         } catch (err: any) {
-          console.error("❌ Fehler beim Laden des Moduls:", err.message);
+          console.error("❌ " + texts.errorLoadModule + " :", err.message);
           setHtml(
             <div className="border">
               <h2>{texts.headline || "Wahlergebnisse"}</h2>
@@ -251,7 +240,21 @@ function Results() {
       }
 
       fetchResults();
-    }, [display1, display2, texts]);
+    }, 
+    [
+      display1, 
+      display2, 
+      modus, 
+      status, 
+      texts.errorLoadModule, 
+      texts.errorProposals, 
+      texts.firstVotes,
+      contract,
+      getPartyBgColor,
+      getPartyColor,
+      texts.headline,
+      texts.party
+    ]);
 
     function getPartyBgColor(_party: string) {
       const found = parties.find(p => p.shortname === _party);

@@ -22,10 +22,19 @@ function createWindow() {
       nodeIntegration: false
     }
   });
-
+/*
   win.loadFile(path.join(__dirname, '../build/index.html'));
+*/
+  if (process.env.ELECTRON_DEV) {
+    // Electron Dev: React läuft auf localhost:3000
+    win.loadURL('http://localhost:3002');
+  } else {
+    // Prod: React aus build laden (file://)
+    win.loadFile(path.join(__dirname, '../build/index.html'));
+  }
   // Entfernt das Standardmenü
-  win.removeMenu()  
+  // win.removeMenu()  
+
 }
 
 app.whenReady().then(createWindow);

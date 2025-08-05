@@ -1,9 +1,10 @@
-// V0.23.8
-
+// V0.23.9
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
+import Texts from "../assets/texts/start-texts.de.json";
+
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
 function Start() {
@@ -14,34 +15,22 @@ function Start() {
   const [proposals, setProposals] = useState([]);
   const [texts, setTexts] = useState(null);
   const { ed } = useParams();
+
   const [electionDistrictNo] = useState(() => {
     return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
-  });  
+  });
 
-  // Texte laden
-  useEffect(() => {
-    fetch("/texts/results-texts.de.json")
-      .then(res => res.json())
-      .then(data => {
-        setTexts(data);
-      })
-      .catch(err => {
-        console.error("❌ ", err);
-      });
-  }, []);  
-
-  // fetchData: rpc und electionDistrictNo
+  // Contract & Daten laden
   useEffect(() => {
     async function fetchData() {
       try {
+        setTexts(Texts);
         let _rpcURL = process.env.REACT_APP_RPC_URL;
-        if (isElectron) {
-          const ipc = window.electronAPI;
-          _rpcURL = await ipc.settings.get('rpcURL');
-          if (!_rpcURL) {
-            throw new Error("❌ Error RPC-URL");
-          }          
-        }        
+        if (isElectron && window.electronAPI?.settings?.get) {
+          _rpcURL = await window.electronAPI.settings.get('rpcURL');
+          if (!_rpcURL) throw new Error("RPC-URL fehlt");
+        }
+
         const provider = new JsonRpcProvider(_rpcURL);
         const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
         setContract(ctr);
@@ -51,17 +40,18 @@ function Start() {
 
         if (Number(m) === 1) {
           const candidatesList = await ctr.getCandidates(electionDistrictNo);
-          setCandidates(candidatesList);
           const partiesList = await ctr.getParties();
+          setCandidates(candidatesList);
           setParties(partiesList);
         } else if (Number(m) === 2) {
           const proposalList = await ctr.getProposals();
           setProposals(proposalList);
         }
       } catch (err) {
-        console.error("❌ ", err);
+        console.error("❌ Fehler beim Laden der Contract-Daten:", err);
       }
     }
+
     fetchData();
   }, [electionDistrictNo]);
 
@@ -70,9 +60,7 @@ function Start() {
   const htmlBundestagswahl = (
     <div id="content">
       <h3 id="titleRegistration">{texts.titleRegistration}</h3>
-      <div id="textRegistration">
-        {texts.textRegistration}
-      </div>
+      <div id="textRegistration">{texts.textRegistration}</div>
       <h3 id="titleCandidates">{texts.titleCandidates}</h3>
       <ul>
         {candidates.map((candidate, index) => (
@@ -94,14 +82,15 @@ function Start() {
 
   const htmlProposal = (
     <div>
-        {proposals.map((candidate, index) => (
-          <div key={index}>
-            <p>{candidate.name} - <a href={candidate.url} target="_blank" rel="noreferrer">{texts.details}</a> {candidate.partei}</p>
-            {candidate.text}
-          </div>
-        ))}
+      {proposals.map((candidate, index) => (
+        <div key={index}>
+          <p>{candidate.name} - <a href={candidate.url} target="_blank" rel="noreferrer">{texts.details}</a> {candidate.partei}</p>
+          {candidate.text}
+        </div>
+      ))}
     </div>
   );
+
   return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }
 
