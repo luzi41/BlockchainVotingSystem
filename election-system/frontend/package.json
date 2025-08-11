@@ -1,6 +1,6 @@
 {
   "name": "bvs",
-  "version": "0.23.11",
+  "version": "0.23.12",
   "description": "Blockchain Voting System",
   "author": "Louis Göttertz <louis.goettertz@gmail.com>",
   "main": "electron/main.js",
@@ -32,10 +32,9 @@
     "electron": "electron .",
     "desktop": "npm run build && npm run electron",
     "pack": "electron-builder --dir",
-    "dist": "node scripts/copy-electron.js && electron-builder"
+    "dist": "electron-builder --win --linux --x64"
   },
   "build": {
-    "buildResources": "assets",
     "appId": "com.bvs.app",
     "productName": "BVS",
     "files": [
@@ -45,7 +44,7 @@
     ],
     "linux": {
       "category": "Utility",
-      "icon": "src/assets/icons/logo512.ico",
+      "icon": "src/assets/icons/logo512.png",
       "target": [
         "AppImage",
         "deb"
