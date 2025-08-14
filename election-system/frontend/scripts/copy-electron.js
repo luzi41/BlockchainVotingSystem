@@ -11,9 +11,3 @@ filesToCopy.forEach(file => {
   fs.copyFileSync(src, dest);
   console.log(`✔️  Copied ${file} to build/`);
 });
-
-//const src = path.join(__dirname, "../public/texts");
-//const dest = path.join(__dirname, "../build/texts");
-
-//fs.mkdirSync(dest, { recursive: true });
-//fs.cpSync(src, dest, { recursive: true });

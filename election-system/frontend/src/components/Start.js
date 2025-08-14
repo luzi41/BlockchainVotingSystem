@@ -1,9 +1,7 @@
-// V0.23.15
+// V0.23.16
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
-import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
-import Texts from "../assets/texts/start-texts.de.json";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
@@ -24,12 +22,26 @@ function Start() {
   useEffect(() => {
     async function fetchData() {
       try {
-        setTexts(Texts);
+        // 📄 Texte laden (aus public/texts/)
+        const lang = process.env.REACT_APP_LANG || "de";
+        const textsRes = await fetch(`/texts/start-texts.${lang}.json`);
+        if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
+        const textsJson = await textsRes.json();
+        setTexts(textsJson);
+
+        //setTexts(Texts);
         let _rpcURL = process.env.REACT_APP_RPC_URL;
         if (isElectron && window.electronAPI?.settings?.get) {
           _rpcURL = await window.electronAPI.settings.get('rpcURL');
           if (!_rpcURL) throw new Error("RPC-URL fehlt");
         }
+
+        // 📦 ABI laden (aus public/contracts/)
+        const electionModeName =
+          process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        const abiRes = await fetch(`/contracts/${electionModeName}.json`);
+        if (!abiRes.ok) throw new Error(`ABI-Datei ${electionModeName}.json nicht gefunden`);
+        const Election = await abiRes.json();
 
         const provider = new JsonRpcProvider(_rpcURL);
         const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
