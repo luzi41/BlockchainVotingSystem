@@ -1,4 +1,4 @@
-// V0.23.9
+// V0.23.15
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
