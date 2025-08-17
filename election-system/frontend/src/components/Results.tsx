@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
-import Texts from "../assets/texts/results-texts.de.json";
+//import Texts from "../assets/texts/results-texts.de.json";
 
 declare global {
   interface Window {
@@ -52,7 +52,13 @@ function Results() {
     useEffect(() => {
       async function fetchResults() {
         try {
-          setTexts(Texts);
+          // 📄 Texte laden (aus public/texts/)
+          const lang = process.env.REACT_APP_LANG || "de";
+          const textsRes = await fetch(`/texts/results-texts.${lang}.json`);
+          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
+          const textsJson = await textsRes.json();
+          setTexts(textsJson);
+
           if (!contract) return;
           const m = await contract.getModus();
           setModus(Number(m));

@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
-import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
-import Texts from "../assets/texts/voteForm-texts.de.json";
+//import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
+//import Texts from "../assets/texts/voteForm-texts.de.json";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
@@ -21,7 +21,6 @@ function VoteForm() {
   {
     ed = 1;
   }
-
   const [contractAddress, setContractAddress] = useState(""); // mit .env vorbelegen?
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
@@ -44,8 +43,7 @@ function VoteForm() {
       try {
 
         let _privateKey, _rpcURL, _electionDistrict;
-        setTexts(Texts);
-
+        
         if (isElectron) {
           const ipc = window.electronAPI;
 
@@ -70,7 +68,12 @@ function VoteForm() {
           }
 
         }
-
+        // 📄 Texte laden (aus public/texts/)
+        const lang = process.env.REACT_APP_LANG || "de";
+        const textsRes = await fetch(`/texts/voteForm-texts.${lang}.json`);
+        if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
+        const textsJson = await textsRes.json();
+        setTexts(textsJson);        
         setPrivateKey(_privateKey);
         setRpcURL(_rpcURL);
         setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
@@ -90,7 +93,14 @@ function VoteForm() {
     async function fetchData() {
       try {
         if (!rpcURL || !contractAddress) return;
-
+        
+        // 📦 ABI laden (aus public/contracts/)
+        const electionModeName =
+          process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        const abiRes = await fetch(`/contracts/${electionModeName}.json`);
+        if (!abiRes.ok) throw new Error(`ABI-Datei ${electionModeName}.json nicht gefunden`);
+        const Election = await abiRes.json();
+        
         const provider = new JsonRpcProvider(rpcURL);
         const ctr = new Contract(contractAddress, Election.abi, provider);
         setContract(ctr);
@@ -118,6 +128,13 @@ function VoteForm() {
 
   const vote = async () => {
     try {
+      // 📦 ABI laden (aus public/contracts/)
+      const electionModeName =
+        process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+      const abiRes = await fetch(`/contracts/${electionModeName}.json`);
+      if (!abiRes.ok) throw new Error(`ABI-Datei ${electionModeName}.json nicht gefunden`);
+      const Election = await abiRes.json();
+
       const provider = new JsonRpcProvider(rpcURL);
       const signer = new Wallet(privateKey, provider);
       const ctr = new Contract(contractAddress, Election.abi, signer);
@@ -141,28 +158,28 @@ function VoteForm() {
     }
   };
 
-  if (!contract) return <p>Lade Vertrag...</p>;
+  if (!contract || !texts) return <p>Load data ...</p>;
 
   // Bundestagswahl-Formular
   const htmlBundestagswahl = (
     <div>
       <div className="row">
         <div className="col-50">
-          <p>Ihr Token</p>
+          <p>{texts.yourToken}</p>
           <p>
-            <input type="text" placeholder="Token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-            <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+            <input type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <button name="scanToken" className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>
         <div className="col-50">
-          <p>Ihr Wahlkreis</p>
+          <p>{texts.yourElectionDistrict}</p>
           <p>{electionDistrictNo}</p>
         </div>
       </div>
 
       <div id="ballot">
         <div id="erststimme">
-          <h2>Erststimme</h2>
+          <h2>{texts.firstVote}</h2>
           {candidates.map((c, i) => (
             <div className="row" key={i}>
               <div className="col-95">
@@ -176,7 +193,7 @@ function VoteForm() {
         </div>
 
         <div id="zweitstimme">
-          <h2>Zweitstimme</h2>
+          <h2>{texts.secondVote}</h2>
           {parties.map((p, i) => (
             <div className="row" key={i}>
               <div className="col-95">
@@ -191,7 +208,7 @@ function VoteForm() {
       </div>
 
       <div className="center">
-        <button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+        <button name="send" type="submit" onClick={vote} disabled={!tokenInput}>{texts.btnSend}</button>
         <p>{error}</p>
       </div>
     </div>
@@ -204,8 +221,8 @@ function VoteForm() {
         <div className="col-50">
           <p>{texts.yourToken}</p>
           <p>
-            <input type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-            <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+            <input name="token" type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <button name="scanToken" className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>
         <div className="col-50">
@@ -231,7 +248,7 @@ function VoteForm() {
           </div>
           <div>&nbsp;</div>
           <div className="center">
-            <button type="submit" onClick={vote} disabled={!tokenInput}>{texts.btnSend}</button>
+            <button name="send" type="submit" onClick={vote} disabled={!tokenInput}>{texts.btnSend}</button>
             <p>{error}</p>
           </div>          
         </div>

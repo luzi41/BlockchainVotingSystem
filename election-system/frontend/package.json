@@ -1,6 +1,6 @@
 {
   "name": "bvs",
-  "version": "0.23.16",
+  "version": "0.23.26",
   "description": "Blockchain Voting System",
   "author": "Louis Göttertz <louis.goettertz@gmail.com>",
   "main": "electron/main.js",
@@ -32,7 +32,7 @@
     "electron": "electron .",
     "desktop": "npm run build && npm run electron",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win --linux --x64"
+    "dist": "electron-builder --linux --x64"
   },
   "build": {
     "appId": "com.bvs.app",

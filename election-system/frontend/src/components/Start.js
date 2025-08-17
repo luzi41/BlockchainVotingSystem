@@ -1,4 +1,4 @@
-// V0.23.16
+// V0.23.27
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from "ethers";
@@ -18,31 +18,38 @@ function Start() {
     return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
   });
 
-  // Contract & Daten laden
+  // Hilfsfunktion: JSON laden (je nach Umgebung)
+  async function loadJson(relativePath) {
+    if (isElectron && window.electronAPI?.loadJson) {
+      return await window.electronAPI.loadJson(relativePath);
+    } else {
+      const res = await fetch(`/${relativePath}`);
+      if (!res.ok) throw new Error(`Datei ${relativePath} nicht gefunden`);
+      return await res.json();
+    }
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
-        // 📄 Texte laden (aus public/texts/)
+        // 📄 Texte laden
         const lang = process.env.REACT_APP_LANG || "de";
-        const textsRes = await fetch(`/texts/start-texts.${lang}.json`);
-        if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
-        const textsJson = await textsRes.json();
+        const textsJson = await loadJson(`texts/start-texts.${lang}.json`);
         setTexts(textsJson);
 
-        //setTexts(Texts);
+        // RPC-URL ermitteln
         let _rpcURL = process.env.REACT_APP_RPC_URL;
         if (isElectron && window.electronAPI?.settings?.get) {
           _rpcURL = await window.electronAPI.settings.get('rpcURL');
           if (!_rpcURL) throw new Error("RPC-URL fehlt");
         }
 
-        // 📦 ABI laden (aus public/contracts/)
+        // 📦 ABI laden
         const electionModeName =
           process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-        const abiRes = await fetch(`/contracts/${electionModeName}.json`);
-        if (!abiRes.ok) throw new Error(`ABI-Datei ${electionModeName}.json nicht gefunden`);
-        const Election = await abiRes.json();
+        const Election = await loadJson(`contracts/${electionModeName}.json`);
 
+        // Contract verbinden
         const provider = new JsonRpcProvider(_rpcURL);
         const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
         setContract(ctr);
