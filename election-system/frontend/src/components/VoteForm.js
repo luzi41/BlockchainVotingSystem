@@ -1,10 +1,17 @@
-// V0.22.15
+// V0.23.37
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
-import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
+// ✅ Web: statisch importierte ABIs (Registry)
+import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+// Wenn du weitere Modi hast, hier ergänzen:
+// import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
+const ABI_REGISTRY = {
+	Proposals: ProposalsABI,
+	// Other: OtherABI,
+};
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
@@ -15,12 +22,35 @@ async function encryptVote(_toVoted, _publicKey) {
 }
 
 function VoteForm() {
+  // JSON-Lader: Electron via IPC, Web via fetch
+  async function loadJson(relativePath) {
+    // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
+    if (window.electronAPI?.invoke) {
+      return await window.electronAPI.invoke("load-json", relativePath);
+    } else {
+      const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
+      const url = `${base}/${relativePath.replace(/^\//, "")}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(
+          `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
+        );
+      }
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
+      }
+    }
+  }
+
   let { ed } = useParams();
   if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
   {
     ed = 1;
   }
-
   const [contractAddress, setContractAddress] = useState(""); // mit .env vorbelegen?
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
@@ -35,14 +65,29 @@ function VoteForm() {
   const [selectedParty, setSelectedParty] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [proposals, setProposals] = useState([]);
+  const [texts, setTexts] = useState(null);
 
   // Dynamischen ABI + Settings laden
   useEffect(() => {
     async function fetchContractAndSettings() {
       try {
+        setError("");
+
+        // 🗣 Texte laden
+        const lang = process.env.REACT_APP_LANG || "de";
+		    let loadedTexts;
+        if (window.electronAPI?.invoke) {
+			    loadedTexts = await loadJson(`texts/voteForm-texts.${lang}.json`);			
+        } else {  
+          // Aus public/texts laden
+          const textsRes = await fetch(`/texts/voteForm-texts.${lang}.json`);
+          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
+          loadedTexts = await textsRes.json();
+        }
+        setTexts(loadedTexts);
 
         let _privateKey, _rpcURL, _electionDistrict;
-
+        
         if (isElectron) {
           const ipc = window.electronAPI;
 
@@ -67,7 +112,6 @@ function VoteForm() {
           }
 
         }
-
         setPrivateKey(_privateKey);
         setRpcURL(_rpcURL);
         setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
@@ -88,8 +132,32 @@ function VoteForm() {
       try {
         if (!rpcURL || !contractAddress) return;
 
+        // 🧠 ABI laden
+        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        let abiJson;
+
+        if (window.electronAPI?.invoke) {
+          // Electron: aus build/resources laden (IPC)
+          try {
+            abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
+          } catch {
+            abiJson = await window.electronAPI.invoke(
+              `load-json`,
+              `contracts/${name}.sol/${name}.json`
+            );
+          }
+        } else {
+          // Web: direkt aus Import (kein fetch → keine HTML-404s)
+          abiJson = ABI_REGISTRY[name];
+          if (!abiJson) {
+            throw new Error(
+              `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
+            );
+          }
+        }
+
         const provider = new JsonRpcProvider(rpcURL);
-        const ctr = new Contract(contractAddress, Election.abi, provider);
+        const ctr = new Contract(contractAddress, abiJson.abi, provider);
         setContract(ctr);
         
         const m = await ctr.getModus();
@@ -104,6 +172,7 @@ function VoteForm() {
           const prop = await ctr.getProposals();
           setProposals(prop);
         }
+
       } catch (error) {
         console.error("Fehler beim Abrufen:", error);
         setError("❌ Fehler beim Abrufen des Vertrags");
@@ -115,9 +184,33 @@ function VoteForm() {
 
   const vote = async () => {
     try {
+      // 🧠 ABI laden
+      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+      let abiJson;
+
+      if (window.electronAPI?.invoke) {
+        // Electron: aus build/resources laden (IPC)
+        try {
+          abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
+        } catch {
+          abiJson = await window.electronAPI.invoke(
+            `load-json`,
+            `contracts/${name}.sol/${name}.json`
+          );
+        }
+      } else {
+        // Web: direkt aus Import (kein fetch → keine HTML-404s)
+        abiJson = ABI_REGISTRY[name];
+        if (!abiJson) {
+          throw new Error(
+            `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
+          );
+        }
+      }
+
       const provider = new JsonRpcProvider(rpcURL);
       const signer = new Wallet(privateKey, provider);
-      const ctr = new Contract(contractAddress, Election.abi, signer);
+      const ctr = new Contract(contractAddress, abiJson.abi, signer);
 
       if (modus === 1) {
         const ed = await ctr.getElectionDistrictByNumber(electionDistrictNo);
@@ -138,28 +231,28 @@ function VoteForm() {
     }
   };
 
-  if (!contract) return <p>Lade Vertrag...</p>;
+  if (!contract || !texts) return <p>Load data ...</p>;
 
   // Bundestagswahl-Formular
   const htmlBundestagswahl = (
     <div>
       <div className="row">
         <div className="col-50">
-          <p>Ihr Token</p>
+          <p>{texts.yourToken}</p>
           <p>
-            <input type="text" placeholder="Token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-            <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+            <input type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <button name="scanToken" className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>
         <div className="col-50">
-          <p>Ihr Wahlkreis</p>
+          <p>{texts.yourElectionDistrict}</p>
           <p>{electionDistrictNo}</p>
         </div>
       </div>
 
       <div id="ballot">
         <div id="erststimme">
-          <h2>Erststimme</h2>
+          <h2>{texts.firstVote}</h2>
           {candidates.map((c, i) => (
             <div className="row" key={i}>
               <div className="col-95">
@@ -173,7 +266,7 @@ function VoteForm() {
         </div>
 
         <div id="zweitstimme">
-          <h2>Zweitstimme</h2>
+          <h2>{texts.secondVote}</h2>
           {parties.map((p, i) => (
             <div className="row" key={i}>
               <div className="col-95">
@@ -188,7 +281,7 @@ function VoteForm() {
       </div>
 
       <div className="center">
-        <button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+        <button name="send" type="submit" onClick={vote} disabled={!tokenInput}>{texts.btnSend}</button>
         <p>{error}</p>
       </div>
     </div>
@@ -199,17 +292,16 @@ function VoteForm() {
     <div>
       <div className="row">
         <div className="col-50">
-          <p>Ihr Token</p>
+          <p>{texts.yourToken}</p>
           <p>
-            <input type="text" placeholder="Token" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-            <button className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
+            <input name="token" type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <button name="scanToken" className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>
         <div className="col-50">
         </div>
       </div>
-      <h2>Petition</h2>
-      <p>Das $Parlament möge beschließen, dass</p>
+      <h2>{texts.survey}</h2>
       {proposals.map((p, i) => (
         <div className="row" key={i}>
           <div className="col-80">{p.text}</div>
@@ -229,7 +321,7 @@ function VoteForm() {
           </div>
           <div>&nbsp;</div>
           <div className="center">
-            <button type="submit" onClick={vote} disabled={!tokenInput}>Absenden</button>
+            <button name="send" type="submit" onClick={vote} disabled={!tokenInput}>{texts.btnSend}</button>
             <p>{error}</p>
           </div>          
         </div>

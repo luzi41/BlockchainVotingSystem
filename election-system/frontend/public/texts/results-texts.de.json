@@ -1,0 +1,22 @@
+{
+  "resultsText": "Die Ergebnisse folgen nach Entschlüsselung und Freigabe durch den Wahlleiter.",
+  "headline": "Wahlergebnisse",
+  "selectView": "Ansicht wählen",
+  "viewDistricts": "Wahlkreise",
+  "viewTotal": "Gesamt",
+  "party" : "Partei",
+  "firstVotes": "Erststimmen",
+  "secondVotes": "Zweitstimmen",
+  "totalParties": "Parteien insgesamt",
+  "answer": "Antwort",
+  "votes": "Stimmen",
+  "title" : "Titel der Wahl",
+  "details": "Details",
+  "errorElectronSettingsRpcURL": "Fehlende Einstellungen (_rpcURL) im Electron Store",
+  "errorFetchData": "Fehler beim Abrufen der Daten",
+  "errorLoadModule": "Fehler beim Laden des Moduls",
+  "errorProposals": "Proposals nicht geladen.",
+  "errorNetwork": "Netzwerkfehler",
+  "errorContractAddress": "SmartContract-Adresse nicht definiert.",
+  "loadContract": "Lade Vertrag ..."
+}
