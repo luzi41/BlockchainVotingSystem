@@ -1,6 +1,6 @@
 {
   "name": "bvs",
-  "version": "0.23.26",
+  "version": "0.23.34",
   "description": "Blockchain Voting System",
   "author": "Louis Göttertz <louis.goettertz@gmail.com>",
   "main": "electron/main.js",
@@ -28,11 +28,13 @@
   },
   "scripts": {
     "start": "node scripts/copy-abi.js && PORT=3002 react-scripts start",
-    "build": "node scripts/copy-abi.js && react-scripts build && node scripts/copy-electron.js",
+    "build": "node scripts/copy-abi.js && react-scripts build",
+    "postbuild": "node scripts/copy-electron.js",
     "electron": "electron .",
     "desktop": "npm run build && npm run electron",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --linux --x64"
+    "dist": "electron-builder --linux --win --x64",
+    "check-build": "node scripts/check-build.js"
   },
   "build": {
     "appId": "com.bvs.app",
@@ -54,7 +56,8 @@
       "target": "dmg"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "src/assets/icons/logo512.png"
     }
   },
   "eslintConfig": {

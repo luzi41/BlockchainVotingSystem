@@ -1,3 +1,4 @@
+// V0.23.32
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require("node:path");
 const fs = require("node:fs/promises");
@@ -41,8 +42,8 @@ ipcMain.handle("load-json", async (event, relativePath) => {
     // während der Entwicklung -> React public/
     basePath = path.join(__dirname, "../public");
   } else {
-    // im Build -> resources/app/
-    basePath = path.join(process.resourcesPath, "app");
+    // im Build -> resources/app/build
+    basePath = path.join(process.resourcesPath, "app.asar", "build");
   }
 
   const filePath = path.join(basePath, relativePath);

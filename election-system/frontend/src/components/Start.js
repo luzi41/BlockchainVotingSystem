@@ -1,59 +1,119 @@
-// V0.23.27
-import { useState, useEffect } from "react";
+// V 0.23.34
+import React, { useEffect, useState } from "react";
+import { Contract, JsonRpcProvider } from "ethers";
 import { useParams } from 'react-router-dom';
-import { JsonRpcProvider, Contract } from "ethers";
 
-const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+// ✅ Web: statisch importierte Texte (Registry)
+import Texts from "../assets/texts/start-texts.de.json";
+// ✅ Web: statisch importierte ABIs (Registry)
+import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+// Wenn du weitere Modi hast, hier ergänzen:
+// import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
+const ABI_REGISTRY = {
+	Proposals: ProposalsABI,
+	// Other: OtherABI,
+};
+
+const TEXT_Registry = {
+	TextReg: Texts,
+	//
+};
 
 function Start() {
-  const [contract, setContract] = useState(null);
-  const [modus, setModus] = useState(0);
-  const [candidates, setCandidates] = useState([]);
-  const [parties, setParties] = useState([]);
-  const [proposals, setProposals] = useState([]);
-  const [texts, setTexts] = useState(null);
-  const { ed } = useParams();
+	const [texts, setTexts] = useState(null);
+	const [contract, setContract] = useState(null);
+	const [error, setError] = useState("");
+	const [candidates, setCandidates] = useState([]);
+	const [parties, setParties] = useState([]);
+	const [proposals, setProposals] = useState([]);
+	const [modus, setModus] = useState(0);
+	const { ed } = useParams();
 
-  const [electionDistrictNo] = useState(() => {
-    return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
-  });
+	const [electionDistrictNo] = useState(() => {
+    	return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
+  	});
 
-  // Hilfsfunktion: JSON laden (je nach Umgebung)
+  // JSON-Lader: Electron via IPC, Web via fetch
   async function loadJson(relativePath) {
-    if (isElectron && window.electronAPI?.loadJson) {
-      return await window.electronAPI.loadJson(relativePath);
+    // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
+    if (window.electronAPI?.invoke) {
+      return await window.electronAPI.invoke("load-json", relativePath);
     } else {
-      const res = await fetch(`/${relativePath}`);
-      if (!res.ok) throw new Error(`Datei ${relativePath} nicht gefunden`);
-      return await res.json();
+      const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
+      const url = `${base}/${relativePath.replace(/^\//, "")}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(
+          `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
+        );
+      }
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
+      }
     }
   }
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // 📄 Texte laden
-        const lang = process.env.REACT_APP_LANG || "de";
-        const textsJson = await loadJson(`texts/start-texts.${lang}.json`);
-        setTexts(textsJson);
+        setError("");
 
-        // RPC-URL ermitteln
-        let _rpcURL = process.env.REACT_APP_RPC_URL;
-        if (isElectron && window.electronAPI?.settings?.get) {
-          _rpcURL = await window.electronAPI.settings.get('rpcURL');
-          if (!_rpcURL) throw new Error("RPC-URL fehlt");
+        // 🗣 Texte laden
+        const lang = process.env.REACT_APP_LANG || "de";
+		let loadedTexts;
+        if (window.electronAPI?.invoke) {
+			loadedTexts = await loadJson(`texts/start-texts.${lang}.json`);			
+		} else {
+			// Web: direkt aus Registry (kein fetch → keine HTML-404s)
+			loadedTexts = Texts;
+			if (!loadedTexts) {
+				throw new Error(
+					`texts start-texts.de.json nicht in TEXT_REGISTRY registriert. Bitte importieren und eintragen.`
+				);
+			}
+		}
+        setTexts(loadedTexts);
+
+        // 🔧 Provider
+        let rpcUrl = process.env.REACT_APP_RPC_URL;
+        if (window.electronAPI?.settings?.get) {
+          const fromStore = await window.electronAPI.settings.get("rpcURL");
+          if (fromStore) rpcUrl = fromStore;
+        }
+        const provider = new JsonRpcProvider(rpcUrl);
+
+        // 🧠 ABI laden
+        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        let abiJson;
+
+        if (window.electronAPI?.invoke) {
+          // Electron: aus build/resources laden (IPC)
+          try {
+            abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
+          } catch {
+            abiJson = await window.electronAPI.invoke(
+              `load-json`,
+              `contracts/${name}.sol/${name}.json`
+            );
+          }
+        } else {
+          // Web: direkt aus Registry (kein fetch → keine HTML-404s)
+          abiJson = ABI_REGISTRY[name];
+          if (!abiJson) {
+            throw new Error(
+              `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
+            );
+          }
         }
 
-        // 📦 ABI laden
-        const electionModeName =
-          process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-        const Election = await loadJson(`contracts/${electionModeName}.json`);
-
-        // Contract verbinden
-        const provider = new JsonRpcProvider(_rpcURL);
-        const ctr = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS, Election.abi, provider);
+        // 📜 Contract
+        const address = process.env.REACT_APP_CONTRACT_ADDRESS;
+        const ctr = new Contract(address, abiJson.abi, provider);
         setContract(ctr);
-
         const m = await ctr.getModus();
         setModus(Number(m));
 
@@ -66,51 +126,64 @@ function Start() {
           const proposalList = await ctr.getProposals();
           setProposals(proposalList);
         }
+
+				
       } catch (err) {
         console.error("❌ Fehler beim Laden der Contract-Daten:", err);
+        setError(String(err?.message || err));
       }
     }
 
     fetchData();
-  }, [electionDistrictNo]);
+  }, []);
 
-  if (!contract || !texts) return <p>Load data ...</p>;
+	if (!contract || !texts) return <p>Load data ...</p>;
+	/*
+	return (
+		<div>
+		<h1>{texts?.title || "Lade..."}</h1>
+		{contract && <p>✅ Contract geladen</p>}
+		{error && (
+			<pre style={{ color: "crimson", whiteSpace: "pre-wrap" }}>{error}</pre>
+		)}
+		</div>
+	);
+	*/
+	const htmlBundestagswahl = (
+	<div id="content">
+		<h3 id="titleRegistration">{texts.titleRegistration}</h3>
+		<div id="textRegistration">{texts.textRegistration}</div>
+		<h3 id="titleCandidates">{texts.titleCandidates}</h3>
+		<ul>
+		{candidates.map((candidate, index) => (
+			<li key={index}>
+			<a href={candidate.url} target="_blank" rel="noreferrer">{candidate.name}</a>, {candidate.partei}
+			</li>
+		))}
+		</ul>
+		<h3 id="titleParties">{texts.titleParties}</h3>
+		<ul>
+		{parties.map((party, index) => (
+			<li key={index}>
+			<a href={party.url} target="_blank" rel="noreferrer">{party.name}</a> – {party.shortname}
+			</li>
+		))}
+		</ul>
+	</div>
+	);
 
-  const htmlBundestagswahl = (
-    <div id="content">
-      <h3 id="titleRegistration">{texts.titleRegistration}</h3>
-      <div id="textRegistration">{texts.textRegistration}</div>
-      <h3 id="titleCandidates">{texts.titleCandidates}</h3>
-      <ul>
-        {candidates.map((candidate, index) => (
-          <li key={index}>
-            <a href={candidate.url} target="_blank" rel="noreferrer">{candidate.name}</a>, {candidate.partei}
-          </li>
-        ))}
-      </ul>
-      <h3 id="titleParties">{texts.titleParties}</h3>
-      <ul>
-        {parties.map((party, index) => (
-          <li key={index}>
-            <a href={party.url} target="_blank" rel="noreferrer">{party.name}</a> – {party.shortname}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+	const htmlProposal = (
+	<div>
+		{proposals.map((candidate, index) => (
+		<div key={index}>
+			<p>{candidate.name} - <a href={candidate.url} target="_blank" rel="noreferrer">{texts.details}</a> {candidate.partei}</p>
+			{candidate.text}
+		</div>
+		))}
+	</div>
+	);
 
-  const htmlProposal = (
-    <div>
-      {proposals.map((candidate, index) => (
-        <div key={index}>
-          <p>{candidate.name} - <a href={candidate.url} target="_blank" rel="noreferrer">{texts.details}</a> {candidate.partei}</p>
-          {candidate.text}
-        </div>
-      ))}
-    </div>
-  );
-
-  return modus === 1 ? htmlBundestagswahl : htmlProposal;
+	return modus === 1 ? htmlBundestagswahl : htmlProposal;
 }
 
 export default Start;
