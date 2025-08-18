@@ -1,11 +1,17 @@
-// V0.22.15
+// V0.22.37
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
-//import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
-//import Texts from "../assets/texts/voteForm-texts.de.json";
+// ✅ Web: statisch importierte ABIs (Registry)
+import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+// Wenn du weitere Modi hast, hier ergänzen:
+// import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
+const ABI_REGISTRY = {
+	Proposals: ProposalsABI,
+	// Other: OtherABI,
+};
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
@@ -16,6 +22,30 @@ async function encryptVote(_toVoted, _publicKey) {
 }
 
 function VoteForm() {
+  // JSON-Lader: Electron via IPC, Web via fetch
+  async function loadJson(relativePath) {
+    // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
+    if (window.electronAPI?.invoke) {
+      return await window.electronAPI.invoke("load-json", relativePath);
+    } else {
+      const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
+      const url = `${base}/${relativePath.replace(/^\//, "")}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(
+          `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
+        );
+      }
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
+      }
+    }
+  }
+
   let { ed } = useParams();
   if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
   {
@@ -41,6 +71,20 @@ function VoteForm() {
   useEffect(() => {
     async function fetchContractAndSettings() {
       try {
+        setError("");
+
+        // 🗣 Texte laden
+        const lang = process.env.REACT_APP_LANG || "de";
+		    let loadedTexts;
+        if (window.electronAPI?.invoke) {
+			    loadedTexts = await loadJson(`texts/voteForm-texts.${lang}.json`);			
+        } else {  
+          // Aus public/texts laden
+          const textsRes = await fetch(`/texts/voteForm-texts.${lang}.json`);
+          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
+          loadedTexts = await textsRes.json();
+        }
+        setTexts(loadedTexts);
 
         let _privateKey, _rpcURL, _electionDistrict;
         
@@ -68,12 +112,6 @@ function VoteForm() {
           }
 
         }
-        // 📄 Texte laden (aus public/texts/)
-        const lang = process.env.REACT_APP_LANG || "de";
-        const textsRes = await fetch(`/texts/voteForm-texts.${lang}.json`);
-        if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
-        const textsJson = await textsRes.json();
-        setTexts(textsJson);        
         setPrivateKey(_privateKey);
         setRpcURL(_rpcURL);
         setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
@@ -93,16 +131,33 @@ function VoteForm() {
     async function fetchData() {
       try {
         if (!rpcURL || !contractAddress) return;
-        
-        // 📦 ABI laden (aus public/contracts/)
-        const electionModeName =
-          process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-        const abiRes = await fetch(`/contracts/${electionModeName}.json`);
-        if (!abiRes.ok) throw new Error(`ABI-Datei ${electionModeName}.json nicht gefunden`);
-        const Election = await abiRes.json();
-        
+
+        // 🧠 ABI laden
+        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        let abiJson;
+
+        if (window.electronAPI?.invoke) {
+          // Electron: aus build/resources laden (IPC)
+          try {
+            abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
+          } catch {
+            abiJson = await window.electronAPI.invoke(
+              `load-json`,
+              `contracts/${name}.sol/${name}.json`
+            );
+          }
+        } else {
+          // Web: direkt aus Import (kein fetch → keine HTML-404s)
+          abiJson = ABI_REGISTRY[name];
+          if (!abiJson) {
+            throw new Error(
+              `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
+            );
+          }
+        }
+
         const provider = new JsonRpcProvider(rpcURL);
-        const ctr = new Contract(contractAddress, Election.abi, provider);
+        const ctr = new Contract(contractAddress, abiJson.abi, provider);
         setContract(ctr);
         
         const m = await ctr.getModus();
@@ -117,6 +172,7 @@ function VoteForm() {
           const prop = await ctr.getProposals();
           setProposals(prop);
         }
+
       } catch (error) {
         console.error("Fehler beim Abrufen:", error);
         setError("❌ Fehler beim Abrufen des Vertrags");
@@ -128,16 +184,33 @@ function VoteForm() {
 
   const vote = async () => {
     try {
-      // 📦 ABI laden (aus public/contracts/)
-      const electionModeName =
-        process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-      const abiRes = await fetch(`/contracts/${electionModeName}.json`);
-      if (!abiRes.ok) throw new Error(`ABI-Datei ${electionModeName}.json nicht gefunden`);
-      const Election = await abiRes.json();
+      // 🧠 ABI laden
+      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+      let abiJson;
+
+      if (window.electronAPI?.invoke) {
+        // Electron: aus build/resources laden (IPC)
+        try {
+          abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
+        } catch {
+          abiJson = await window.electronAPI.invoke(
+            `load-json`,
+            `contracts/${name}.sol/${name}.json`
+          );
+        }
+      } else {
+        // Web: direkt aus Import (kein fetch → keine HTML-404s)
+        abiJson = ABI_REGISTRY[name];
+        if (!abiJson) {
+          throw new Error(
+            `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
+          );
+        }
+      }
 
       const provider = new JsonRpcProvider(rpcURL);
       const signer = new Wallet(privateKey, provider);
-      const ctr = new Contract(contractAddress, Election.abi, signer);
+      const ctr = new Contract(contractAddress, abiJson.abi, signer);
 
       if (modus === 1) {
         const ed = await ctr.getElectionDistrictByNumber(electionDistrictNo);

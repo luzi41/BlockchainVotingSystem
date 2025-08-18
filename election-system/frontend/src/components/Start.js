@@ -1,10 +1,8 @@
-// V 0.23.34
+// V 0.23.35
 import React, { useEffect, useState } from "react";
 import { Contract, JsonRpcProvider } from "ethers";
 import { useParams } from 'react-router-dom';
 
-// ✅ Web: statisch importierte Texte (Registry)
-import Texts from "../assets/texts/start-texts.de.json";
 // ✅ Web: statisch importierte ABIs (Registry)
 import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 // Wenn du weitere Modi hast, hier ergänzen:
@@ -12,11 +10,6 @@ import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 const ABI_REGISTRY = {
 	Proposals: ProposalsABI,
 	// Other: OtherABI,
-};
-
-const TEXT_Registry = {
-	TextReg: Texts,
-	//
 };
 
 function Start() {
@@ -64,18 +57,16 @@ function Start() {
 
         // 🗣 Texte laden
         const lang = process.env.REACT_APP_LANG || "de";
-		let loadedTexts;
+		    let loadedTexts;
         if (window.electronAPI?.invoke) {
-			loadedTexts = await loadJson(`texts/start-texts.${lang}.json`);			
-		} else {
-			// Web: direkt aus Registry (kein fetch → keine HTML-404s)
-			loadedTexts = Texts;
-			if (!loadedTexts) {
-				throw new Error(
-					`texts start-texts.de.json nicht in TEXT_REGISTRY registriert. Bitte importieren und eintragen.`
-				);
-			}
-		}
+			    loadedTexts = await loadJson(`texts/start-texts.${lang}.json`);			
+        } else {
+          
+          // Aus public/texts laden
+          const textsRes = await fetch(`/texts/start-texts.${lang}.json`);
+          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
+          loadedTexts = await textsRes.json();
+        }
         setTexts(loadedTexts);
 
         // 🔧 Provider
@@ -101,7 +92,7 @@ function Start() {
             );
           }
         } else {
-          // Web: direkt aus Registry (kein fetch → keine HTML-404s)
+          // Web: direkt aus Import (kein fetch → keine HTML-404s)
           abiJson = ABI_REGISTRY[name];
           if (!abiJson) {
             throw new Error(
