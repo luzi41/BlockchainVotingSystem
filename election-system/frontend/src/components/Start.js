@@ -4,12 +4,14 @@ import { Contract, JsonRpcProvider } from "ethers";
 import { useParams } from 'react-router-dom';
 
 // ✅ Web: statisch importierte ABIs (Registry)
-import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+// import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 // Wenn du weitere Modi hast, hier ergänzen:
+import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 // import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
 const ABI_REGISTRY = {
-	Proposals: ProposalsABI,
-	// Other: OtherABI,
+//	Proposals: ProposalsABI,
+	Bundestagswahl: BundestagswahlABI,
+  // Other: OtherABI,
 };
 
 function Start() {
@@ -78,7 +80,8 @@ function Start() {
         const provider = new JsonRpcProvider(rpcUrl);
 
         // 🧠 ABI laden
-        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        //const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Bundestagswahl";
         let abiJson;
 
         if (window.electronAPI?.invoke) {

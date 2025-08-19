@@ -1,14 +1,17 @@
-// Results.tsx V 0.23.36
+// Results.tsx V 0.23.38
 import { useState, useEffect } from "react";
 // import Election from "../artifacts/contracts/Proposals.sol/Proposals.json";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
 // ✅ Web: statisch importierte ABIs (Registry)
-import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+//import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 // Wenn du weitere Modi hast, hier ergänzen:
 // import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
+import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
+
 const ABI_REGISTRY = {
-	Proposals: ProposalsABI,
+	//Proposals: ProposalsABI,
+ 	Bundestagswahl: BundestagswahlABI,
 	// Other: OtherABI,
 };
 
@@ -49,6 +52,14 @@ function Results() {
   const [parties, setParties] = useState<any[]>([]);
   const [display1, setDisplay1] = useState<string>("none");
   const [display2, setDisplay2] = useState<string>("block");
+  const [results_1, setResults_1] = useState<any[]>([]);
+  const [results_2, setResults_2] = useState<any[]>([]);
+  const [electionDistricts, setElectionDistricts] = useState<any[]>([]);
+  const [resultsParties, setResultsParties] = useState<Record<string, number>>({});
+  const [proposalList, setProposalList] = useState<any[]>([]);
+  const [result, setResult] = useState<any[]>([]);
+  const [voteNumber, setVoteNumber] = useState(0);
+  const [error, setError] = useState(0);
 
   // JSON-Lader: Electron via IPC, Web via fetch
   async function loadJson(relativePath) {
@@ -129,11 +140,23 @@ useEffect(() => {
       const contract = new Contract(address, abiJson.abi, provider);
 
       if (!contract) return;
+
+      const _status = await contract.getElectionStatus();
+      setStatus(_status);   
+
       const m = await contract.getModus();
       setModus(Number(m));
+      console.log("Modus: ", Number(m))
 
-      if (modus === 1) {
+      if (status !== "Die Wahl ist geschlossen.") {
+        setError(1);
+        throw new Error("Die Wahl ist noch nicht geschlossen.");
+      }
+
+      if (Number(m) === 1) {
         const _electionDistricts = await contract.getElectionDistricts();
+        setElectionDistricts(_electionDistricts);
+
         const _parties = await contract.getParties();
         setParties(_parties);
 
@@ -147,187 +170,32 @@ useEffect(() => {
           results_1[i] = JSON.parse(newResult1.tally);
           results_2[i] = JSON.parse(newResult2.tally);
         }
+        setResults_1(results_1);
+        setResults_2(results_2);
 
-        const resultsParties = aggregateObjects(results_2);
-
-        const htmlED = (
-          <div>
-            <h1>{texts.headline}</h1>
-            <p>
-              <select
-                onChange={e => {
-                  if (e.target.value === "1") { // bestimmt, ob Elemente ausgeblendet werden
-                    setDisplay1("block");
-                    setDisplay2("none");
-                  } else {
-                    setDisplay2("block");
-                    setDisplay1("none");
-                  }
-                }}
-              >
-                <option value="0">{texts.selectView}</option>
-                <option value="1">{texts.viewDistricts}</option>
-                <option value="2">{texts.viewTotal}</option>
-              </select>
-            </p>
-
-            {/* Einzelne Wahlkreise */}
-            <div id="ed" style={{ display: display1 }}>
-              <table border={1} cellPadding="5" cellSpacing="0">
-                <tbody>
-                  {_electionDistricts.map((district: any, i: number) => (
-                    <tr key={i}>
-                      <td>
-                        <h2>{district.name} {district.nummer}</h2>
-                        <b>{texts.firstVotes}</b>
-                        <span className="right">
-                          <Link to={`./signature/${district.nummer}/1`}>Signatur</Link>
-                        </span>
-                        <table border={0} cellPadding="5" cellSpacing="0">
-                          <thead>
-                            <tr>
-                              <th style={{ width: "50%" }}>Name</th>
-                              <th style={{ width: "50%" }}>{texts.votes}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Object.entries(results_1[i]).map(([name, value]) => (
-                              <tr key={name}>
-                                <td>{name}</td>
-                                <td>{String(value)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-
-                        <b>{texts.secondVotes}</b>
-                        <span className="right">
-                          <Link to={`./signature/${district.nummer}/2`}>Signatur</Link>
-                        </span>
-                        <table border={0} cellPadding="5" cellSpacing="0">
-                          <thead>
-                            <tr>
-                              <th style={{ width: "50%" }}>{texts.party}</th>
-                              <th style={{ width: "50%" }}>{texts.votes}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Object.entries(results_2[i]).map(([name, value]) => (
-                              <tr key={name}>
-                                <td>{name}</td>
-                                <td>{String(value)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Gesamtergebnisse */}
-            <div id="total" style={{ display: display2 }}>
-              <h2>{texts.totalParties}</h2>
-              <table border={1} cellPadding="5" cellSpacing="0">
-                <tbody>
-                  {Object.entries(resultsParties).map(([name, value]) => (
-                    <tr key={name}>
-                      <td>{name}</td>
-                      <td>
-                        <div
-                          style={{
-                            color: getPartyColor(name),
-                            backgroundColor: getPartyBgColor(name),
-                            width: (100 * Number(value) / Stimmen).toString() + '%'
-                          }}
-                        >
-                          {fmt3.format(100 * Number(value) / Stimmen)}&nbsp;%
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div>{texts.votes}: {Stimmen}</div>
-            </div>
-          </div>
-        );
-
-        setHtml(htmlED);
-        setStatus("");
+        const _resultsParties = aggregateObjects(results_2);
+        setResultsParties(_resultsParties);
 
       } else if (Number(m) === 2) {
         const proposalList = await contract.getProposals();
         if (!proposalList || proposalList.length === 0) throw new Error(texts.errorProposals);
+        setProposalList(proposalList);
 
         const rawResult = await contract.getVotingResult();
-        const result = JSON.parse(rawResult.tally); 
-        const voteNumber = await contract.getNumberOfVotes();
-
-        const htmlProposals = (
-          <div>
-            <h1>{texts.headline}</h1>
-            {proposalList.map((item: any, index: number) => (
-              <div className="row" key={index}>
-                <div>{item.text} {item.answer1}/{item.answer2}</div>
-                <div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ width: "60%" }}>{texts.answer}</th>
-                        <th style={{ width: "40%" }}>{texts.votes}</th>
-                      </tr>
-                    </thead>                      
-                    <tbody>
-                    {Object.entries(result).map(([name, value]) => (
-                      <tr key={name}>
-                        <td>{name}</td>
-                        <td>
-                          <div
-                            style={{ color: "ffcc00", backgroundColor: "#ccc", width: (100 * Number(value) / Number(voteNumber)).toString() + '%' }}>
-                            {fmt3.format(100 * Number(value) / Number(voteNumber))} %
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-
-        setHtml(htmlProposals);
-        setStatus("");
+        const _result = JSON.parse(rawResult.tally); 
+        setResult(_result);
+        const _voteNumber = await contract.getNumberOfVotes();
+        setVoteNumber(_voteNumber);
       }
     } catch (err: any) {
       console.error("❌ " + texts.errorLoadModule + " :", err.message);
-      setHtml(
-        <div className="border">
-          <h2>{texts.headline || "Wahlergebnisse"}</h2>
-          <p>{status}</p>
-        </div>
-      );
     }
   }
 
   fetchResults();
 }, 
   [
-    display1, 
-    display2, 
-    modus, 
-    status, 
-    texts.errorLoadModule, 
-    texts.errorProposals, 
-    texts.firstVotes,
-    getPartyBgColor,
-    getPartyColor,
-    texts.headline,
-    texts.party
+
   ]);
 
   function getPartyBgColor(_party: string) {
@@ -340,8 +208,158 @@ useEffect(() => {
     return found ? found.color : "#000";
   }
 
-  return <div>{html}</div>;
+  const htmlBundestagswahl = (
+    <div>
+      <h1>{texts.headline}</h1>
+      <p>
+        <select
+          onChange={e => {
+            if (e.target.value === "1") { // bestimmt, ob Elemente ausgeblendet werden
+              setDisplay1("block");
+              setDisplay2("none");
+            } else {
+              setDisplay2("block");
+              setDisplay1("none");
+            }
+          }}
+        >
+          <option value="0">{texts.selectView}</option>
+          <option value="1">{texts.viewDistricts}</option>
+          <option value="2">{texts.viewTotal}</option>
+        </select>
+      </p>
+
+      {/* Einzelne Wahlkreise */}
+      <div id="ed" style={{ display: display1 }}>
+        <table border={1} cellPadding="5" cellSpacing="0">
+          <tbody>
+            {electionDistricts.map((district: any, i: number) => (
+              <tr key={i}>
+                <td>
+                  <h2>{district.name} {district.nummer}</h2>
+                  <b>{texts.firstVotes}</b>
+                  <span className="right">
+                    <Link to={`./signature/${district.nummer}/1`}>Signatur</Link>
+                  </span>
+                  <table border={0} cellPadding="5" cellSpacing="0">
+                    <thead>
+                      <tr>
+                        <th style={{ width: "50%" }}>Name</th>
+                        <th style={{ width: "50%" }}>{texts.votes}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(results_1[i]).map(([name, value]) => (
+                        <tr key={name}>
+                          <td>{name}</td>
+                          <td>{String(value)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  <b>{texts.secondVotes}</b>
+                  <span className="right">
+                    <Link to={`./signature/${district.nummer}/2`}>Signatur</Link>
+                  </span>
+                  <table border={0} cellPadding="5" cellSpacing="0">
+                    <thead>
+                      <tr>
+                        <th style={{ width: "50%" }}>{texts.party}</th>
+                        <th style={{ width: "50%" }}>{texts.votes}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(results_2[i]).map(([name, value]) => (
+                        <tr key={name}>
+                          <td>{name}</td>
+                          <td>{String(value)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Gesamtergebnisse */}
+      <div id="total" style={{ display: display2 }}>
+        <h2>{texts.totalParties}</h2>
+        <table border={1} cellPadding="5" cellSpacing="0">
+          <tbody>
+            {Object.entries(resultsParties).map(([name, value]) => (
+              <tr key={name}>
+                <td>{name}</td>
+                <td>
+                  <div
+                    style={{
+                      color: getPartyColor(name),
+                      backgroundColor: getPartyBgColor(name),
+                      width: (100 * Number(value) / Stimmen).toString() + '%'
+                    }}
+                  >
+                    {fmt3.format(100 * Number(value) / Stimmen)}&nbsp;%
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div>{texts.votes}: {Stimmen}</div>
+      </div>
+    </div>
+  );
+
+  const htmlProposal = (
+    <div>
+      <h1>317 {texts.headline}</h1>
+      {proposalList.map((item: any, index: number) => (
+        <div className="row" key={index}>
+          <div>{item.text} {item.answer1}/{item.answer2}</div>
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: "60%" }}>{texts.answer}</th>
+                  <th style={{ width: "40%" }}>{texts.votes}</th>
+                </tr>
+              </thead>                      
+              <tbody>
+              {Object.entries(result).map(([name, value]) => (
+                <tr key={name}>
+                  <td>{name}</td>
+                  <td>
+                    <div
+                      style={{ color: "ffcc00", backgroundColor: "#ccc", width: (100 * Number(value) / Number(voteNumber)).toString() + '%' }}>
+                      {fmt3.format(100 * Number(value) / Number(voteNumber))} %
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  /*
+  if (error === 1) {
+    setStatus("Error");
+    return (
+      <div className="border">
+        <h2>{texts.headline || "Wahlergebnisse"}</h2>
+        <p>{status}</p>
+      </div>
+    );    
+  }
+  */
+  return modus === 1 ? htmlBundestagswahl : htmlProposal;
+  //return <div>{html}</div>;
 }
  
-
 export default Results;
