@@ -1,4 +1,4 @@
-// Results.tsx V 0.24.1 (Colors fix)
+// Results.tsx V 0.24.2 (Colors fix)
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
@@ -182,7 +182,9 @@ function Results() {
         const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
         const abiJson = window.electronAPI?.invoke
           ? await window.electronAPI.invoke("load-json", `contracts/${name}.json`).catch(() =>
-              window.electronAPI!.invoke("load-json", `contracts/${name}.sol/${name}.json`)
+              window.electronAPI?.invoke
+                ? window.electronAPI.invoke("load-json", `contracts/${name}.sol/${name}.json`)
+                : undefined
             )
           : ABI_REGISTRY[name];
         if (!abiJson) throw new Error(`ABI "${name}" nicht registriert.`);
