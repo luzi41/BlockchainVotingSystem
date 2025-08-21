@@ -1,15 +1,15 @@
-// V 0.23.35
+// V 0.24.8
 import React, { useEffect, useState } from "react";
 import { Contract, JsonRpcProvider } from "ethers";
 import { useParams } from 'react-router-dom';
 
 // ✅ Web: statisch importierte ABIs (Registry)
-// import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 // Wenn du weitere Modi hast, hier ergänzen:
 import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 // import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
 const ABI_REGISTRY = {
-//	Proposals: ProposalsABI,
+	Proposals: ProposalsABI,
 	Bundestagswahl: BundestagswahlABI,
   // Other: OtherABI,
 };
@@ -23,10 +23,10 @@ function Start() {
 	const [proposals, setProposals] = useState([]);
 	const [modus, setModus] = useState(0);
 	const { ed } = useParams();
-
-	const [electionDistrictNo] = useState(() => {
+  
+	const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
     	return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
-  	});
+  });
 
   // JSON-Lader: Electron via IPC, Web via fetch
   async function loadJson(relativePath) {
@@ -57,6 +57,12 @@ function Start() {
       try {
         setError("");
 
+        // Aktuellen Wahlkreis laden
+        if (window.electronAPI?.invoke) {
+          window.electronAPI.settings.get('electionDistrict').then((val) => {
+            if (val !== undefined && val !== null) setElectionDistrictNo(val);
+          });
+        }
         // 🗣 Texte laden
         const lang = process.env.REACT_APP_LANG || "de";
 		    let loadedTexts;
@@ -120,29 +126,18 @@ function Start() {
           const proposalList = await ctr.getProposals();
           setProposals(proposalList);
         }
-
-				
       } catch (err) {
-        console.error("❌ Fehler beim Laden der Contract-Daten:", err);
         setError(String(err?.message || err));
+        console.error("❌ Fehler beim Laden der Contract-Daten:", error);
+        
       }
     }
 
     fetchData();
-  }, []);
+  }, [electionDistrictNo, error]);
 
 	if (!contract || !texts) return <p>Load data ...</p>;
-	/*
-	return (
-		<div>
-		<h1>{texts?.title || "Lade..."}</h1>
-		{contract && <p>✅ Contract geladen</p>}
-		{error && (
-			<pre style={{ color: "crimson", whiteSpace: "pre-wrap" }}>{error}</pre>
-		)}
-		</div>
-	);
-	*/
+
 	const htmlBundestagswahl = (
 	<div id="content">
 		<h3 id="titleRegistration">{texts.titleRegistration}</h3>
