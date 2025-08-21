@@ -1,8 +1,8 @@
-// Results.tsx V 0.24.2 (Colors fix)
+// Results.tsx V 0.24.3 (Colors fix)
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
-
+import "./Results.css";
 import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 
@@ -121,17 +121,18 @@ function TotalResults({ texts, parties }: any) {
 
   return (
     <>
-      <table border={1} cellPadding="5" cellSpacing="0">
+      <table border={1} cellPadding="5" cellSpacing="0" className="results-table">
         <tbody>
           {Object.entries(resultsParties).map(([name, value]) => {
             const p = parties.find(p => p.shortname === name);
             const fg = p?.color || "#000";
             const bg = p?.bgcolor || "#ddd";
+            const percent = (100 * Number(value)) / Stimmen;
             return (
               <tr key={name}>
-                <td>{name}</td>
+                <td className="results-label">{name}</td>
                 <td>
-                  <div
+                  <div className="results-bar-fill"
                     style={{
                       color: fg,
                       backgroundColor: bg,
