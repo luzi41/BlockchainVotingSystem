@@ -66,6 +66,7 @@ election-system/api*.json
 # misc
 /cache
 election-system/api/deployment-address.txt
+election-system/api/*json
 election-system/frontend/package-lock.json
 election-system/frontend/.env
 election-system/frontend/.env.local
