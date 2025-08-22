@@ -1,16 +1,17 @@
-// V0.23.37
+// V0.23.38
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
 // ✅ Web: statisch importierte ABIs (Registry)
-import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+//import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
 // Wenn du weitere Modi hast, hier ergänzen:
 // import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
 const ABI_REGISTRY = {
-	Proposals: ProposalsABI,
-	// Other: OtherABI,
+	//Proposals: ProposalsABI,
+	Bundestagswahl: BundestagswahlABI,
 };
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
@@ -51,6 +52,7 @@ function VoteForm() {
   {
     ed = 1;
   }
+
   const [contractAddress, setContractAddress] = useState(""); // mit .env vorbelegen?
   const [contract, setContract] = useState(null);
   const [modus, setModus] = useState(0);
@@ -101,11 +103,13 @@ function VoteForm() {
           }
 
           _electionDistrict = await ipc.settings.get('electionDistrict');
+          setElectionDistrictNo(_electionDistrict);
 
         } else {
           _privateKey = process.env.REACT_APP_PRIVATE_KEY || Wallet.createRandom().privateKey;
           _rpcURL = process.env.REACT_APP_RPC_URL;
           _electionDistrict = process.env.REACT_APP_ELECTION_DISTRICT || 0;
+          
 
           if (!_privateKey || !_rpcURL) {
             throw new Error("Fehlende Einstellungen in .env");
@@ -115,7 +119,7 @@ function VoteForm() {
         setPrivateKey(_privateKey);
         setRpcURL(_rpcURL);
         setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
-        setElectionDistrictNo(Number(_electionDistrict));
+        //setElectionDistrictNo(Number(_electionDistrict));
 
       } catch (err) {
         console.error("Fehler beim Laden des Vertrags und der Einstellungen:", err);
@@ -185,7 +189,8 @@ function VoteForm() {
   const vote = async () => {
     try {
       // 🧠 ABI laden
-      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+//      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Bundestagswahl";
       let abiJson;
 
       if (window.electronAPI?.invoke) {
