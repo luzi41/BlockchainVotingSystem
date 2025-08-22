@@ -1,28 +1,17 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.22.3
+// V 0.24.9 Multi-Election Bundestagswahl
 
 import "./Registry.sol";
 
 contract Bundestagswahl is Registry {
-    uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
-    uint256 currentPartyId;
-    uint256 currentCandidateId;
-
-    function getModus() public view returns (uint) {
-        return modus;
-    }
 
     struct ElectionDistrict {
         string name;
         uint nummer;
         string publicKey;
     }
-
-    ElectionDistrict[] public electionDistricts;
-    event ElectionDistrictCreated(string name, uint _electionDistrict);    
 
     struct Party {
         uint256 uid;
@@ -34,9 +23,6 @@ contract Bundestagswahl is Registry {
         uint256 votes;
     }
 
-    Party[] public parties;
-    event PartyCreated(uint256 uid, string name, string shortname);
-
     struct Candidate {
         uint256 uid;
         string name;
@@ -45,10 +31,6 @@ contract Bundestagswahl is Registry {
         string url;
         uint256 votes;
     }
-    // Array to store candidates
-    Candidate[] public candidates;
-    event CandidateCreated(uint256 uid, string name, uint wahlbezirk);    
- 
 
     struct EncryptedVote {
         string vote1;
@@ -56,203 +38,147 @@ contract Bundestagswahl is Registry {
         uint electionDistrict;
     }
 
-    //array to store encrypted votes
-    EncryptedVote[] public encryptedVotes;
-
-    struct ElectionResult1 {
+    struct ElectionResult {
         string tally;
         string signature;
         uint timestamp;
         uint electionDistrict;
     }
 
-    struct ElectionResult2 {
-        string tally;
-        string signature;
-        uint timestamp;
-        uint electionDistrict;
-    }       
+    // Wichtige Mappings pro Wahl
+    mapping(uint => ElectionDistrict[]) public electionDistricts;
+    mapping(uint => Party[]) public parties;
+    mapping(uint => Candidate[]) public candidates;
+    mapping(uint => EncryptedVote[]) public encryptedVotes;
+    mapping(uint => ElectionResult[]) public electionResults1;
+    mapping(uint => ElectionResult[]) public electionResults2;
 
-    // Arrays to store decrypted results
-    ElectionResult1[] public electionResults1;
-    ElectionResult2[] public electionResults2;
+    uint256 public currentPartyId;
+    uint256 public currentCandidateId;
 
-    event StoreElectionResult1(address sender, uint electionDistrict, uint256 timestamp);
-    event StoreElectionResult2(address sender, uint electionDistrict, uint256 timestamp);
-
-    // fkt. Wahlbezirke (ElectionDistricts)
-    function getElectionDistricts() public view returns (ElectionDistrict[] memory){
-        return electionDistricts;
+    // --- ElectionDistricts ---
+    function registerElectionDistrict(uint electionId, string memory _name, uint _nummer, string memory _publicKey) 
+        public onlyAdmin onlyBeforeVoting(electionId) 
+    {
+        electionDistricts[electionId].push(ElectionDistrict({name: _name, nummer: _nummer, publicKey: _publicKey}));
     }
 
-    function getElectionDistrictByNumber(uint _number) public view returns (ElectionDistrict memory){
-        for (uint i = 0; i < electionDistricts.length; i++) {
-            if (electionDistricts[i].nummer == _number) return electionDistricts[i];
-        }
-        revert("No election district with the given number found");
+    function getElectionDistricts(uint electionId) public view returns (ElectionDistrict[] memory) {
+        return electionDistricts[electionId];
     }
 
-    function registerElectionDistrict(string memory _name, uint _nummer, string memory _publicKey) public Registry.onlyAdmin Registry.onlyBeforeVoting {
-        electionDistricts.push(ElectionDistrict({name: _name, nummer: _nummer, publicKey: _publicKey}));
-        emit ElectionDistrictCreated(_name, _nummer);
-    }
-
-    function getParties() public view returns (Party[] memory) {
-        return parties;
-    }
-
-    function registerParty(
-        string memory _name, 
-        string memory _shortname,
-        string memory _color,
-        string memory _bgcolor,
-        string memory _url
-
-        ) public Registry.onlyAdmin Registry.onlyBeforeVoting {
-
+    // --- Parties ---
+    function registerParty(uint electionId, string memory _name, string memory _shortname, string memory _color, string memory _bgcolor, string memory _url) 
+        public onlyAdmin onlyBeforeVoting(electionId) 
+    {
         currentPartyId++;
-        parties.push(Party({
-            uid: currentPartyId, 
-            name: _name, 
+        parties[electionId].push(Party({
+            uid: currentPartyId,
+            name: _name,
             shortname: _shortname,
             color: _color,
             bgcolor: _bgcolor,
             url: _url,
             votes: 0
-            }));
+        }));
     }
-  
-    // fkt. Kandidaten
-    function registerCandidate(
-        string memory _name, 
-        uint _wahlbezirk, 
-        string memory _partei,
-        string memory _url
-        ) 
-        public Registry.onlyAdmin Registry.onlyBeforeVoting {
+
+    function getParties(uint electionId) public view returns (Party[] memory) {
+        return parties[electionId];
+    }
+
+    // --- Candidates ---
+    function registerCandidate(uint electionId, string memory _name, uint _wahlbezirk, string memory _partei, string memory _url) 
+        public onlyAdmin onlyBeforeVoting(electionId) 
+    {
+        Candidate[] storage cands = candidates[electionId];
+        ElectionDistrict[] storage districts = electionDistricts[electionId];
 
         bool found = false;
-        for (uint i = 0; i < electionDistricts.length; i++)
-        {
-            if (electionDistricts[i].nummer == _wahlbezirk) {
+        for (uint i = 0; i < districts.length; i++) {
+            if (districts[i].nummer == _wahlbezirk) {
                 currentCandidateId++;
-                candidates.push(Candidate({
+                cands.push(Candidate({
                     uid: currentCandidateId,
-                    name: _name, 
-                    wahlbezirk: _wahlbezirk, 
+                    name: _name,
+                    wahlbezirk: _wahlbezirk,
                     partei: _partei,
                     url: _url,
                     votes: 0
                 }));
-
                 found = true;
                 break;
             }
         }
-        if (!found) {
-            revert(unicode"Kein gültiger Wahlbezirk!");
-        }
-        
+        if (!found) revert(unicode"Kein gültiger Wahlbezirk!");
     }
 
-    function getCandidates(uint _wahlbezirk) public view returns (Candidate[] memory) {
-        // First, count how many candidates match the wahlbezirk
+    function getCandidates(uint electionId, uint _wahlbezirk) public view returns (Candidate[] memory) {
+        Candidate[] storage allCandidates = candidates[electionId];
         uint count = 0;
-        for (uint i = 0; i < candidates.length; i++) {
-            if (candidates[i].wahlbezirk == _wahlbezirk) {
-                count++;
-            }
+        for (uint i = 0; i < allCandidates.length; i++) {
+            if (allCandidates[i].wahlbezirk == _wahlbezirk) count++;
         }
-
-        // Create a new array with the correct size
-        Candidate[] memory filteredCandidates = new Candidate[](count);
-        if (count == 0) {
-            return new Candidate[](0); // Return an empty array if no candidates found
-        }
-
+        Candidate[] memory filtered = new Candidate[](count);
         uint index = 0;
-        for (uint i = 0; i < candidates.length; i++) {
-            if (candidates[i].wahlbezirk == _wahlbezirk) {
-                filteredCandidates[index] = candidates[i];
-                index++;
+        for (uint i = 0; i < allCandidates.length; i++) {
+            if (allCandidates[i].wahlbezirk == _wahlbezirk) {
+                filtered[index++] = allCandidates[i];
             }
         }
-        return filteredCandidates;
+        return filtered;
     }
 
-    function castEncryptedVote(string memory _encryptedVote1, string memory _encryptedVote2, string memory _token, uint _wahlbezirk) public Registry.onlyDuringVoting {
-        require(Registry.isTokenValid(_token, _wahlbezirk), "Invalid or used token");
-        Registry.markTokenUsed(_token, _wahlbezirk);
-        EncryptedVote memory encryptedVote;
-        encryptedVote.vote1 = _encryptedVote1;
-        encryptedVote.vote2 = _encryptedVote2;
-        encryptedVote.electionDistrict = _wahlbezirk;
-        encryptedVotes.push(encryptedVote);
+    // --- Votes ---
+    function castEncryptedVote(uint electionId, string memory _encryptedVote1, string memory _encryptedVote2, string memory _token, uint _wahlbezirk) 
+        public onlyDuringVoting(electionId) 
+    {
+        require(isTokenValid(electionId, _token, _wahlbezirk), "Invalid or used token");
+        markTokenUsed(electionId, _token, _wahlbezirk);
+        encryptedVotes[electionId].push(EncryptedVote({vote1: _encryptedVote1, vote2: _encryptedVote2, electionDistrict: _wahlbezirk}));
     }
 
-    function getEncryptedVotes(uint _wahlbezirk) public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
-
-        // First, count how many votes match the wahlbezirk
+    function getEncryptedVotes(uint electionId, uint _wahlbezirk) public view onlyAfterVoting(electionId) onlyAdmin returns (EncryptedVote[] memory) {
+        EncryptedVote[] storage votes = encryptedVotes[electionId];
         uint count = 0;
-        for (uint i = 0; i < encryptedVotes.length; i++) {
-            if (encryptedVotes[i].electionDistrict == _wahlbezirk) {
-                count++;
-            }
+        for (uint i = 0; i < votes.length; i++) {
+            if (votes[i].electionDistrict == _wahlbezirk) count++;
         }
-        if (count == 0) {
-            return new EncryptedVote[](0); // Return an empty array if no candidates found
-        }
-        // Create a new array with the correct size
-        EncryptedVote[] memory filteredEncryptedVotes = new EncryptedVote[](count);
-
+        EncryptedVote[] memory filtered = new EncryptedVote[](count);
         uint index = 0;
-        for (uint i = 0; i < encryptedVotes.length; i++) {
-            if (encryptedVotes[i].electionDistrict == _wahlbezirk) {
-                filteredEncryptedVotes[index] = encryptedVotes[i];
-                index++;
-            }
+        for (uint i = 0; i < votes.length; i++) {
+            if (votes[i].electionDistrict == _wahlbezirk) filtered[index++] = votes[i];
         }
-        return filteredEncryptedVotes;
+        return filtered;
     }
 
-    function storeElectionResult1(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
-        ElectionResult1 memory result;
-        result.tally = _tally;
-        result.signature = _signature;
-        result.timestamp = block.timestamp;
-        result.electionDistrict = _wahlbezirk;
-        electionResults1.push(result);
+    // --- Results ---
+    function storeElectionResult1(uint electionId, string memory _tally, string memory _signature, uint _wahlbezirk) 
+        public onlyAfterVoting(electionId) onlyAdmin 
+    {
+        electionResults1[electionId].push(ElectionResult({tally: _tally, signature: _signature, timestamp: block.timestamp, electionDistrict: _wahlbezirk}));
     }
 
-    function storeElectionResult2(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
-        ElectionResult2 memory result;
-        result.tally = _tally;
-        result.signature = _signature;
-        result.timestamp = block.timestamp;
-        result.electionDistrict = _wahlbezirk;
-        electionResults2.push(result);
+    function storeElectionResult2(uint electionId, string memory _tally, string memory _signature, uint _wahlbezirk) 
+        public onlyAfterVoting(electionId) onlyAdmin 
+    {
+        electionResults2[electionId].push(ElectionResult({tally: _tally, signature: _signature, timestamp: block.timestamp, electionDistrict: _wahlbezirk}));
     }
 
-    // Neu: Gibt Datensatz Erststimmen für einen bestimmten Wahlbezirk zurück
-    function getElectionResultsDistrict1(uint _electionDistrict) public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
-        
-        for (uint i = 0; i < electionResults1.length; i++) {
-            if (electionResults1[i].electionDistrict == _electionDistrict) {
-                
-                ElectionResult1 storage result = electionResults1[i];
-                return (result.tally, result.electionDistrict, result.signature, result.timestamp);
+    function getElectionResultsDistrict1(uint electionId, uint _electionDistrict) public view onlyAfterVoting(electionId) returns (string memory, uint, string memory, uint) {
+        ElectionResult[] storage results = electionResults1[electionId];
+        for (uint i = 0; i < results.length; i++) {
+            if (results[i].electionDistrict == _electionDistrict) {
+                return (results[i].tally, results[i].electionDistrict, results[i].signature, results[i].timestamp);
             }
         }
     }
 
-    // Neu: Gibt Datensatz Zweitstimmen für einen bestimmten Wahlbezirk zurück
-    function getElectionResultsDistrict2(uint _electionDistrict) public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
-        
-        for (uint i = 0; i < electionResults2.length; i++) {
-            if (electionResults2[i].electionDistrict == _electionDistrict) {
-                
-                ElectionResult2 storage result = electionResults2[i];
-                return (result.tally, result.electionDistrict, result.signature, result.timestamp);
+    function getElectionResultsDistrict2(uint electionId, uint _electionDistrict) public view onlyAfterVoting(electionId) returns (string memory, uint, string memory, uint) {
+        ElectionResult[] storage results = electionResults2[electionId];
+        for (uint i = 0; i < results.length; i++) {
+            if (results[i].electionDistrict == _electionDistrict) {
+                return (results[i].tally, results[i].electionDistrict, results[i].signature, results[i].timestamp);
             }
         }
     }

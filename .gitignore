@@ -8,6 +8,9 @@
 logo*
 bvs.png
 
+# Backups
+*bak
+
 # dependencies
 node_modules/
 */node_modules/*
