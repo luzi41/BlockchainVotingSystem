@@ -2,7 +2,9 @@
 // Express API – Multi‑Election + Batch für Quorum (ethers v6)
 // Kompatibel mit den Multi‑Election Contracts (Registry + Bundestagswahl)
 // Enthält: Batch-Endpunkte, electionId-Parametrisierung, parallele Transaktionen
-// V 1.0.0
+// V 0.25.3
+
+// import createProposalsRoutes from "./routes/proposals.js";
 
 const express = require("express");
 const fs = require("fs");
@@ -27,6 +29,9 @@ const ABI = require(path.join(__dirname, "./Bundestagswahl.json")).abi;
 // ====== Express Setup ======
 const app = express();
 app.use(express.json({ limit: "10mb" }));
+
+// ====== Extension for proposals ======
+//app.use("/proposals", createProposalsRoutes(provider, signer, process.env.PROPOSALS_ADDRESS));
 
 // ====== Ethers Setup (lazy singleton) ======
 let _signer = null;

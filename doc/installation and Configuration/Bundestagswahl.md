@@ -43,23 +43,66 @@ Assume electionId=1
     -d '{
     "names":["Wahlkreis 1","Wahlkreis 2","Wahlkreis 3"],
     "nummern":[1,2,3],
-    "publicKeys":["-----BEGIN PUBLIC KEY-----...END PUBLIC KEY-----","-----BEGIN PUBLIC KEY-----...END PUBLIC KEY-----","-----BEGIN PUBLIC KEY-----...END PUBLIC KEY-----"]
-}'
+    "publicKeys":["-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RPuK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JShIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+glsiQIDAQAB-----END PUBLIC KEY-----","-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RPuK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JShIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+glsiQIDAQAB-----END PUBLIC KEY-----","-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzySURgrOWXJv9H2bCvE2AgP0A9C5YqI4bATqaae6UxDsu0JajSx40m0Trg8zoJnYszvUSG/Z6/4sFvTvXuxb4F+kIjTQSHmkgjW1gYK/k55MddG0kjF/ZH8T0pXNCozTRmyp315vuPrB+0TDD+RPuK+HllSkZ+iPI3ddR6cGDNgKLMCUfJKvF91nrx/9ZBl3ZbW6Kla/5qO1BLURo1JShIq3K40khk+wwIkyPAeP0LLaPCw9RHyQzeFTevYN9zTYPvFuP2WDnlPXCefzzqA0XTxWcBGvMDH4qcXq86cPAPeuyiCrvrJWClHxgHlASLM50dLKxkI2XIvx8/Cd+glsiQIDAQAB-----END PUBLIC KEY-----"]
+    }'
 
 Please do not use the public key from this guide and choose a different key pair for each constituency (see 4.2).
 
 ## 5.3 Register parties
 
+    curl -X POST http://localhost:3001/1/registerPartiesBatch \
+    -H "Content-Type: application/json" \
+    -d '{
+        "names":["CDU","SPD","FDP","Grüne","Linke"],
+        "shortnames":["CDU","SPD","FDP","GRUENE","LINKE"],
+        "colors":["#fff","#fff","#8e44ad","#fff","#fff"],
+        "bgcolors":["#000","#FF0000","#f1c40f","#27ae60","#c01c28"],
+        "urls":["https://www.cdu.de","https://www.spd.de","https://www.fdp.de","https://www.gruene.de","https://www.linke.de"]
+    }'
+
+
 ## 5.4 Register candidates
+
+    curl -X POST http://localhost:3001/1/registerCandidatesBatch \
+    -H "Content-Type: application/json" \
+    -d '{
+        "names":["Alice","Bob","Charly","Denise","Emily"],
+        "wahlbezirke":[1,1,1,1,1],
+        "parteien":["CDU","SPD","FDP","Grüne","Linke"],
+        "urls":["https://.../alice","https://.../bob","https://.../charly","https://.../denise","https://.../emily"]
+    }'
+
+
+    curl -X POST http://localhost:3001/1/registerCandidatesBatch \
+    -H "Content-Type: application/json" \
+    -d '{
+        "names":["Fritz","Gertud","Harry","Isolde","Jason"],
+        "wahlbezirke":[2,2,2,2,2],
+        "parteien":["CDU","SPD","FDP","Grüne","Linke"],
+        "urls":["https://.../alice","https://.../bob","https://.../charly","https://.../denise","https://.../emily"]
+    }'
+
+    curl -X POST http://localhost:3001/1/registerCandidatesBatch \
+    -H "Content-Type: application/json" \
+    -d '{
+        "names":["Karla","Ludwig","Mandy","Nele","Otto"],
+        "wahlbezirke":[3,3,3,3,3],
+        "parteien":["CDU","SPD","FDP","Grüne","Linke"],
+        "urls":["https://.../Karla","https://.../Ludwig","https://.../Mandy","https://.../Nele","https://.../Otto"]
+    }'
 
 ## 5.5 Store voting tokens
 
-
-
+    curl -X POST http://localhost:3001/1/registerTokensBatch \
+    -H "Content-Type: application/json" \
+    -d '{
+        "tokens":["SecretToken1","SecretToken2","SecretToken3","SecretToken4","SecretToken5","SecretToken6","SecretToken7","SecretToken8","SecretToken9","SecretToken10","SecretToken11","SecretToken12"],
+        "electionDistricts":[1,1,1,1,2,2,2,2,3,3,3,3]
+    }'
     
 # 6 Start voting phase:
 
-    curl -X POST http://localhost:3001/startVoting -H "Content-Type: application/json" -d '{"title" : "Test-Election 2025"}'
+    curl -X POST http://localhost:3001/1/startVoting -H "Content-Type: application/json" -d '{}'
 
 # 7 Install and start frontend-UI
 

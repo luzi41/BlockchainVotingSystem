@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.20.0 Multi-Election Registry
+// V 0.25.3 Multi-Election Registry
 
 contract Registry {
 
@@ -74,7 +74,43 @@ contract Registry {
             electionDistrict: _electionDistrict,
             usedToken: false
         }));
-    }   
+    }
+
+    // --- Tokens Batch ---
+    function registerTokens(
+        uint electionId, 
+        string[] memory _tokens, 
+        uint[] memory _electionDistricts
+    ) 
+        public 
+        onlyAdmin 
+        onlyBeforeVoting(electionId) 
+    {
+        require(_tokens.length == _electionDistricts.length, "Length mismatch");
+
+        Token[] storage tokens = electionTokens[electionId];
+
+        for (uint i = 0; i < _tokens.length; i++) {
+            bytes32 hashedToken = keccak256(abi.encodePacked(_tokens[i]));
+
+            // Prüfen, ob der Token für den Wahlkreis schon existiert
+            bool exists = false;
+            for (uint j = 0; j < tokens.length; j++) {
+                if (tokens[j].token == hashedToken && tokens[j].electionDistrict == _electionDistricts[i]) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                tokens.push(Token({
+                    token: hashedToken,
+                    electionDistrict: _electionDistricts[i],
+                    usedToken: false
+                }));
+            }
+        }
+    }
 
     function isTokenValid(uint electionId, string memory _token, uint _electionDistrict) public view returns (bool) {
         Token[] storage tokens = electionTokens[electionId];

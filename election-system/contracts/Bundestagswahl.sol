@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.24.9 Multi-Election Bundestagswahl
+// V 0.25.3 Multi-Election Bundestagswahl
 
 import "./Registry.sol";
 
@@ -57,13 +57,52 @@ contract Bundestagswahl is Registry {
     uint256 public currentCandidateId;
 
     // --- ElectionDistricts ---
-    function registerElectionDistrict(uint electionId, string memory _name, uint _nummer, string memory _publicKey) 
-        public onlyAdmin onlyBeforeVoting(electionId) 
+    function registerElectionDistrict(
+        uint electionId, 
+        string memory _name, 
+        uint _nummer, 
+        string memory _publicKey
+    ) 
+        public 
+        onlyAdmin 
+        onlyBeforeVoting(electionId) 
     {
-        electionDistricts[electionId].push(ElectionDistrict({name: _name, nummer: _nummer, publicKey: _publicKey}));
+        electionDistricts[electionId].push(
+            ElectionDistrict({name: _name, nummer: _nummer, publicKey: _publicKey})
+        );
     }
 
-    function getElectionDistricts(uint electionId) public view returns (ElectionDistrict[] memory) {
+    function registerElectionDistricts(
+        uint electionId, 
+        string[] memory _names, 
+        uint[] memory _nummern, 
+        string[] memory _publicKeys
+    ) 
+        public 
+        onlyAdmin 
+        onlyBeforeVoting(electionId) 
+    {
+        require(
+            _names.length == _nummern.length && _names.length == _publicKeys.length,
+            "Arrays must have same length"
+        );
+
+        for (uint i = 0; i < _names.length; i++) {
+            electionDistricts[electionId].push(
+                ElectionDistrict({
+                    name: _names[i], 
+                    nummer: _nummern[i], 
+                    publicKey: _publicKeys[i]
+                })
+            );
+        }
+    }
+
+    function getElectionDistricts(uint electionId) 
+        public 
+        view 
+        returns (ElectionDistrict[] memory) 
+    {
         return electionDistricts[electionId];
     }
 
@@ -81,6 +120,40 @@ contract Bundestagswahl is Registry {
             url: _url,
             votes: 0
         }));
+    }
+
+    function registerParties(
+        uint electionId,
+        string[] memory _names,
+        string[] memory _shortnames,
+        string[] memory _colors,
+        string[] memory _bgcolors,
+        string[] memory _urls
+    )
+        public
+        onlyAdmin
+        onlyBeforeVoting(electionId)
+    {
+        require(
+            _names.length == _shortnames.length &&
+            _names.length == _colors.length &&
+            _names.length == _bgcolors.length &&
+            _names.length == _urls.length,
+            "Arrays must have same length"
+        );
+
+        for (uint i = 0; i < _names.length; i++) {
+            currentPartyId++;
+            parties[electionId].push(Party({
+                uid: currentPartyId,
+                name: _names[i],
+                shortname: _shortnames[i],
+                color: _colors[i],
+                bgcolor: _bgcolors[i],
+                url: _urls[i],
+                votes: 0
+            }));
+        }
     }
 
     function getParties(uint electionId) public view returns (Party[] memory) {
@@ -112,6 +185,48 @@ contract Bundestagswahl is Registry {
         }
         if (!found) revert(unicode"Kein gültiger Wahlbezirk!");
     }
+
+    function registerCandidates(
+        uint electionId,
+        string[] memory _names,
+        uint[] memory _wahlbezirke,
+        string[] memory _parteien,
+        string[] memory _urls
+    )
+        public
+        onlyAdmin
+        onlyBeforeVoting(electionId)
+    {
+        require(
+            _names.length == _wahlbezirke.length &&
+            _names.length == _parteien.length &&
+            _names.length == _urls.length,
+            "Arrays must have same length"
+        );
+
+        Candidate[] storage cands = candidates[electionId];
+        ElectionDistrict[] storage districts = electionDistricts[electionId];
+
+        for (uint i = 0; i < _names.length; i++) {
+            bool found = false;
+            for (uint j = 0; j < districts.length; j++) {
+                if (districts[j].nummer == _wahlbezirke[i]) {
+                    currentCandidateId++;
+                    cands.push(Candidate({
+                        uid: currentCandidateId,
+                        name: _names[i],
+                        wahlbezirk: _wahlbezirke[i],
+                        partei: _parteien[i],
+                        url: _urls[i],
+                        votes: 0
+                    }));
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) revert(unicode"Kein gültiger Wahlbezirk!");
+        }
+    }    
 
     function getCandidates(uint electionId, uint _wahlbezirk) public view returns (Candidate[] memory) {
         Candidate[] storage allCandidates = candidates[electionId];
