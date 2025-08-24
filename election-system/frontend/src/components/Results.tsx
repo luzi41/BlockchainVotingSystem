@@ -1,4 +1,4 @@
-// Results.tsx V 0.24.3 (Colors fix)
+// Results.tsx V 0.25.3 (Colors fix)
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
@@ -157,7 +157,8 @@ TotalResults.displayName = "TotalResults";
 
 /** Hauptkomponente */
 function Results() {
-  const [modus, setModus] = useState<number>(0);
+  const [electionId, setElectionId] = useState(1);
+  const [modus, setModus] = useState<number>(1);
   const [status, setStatus] = useState("");
   const [texts, setTexts] = useState<Record<string, string>>({});
   const [html, setHtml] = useState<React.ReactNode>("");
@@ -193,20 +194,20 @@ function Results() {
         const address = process.env.REACT_APP_CONTRACT_ADDRESS;
         if (!address) throw new Error("Contract address not defined.");
         const contract = new Contract(address, abiJson.abi, provider);
-
+        /*
         const m = await contract.getModus();
         setModus(Number(m));
-
-        if (Number(m) === 1) {
-          const _districts = await contract.getElectionDistricts();
-          const _parties = await contract.getParties();
+        */
+        if (Number(modus) === 1) {
+          const _districts = await contract.getElectionDistricts(electionId);
+          const _parties = await contract.getParties(electionId);
           setParties(_parties);
 
           const results1: any[] = [];
           const results2: any[] = [];
           for (let i = 0; i < _districts.length; i++) {
-            results1[i] = JSON.parse((await contract.getElectionResultsDistrict1(i + 1)).tally);
-            results2[i] = JSON.parse((await contract.getElectionResultsDistrict2(i + 1)).tally);
+            results1[i] = JSON.parse((await contract.getElectionResultsDistrict1(electionId, i + 1)).tally);
+            results2[i] = JSON.parse((await contract.getElectionResultsDistrict2(electionId, i + 1)).tally);
           }
           Results.cache.resultsParties = aggregateObjects(results2);
           Results.cache.parties = _parties;
@@ -241,14 +242,14 @@ function Results() {
               />
             </div>
           );
-        } else if (Number(m) === 2) {
+        } else if (Number(modus) === 2) {
           // Proposal-Modus unverändert
-          const proposalList = await contract.getProposals();
+          const proposalList = await contract.getProposals(electionId);
           if (!proposalList || proposalList.length === 0) throw new Error(loadedTexts.errorProposals);
 
-          const rawResult = await contract.getVotingResult();
+          const rawResult = await contract.getVotingResult(electionId);
           const result = JSON.parse(rawResult.tally);
-          const voteNumber = await contract.getNumberOfVotes();
+          const voteNumber = await contract.getNumberOfVotes(electionId);
 
           setHtml(
             <div>
