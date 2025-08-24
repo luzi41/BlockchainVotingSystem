@@ -78,5 +78,3 @@ election-system/frontend/.env.test
 election-system/hardhat.config.js
 election-system/admin-ui/src/reportWebVitals.js
 election-system/frontend/src/artifacts/index.text
-
-

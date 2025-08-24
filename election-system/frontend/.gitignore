@@ -1,4 +1,4 @@
 dist
 *bak
-public/texts
-public/contracts
+*json
+public
