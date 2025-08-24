@@ -81,6 +81,7 @@ th, td {
 
 .center {
   text-align: center;
+  overflow: hidden;
 }
 
 #root {
