@@ -165,10 +165,10 @@ function VoteForm() {
         const provider = new JsonRpcProvider(rpcURL);
         const ctr = new Contract(contractAddress, abiJson.abi, provider);
         setContract(ctr);
-        /*
+        
         const m = await ctr.getModus();
         setModus(Number(m));
-        */
+        
         if (Number(modus) === 1) {
           const cand = await ctr.getCandidates(electionId, electionDistrictNo);
           setCandidates(cand);
@@ -247,7 +247,7 @@ function VoteForm() {
         <div className="col-50">
           <p>{texts.yourToken}</p>
           <p>
-            <input type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
+            <input name="token" type="text" placeholder={texts.token} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
             <button name="scanToken" className=".btn"><img src={scanner} alt="Scan icon" width="13" height="13" /></button>
           </p>
         </div>

@@ -257,14 +257,14 @@ function Results() {
             );
           }
         }
-        console.log("ABI", abiJson);
+        //console.log("ABI", abiJson);
         const address = process.env.REACT_APP_CONTRACT_ADDRESS;
         if (!address) throw new Error("Contract address not defined.");
         const contract = new Contract(address, abiJson.abi, provider);
-        /*
+        
         const m = await contract.getModus();
         setModus(Number(m));
-        */
+        
         if (Number(modus) === 1) {
           const _districts = await contract.getElectionDistricts(electionId);
           const _parties = await contract.getParties(electionId);
@@ -300,6 +300,7 @@ function Results() {
               <h1>{loadedTexts.headline}</h1>
               <p>
                 <select
+                  name="display"
                   onChange={e => {
                     if (e.target.value === "1") {
                       setDisplay1("block");
