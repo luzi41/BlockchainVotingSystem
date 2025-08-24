@@ -63,7 +63,7 @@ function App() {
           <li><Link to="/extras">Extras</Link></li>
           <li className="title">
             <Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">
-              Blockchain Voting System 0.25
+              Blockchain Voting System 0.26
             </Link>
           </li>
         </ul>
