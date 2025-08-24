@@ -1,4 +1,4 @@
-// Results.tsx V 0.25.3 (Colors fix)
+// Results.tsx V 0.25.8
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
@@ -209,6 +209,11 @@ function Results() {
             results1[i] = JSON.parse((await contract.getElectionResultsDistrict1(electionId, i + 1)).tally);
             results2[i] = JSON.parse((await contract.getElectionResultsDistrict2(electionId, i + 1)).tally);
           }
+
+          if (results1.length === 0||results2.length === 0) {
+            setStatus("Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!");
+            throw new Error("Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!");
+          } 
           Results.cache.resultsParties = aggregateObjects(results2);
           Results.cache.parties = _parties;
 
@@ -292,6 +297,7 @@ function Results() {
         }
         setStatus("");
       } catch (err: any) {
+        setStatus(err.message);
         console.error("❌ Fehler beim Laden der Ergebnisse:", err.message);
         setHtml(
           <div className="border">
@@ -302,7 +308,7 @@ function Results() {
       }
     }
     fetchResults();
-  }, [display1, display2]);
+  }, [display1, display2, status]);
 
   return <div>{html}</div>;
 }

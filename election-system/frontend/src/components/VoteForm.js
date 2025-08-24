@@ -1,16 +1,18 @@
-// V0.23.38
+// V0.25.8
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { JsonRpcProvider, Wallet, Contract } from "ethers";
 import scanner from "../assets/scan-59.png";
+
 // ✅ Web: statisch importierte ABIs (Registry)
-//import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
+import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
 import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
+
 // Wenn du weitere Modi hast, hier ergänzen:
 // import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
 const ABI_REGISTRY = {
-	//Proposals: ProposalsABI,
+	Proposals: ProposalsABI,
 	Bundestagswahl: BundestagswahlABI,
 };
 
