@@ -127,15 +127,15 @@ Start frontend:
 
 ## 8.1 Stop voting phase
 
-    curl -X POST http://localhost:3001/endVoting
+    curl -X POST http://localhost:3001/1/endVoting
 
 ## 8.2 Counting the results
 
 election-system/scripts$
 
-    curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "1"}' &&
-    curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "2"}' &&
-    curl -X POST http://localhost:3001/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "3"}'
+    curl -X POST http://localhost:3001/1/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "1"}' &&
+    curl -X POST http://localhost:3001/1/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "2"}' &&
+    curl -X POST http://localhost:3001/1/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "3"}'
 
 ## 8.3 See results 
 
