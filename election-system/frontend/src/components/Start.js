@@ -117,12 +117,11 @@ function Start() {
         const address = process.env.REACT_APP_CONTRACT_ADDRESS;
         const ctr = new Contract(address, abiJson.abi, provider);
         setContract(ctr);
-        /* const m = await ctr.getModus();
+        
+        const m = await ctr.getModus();
         if (m) {
           setModus(Number(m));
-        }
-        */
-        
+        }        
 
         if (Number(modus) === 1) {
           const candidatesList = await ctr.getCandidates(electionId, electionDistrictNo);
