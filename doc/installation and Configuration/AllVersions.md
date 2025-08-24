@@ -59,6 +59,8 @@ election-system$
     cd contracts
     npx hardhat compile
 
+The compiled artifacts will be saved in the artifacts/ directory by default, or whatever your configured artifacts path is. [Hardhat documentation] (https://v2.hardhat.org/hardhat-runner/docs/guides/compile-contracts).
+
 ### 3.4 Deploy contract
 
 election-system$

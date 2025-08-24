@@ -81,6 +81,7 @@ th, td {
 
 .center {
   text-align: center;
+  overflow: hidden;
 }
 
 #root {
@@ -209,6 +210,7 @@ div .border {
   padding: 10px 5px;
   margin: 10px -5px;
   border: 0.1em dotted black;
+  overflow: hidden;
 }
 
 .btn {

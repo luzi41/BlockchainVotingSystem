@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.16.4
+// V 0.25.3 Multi-Election Registry
 
 contract Registry {
 
     address public admin;
-    bool public votingOpen;
-    bool public electionBegin;
-    string public electionTitle;
+
+    struct Election {
+        string title;
+        bool votingOpen;
+        bool electionBegin;
+    }
 
     struct Token {
         bytes32 token;
@@ -16,26 +19,34 @@ contract Registry {
         bool usedToken;
     }
 
-    // Array to store token
-    Token[] tokens;
+    // electionId => Election
+    mapping(uint => Election) public elections;
+    
+    // Contract → electionId
+    mapping(address => uint) public contractToElectionId;        
+
+    // electionId => Token[]
+    mapping(uint => Token[]) private electionTokens;
+
+    uint public currentElectionId;
 
     modifier onlyAdmin() {
         require(msg.sender == admin, unicode"Nur der Admin kann diese Funktion ausführen!");
         _;
     }
 
-    modifier onlyDuringVoting() {
-        require(votingOpen, unicode"Die Wahl ist nicht geöffnet.");
+    modifier onlyDuringVoting(uint electionId) {
+        require(elections[electionId].votingOpen, unicode"Die Wahl ist nicht geöffnet.");
         _;
     }
 
-    modifier onlyAfterVoting() {
-        require(!votingOpen, unicode"Die Wahl ist noch geöffnet.");
+    modifier onlyAfterVoting(uint electionId) {
+        require(!elections[electionId].votingOpen && elections[electionId].electionBegin, unicode"Die Wahl ist noch geöffnet oder hat nicht begonnen.");
         _;
     }
 
-    modifier onlyBeforeVoting() {
-        require(!electionBegin, unicode"Die Wahl ist schon geöffnet.");
+    modifier onlyBeforeVoting(uint electionId) {
+        require(!elections[electionId].electionBegin, unicode"Die Wahl ist schon geöffnet.");
         _;
     }    
 
@@ -43,97 +54,118 @@ contract Registry {
         admin = msg.sender;
     }
 
+    // Neue Wahl anlegen
+    function createElection(string memory _title) public onlyAdmin {
+        currentElectionId++;
+        elections[currentElectionId] = Election({
+            title: _title,
+            votingOpen: false,
+            electionBegin: false
+        });
+    }
 
-    // fkt. Wähler (Wählertoken, Wahlbezirk)
-    function registerToken(string memory _token, uint _electionDistrict) public onlyAdmin onlyBeforeVoting  {
-
+    // Token-Registrierung
+    function registerToken(uint electionId, string memory _token, uint _electionDistrict) public onlyAdmin onlyBeforeVoting(electionId) {
+        Token[] storage tokens = electionTokens[electionId];
         for (uint i = 0; i < tokens.length; i++) { 
             if (tokens[i].token == keccak256(abi.encodePacked(_token)) && tokens[i].electionDistrict == _electionDistrict) {
                 revert("Token already registered");
             }
         }
-
-        Token memory token;
-        token.token = keccak256(abi.encodePacked(_token));
-        token.electionDistrict = _electionDistrict;
-        tokens.push(token);
-    }   
-
-    function isTokenValid(string memory _token, uint _electionDistrict) public view returns (bool) {
-        bool valid = false;
-        for (uint i = 0; i < tokens.length; i++) {
-            if (tokens[i].token == keccak256(abi.encodePacked(_token)) 
-                && tokens[i].usedToken == false 
-                && tokens[i].electionDistrict == _electionDistrict) {
-                valid = true;
-            }
-        }
-        return valid;
+        tokens.push(Token({
+            token: keccak256(abi.encodePacked(_token)),
+            electionDistrict: _electionDistrict,
+            usedToken: false
+        }));
     }
 
-    function markTokenUsed(string memory _token, uint _electionDistrict) public {
+    // --- Tokens Batch ---
+    function registerTokens(
+        uint electionId, 
+        string[] memory _tokens, 
+        uint[] memory _electionDistricts
+    ) 
+        public 
+        onlyAdmin 
+        onlyBeforeVoting(electionId) 
+    {
+        require(_tokens.length == _electionDistricts.length, "Length mismatch");
 
-        // neue Methode
+        Token[] storage tokens = electionTokens[electionId];
+
+        for (uint i = 0; i < _tokens.length; i++) {
+            bytes32 hashedToken = keccak256(abi.encodePacked(_tokens[i]));
+
+            // Prüfen, ob der Token für den Wahlkreis schon existiert
+            bool exists = false;
+            for (uint j = 0; j < tokens.length; j++) {
+                if (tokens[j].token == hashedToken && tokens[j].electionDistrict == _electionDistricts[i]) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                tokens.push(Token({
+                    token: hashedToken,
+                    electionDistrict: _electionDistricts[i],
+                    usedToken: false
+                }));
+            }
+        }
+    }
+
+    function isTokenValid(uint electionId, string memory _token, uint _electionDistrict) public view returns (bool) {
+        Token[] storage tokens = electionTokens[electionId];
+        for (uint i = 0; i < tokens.length; i++) {
+            if (tokens[i].token == keccak256(abi.encodePacked(_token)) 
+                && !tokens[i].usedToken 
+                && tokens[i].electionDistrict == _electionDistrict) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function markTokenUsed(uint electionId, string memory _token, uint _electionDistrict) public {
+        Token[] storage tokens = electionTokens[electionId];
         for (uint i = 0; i < tokens.length; i++) {
             if (tokens[i].token == keccak256(abi.encodePacked(_token)) 
                && tokens[i].electionDistrict == _electionDistrict) {
                 tokens[i].usedToken = true;
-               } 
+            } 
         }
     }
 
-    // fkt. Wahl
-    function startVoting(string memory _electionTitle) public onlyAdmin onlyBeforeVoting {
-        // require(candidates.length >= 2, "Mindestens zwei Kandidaten erforderlich.");
-        votingOpen = true;
-        electionBegin = true;
-        electionTitle = _electionTitle;
+    // Wahl-Status steuern
+    function startVoting(uint electionId) public onlyAdmin onlyBeforeVoting(electionId) {
+        elections[electionId].votingOpen = true;
+        elections[electionId].electionBegin = true;
     }
 
-    function endVoting() public onlyAdmin onlyDuringVoting {
-        votingOpen = false;
+    function endVoting(uint electionId) public onlyAdmin onlyDuringVoting(electionId) {
+        elections[electionId].votingOpen = false;
     }
 
-    function getElectionStatus() public view returns (string memory status)
-    {
-        if (electionBegin == true)
-        {
-            if (votingOpen == true)
-            {
-                return status = unicode"Die Wahl ist geöffnet.";
+    function getElectionStatus(uint electionId) public view returns (string memory status) {
+        Election storage e = elections[electionId];
+        if (e.electionBegin) {
+            if (e.votingOpen) {
+                return unicode"Die Wahl ist geöffnet.";
+            } else {
+                return unicode"Die Wahl ist geschlossen.";
             }
-            else {
-                return status = unicode"Die Wahl ist geschlossen.";
-            }
-
-        }
-        else {
-            return status = unicode"Die Wahl hat noch nicht begonnen.";
+        } else {
+            return unicode"Die Wahl hat noch nicht begonnen.";
         }
     }
 
-    function getElectionTitle() public view returns (string memory title)
-    {
-        return title = electionTitle;
+    function getElectionTitle(uint electionId) public view returns (string memory title) {
+        return elections[electionId].title;
     }
 
-    // Helper function to convert uint to string
-    function uintToString(uint v) internal pure returns (string memory str) {
-        if (v == 0) {
-            return "0";
-        }
-        uint maxlength = 100;
-        bytes memory reversed = new bytes(maxlength);
-        uint i = 0;
-        while (v != 0) {
-            uint remainder = v % 10;
-            v = v / 10;
-            reversed[i++] = bytes1(uint8(48 + remainder));
-        }
-        bytes memory s = new bytes(i);
-        for (uint j = 0; j < i; j++) {
-            s[j] = reversed[i - j - 1];
-        }
-        str = string(s);
+    // Neue Getter-Funktion: electionId anhand der Contract-Adresse zurückgeben
+    function getElectionIdByContract(address contractAddress) public view returns (uint) {
+        return contractToElectionId[contractAddress];
     }
 }

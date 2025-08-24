@@ -1,37 +1,41 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.23.5
-
 import "./Registry.sol";
 
 contract Proposals is Registry {
-    uint public modus = 2;
-    uint256 currentProposalId;
-    string  publicKey; // Public key to encrypt
-    uint256 voteCount;
+    uint public modus = 2; // 2 = Proposals-Modus
+    uint256 private currentProposalId;
 
-    function getModus() public view returns (uint) {
-        return modus;
-    }    
+    // PublicKey je Wahl
+    mapping(uint => string) public publicKeys;
 
+    // Proposal-Daten
     struct Proposal {
         uint256 uid;
         string name;
         string text;
         string url;
-        uint qtype; // 1=Boolean
+        uint qtype; // 1=Boolean, 2=MultipleChoice, etc.
         string answer1;
         string answer2;
     }
 
-    Proposal[] public proposals;
+    // Input-Struct für Batch (vermeidet „stack too deep“)
+    struct ProposalInput {
+        string name;
+        string text;
+        string url;
+        uint qtype;
+        string answer1;
+        string answer2;
+    }
 
-    struct EncryptedVote {
-        string vote;
-    }    
-
-    EncryptedVote[] public encryptedVotes;
+    // Storage
+    mapping(uint => Proposal[]) private _proposals;            // electionId => proposals
+    struct EncryptedVote { string vote; }
+    mapping(uint => EncryptedVote[]) private _encryptedVotes;  // electionId => votes
+    mapping(uint => uint256) private _voteCounts;              // electionId => count
 
     struct VotingResult {
         string tally;
@@ -39,74 +43,133 @@ contract Proposals is Registry {
         uint timestamp;
         uint electionDistrict;
     }
+    mapping(uint => mapping(uint => VotingResult[])) private _votingResults; // electionId => district => results[]
 
-    // Array to store decrypted results
-    VotingResult public votingResult;
-    event StoreVotingResult(address sender, uint electionDistrict, uint256 timestamp);    
+    // Events
+    event ProposalCreated(uint indexed electionId, uint indexed proposalId, string name);
+    event StoreVotingResult(address indexed sender, uint indexed electionId, uint indexed electionDistrict, uint256 timestamp);
 
-    function getPublicKey() public view returns (string memory) {
-        return publicKey;
+    // --- Modus
+    function getModus() external view returns (uint) {
+        return modus;
     }
 
-    function storePublicKey(string memory _publicKey) public Registry.onlyAdmin Registry.onlyBeforeVoting {
-        publicKey = _publicKey;
+    // --- PublicKey je Wahl
+    function getPublicKey(uint electionId) external view returns (string memory) {
+        return publicKeys[electionId];
     }
 
-    function registerProposal(
-        string memory _name, 
-        string memory _text,
-        string memory _url,
-        uint _qtype,
-        string memory _answer1,
-        string memory _answer2
-        ) 
-        public Registry.onlyAdmin Registry.onlyBeforeVoting {
+    function storePublicKey(uint electionId, string calldata _publicKey)
+        external
+        Registry.onlyAdmin
+        Registry.onlyBeforeVoting(electionId)
+    {
+        publicKeys[electionId] = _publicKey;
+    }
+
+    // --- Proposal-Registrierung (Single)
+    function registerProposal(uint electionId, ProposalInput calldata p)
+        external
+        Registry.onlyAdmin
+        Registry.onlyBeforeVoting(electionId)
+    {
         currentProposalId++;
-        proposals.push(Proposal({
-            uid: currentProposalId,
-            name: _name,  
-            text: _text,
-            url: _url,
-            qtype: _qtype,
-            answer1: _answer1,
-            answer2: _answer2
-        }));
+        Proposal[] storage arr = _proposals[electionId];
+        arr.push();
+        Proposal storage slot = arr[arr.length - 1];
+        slot.uid      = currentProposalId;
+        slot.name     = p.name;
+        slot.text     = p.text;
+        slot.url      = p.url;
+        slot.qtype    = p.qtype;
+        slot.answer1  = p.answer1;
+        slot.answer2  = p.answer2;
+
+        emit ProposalCreated(electionId, currentProposalId, p.name);
     }
 
-    function getProposals() public view returns (Proposal[] memory) {
-        return proposals;
+    // --- Proposal-Registrierung (Batch) – stack-sicher via Struct-Array
+    function registerProposalsBatch(uint electionId, ProposalInput[] calldata items)
+        external
+        Registry.onlyAdmin
+        Registry.onlyBeforeVoting(electionId)
+    {
+        Proposal[] storage arr = _proposals[electionId];
+        uint len = items.length;
+        for (uint i = 0; i < len; i++) {
+            currentProposalId++;
+            arr.push();
+            Proposal storage slot = arr[arr.length - 1];
+            slot.uid      = currentProposalId;
+            slot.name     = items[i].name;
+            slot.text     = items[i].text;
+            slot.url      = items[i].url;
+            slot.qtype    = items[i].qtype;
+            slot.answer1  = items[i].answer1;
+            slot.answer2  = items[i].answer2;
+
+            emit ProposalCreated(electionId, currentProposalId, items[i].name);
+        }
     }
 
-    function castEncryptedVote(string memory _encryptedVote, string memory _token) public Registry.onlyDuringVoting {
-        require(Registry.isTokenValid(_token, 1), "Invalid or used token");
-        Registry.markTokenUsed(_token, 1);
-        voteCount++;
-
-        EncryptedVote memory encryptedVote;
-        encryptedVote.vote = _encryptedVote;
-        encryptedVotes.push(encryptedVote);
+    function getProposals(uint electionId) external view returns (Proposal[] memory) {
+        return _proposals[electionId];
     }
 
-    function getNumberOfVotes() public view Registry.onlyAfterVoting returns(uint256){
-        return voteCount;
-    }
-        
-    function getEncryptedVotes() public view Registry.onlyAfterVoting Registry.onlyAdmin returns (EncryptedVote[] memory) {
-        return encryptedVotes;
+    // --- Voting
+    function castEncryptedVote(uint electionId, string calldata _encryptedVote, string calldata _token, uint district)
+        external
+        Registry.onlyDuringVoting(electionId)
+    {
+        require(Registry.isTokenValid(electionId, _token, district), "Invalid or used token");
+        Registry.markTokenUsed(electionId, _token, district);
+        _voteCounts[electionId]++;
+
+        _encryptedVotes[electionId].push(EncryptedVote({ vote: _encryptedVote }));
     }
 
-    function storeVotingResult(string memory _tally, string memory _signature, uint _wahlbezirk) public Registry.onlyAfterVoting Registry.onlyAdmin {
-        VotingResult memory result;
-        result.tally = _tally;
-        result.signature = _signature;
-        result.timestamp = block.timestamp;
-        result.electionDistrict = _wahlbezirk;
-        votingResult = result;
+    function getNumberOfVotes(uint electionId)
+        external
+        view
+        Registry.onlyAfterVoting(electionId)
+        returns (uint256)
+    {
+        return _voteCounts[electionId];
     }
 
-    function getVotingResult() public view Registry.onlyAfterVoting returns (string memory tally, uint wahlbezirk, string memory signature, uint timestamp) {
-            VotingResult storage result = votingResult;
-            return (result.tally, result.electionDistrict, result.signature, result.timestamp);
-        
-    }    
+    function getEncryptedVotes(uint electionId)
+        external
+        view
+        Registry.onlyAfterVoting(electionId)
+        Registry.onlyAdmin
+        returns (EncryptedVote[] memory)
+    {
+        return _encryptedVotes[electionId];
+    }
+
+    // --- Ergebnisse
+    function storeVotingResult(uint electionId, string calldata _tally, string calldata _signature, uint _wahlbezirk)
+        external
+        Registry.onlyAfterVoting(electionId)
+        Registry.onlyAdmin
+    {
+        _votingResults[electionId][_wahlbezirk].push(
+            VotingResult({
+                tally: _tally,
+                signature: _signature,
+                timestamp: block.timestamp,
+                electionDistrict: _wahlbezirk
+            })
+        );
+        emit StoreVotingResult(msg.sender, electionId, _wahlbezirk, block.timestamp);
+    }
+
+    function getVotingResults(uint electionId, uint _wahlbezirk)
+        external
+        view
+        Registry.onlyAfterVoting(electionId)
+        returns (VotingResult[] memory)
+    {
+        return _votingResults[electionId][_wahlbezirk];
+    }
 }

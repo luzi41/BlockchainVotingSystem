@@ -8,6 +8,9 @@
 logo*
 bvs.png
 
+# Backups
+*bak
+
 # dependencies
 node_modules/
 */node_modules/*
@@ -63,6 +66,7 @@ election-system/api*.json
 # misc
 /cache
 election-system/api/deployment-address.txt
+election-system/api/*json
 election-system/frontend/package-lock.json
 election-system/frontend/.env
 election-system/frontend/.env.local
@@ -74,5 +78,4 @@ election-system/frontend/.env.test
 election-system/hardhat.config.js
 election-system/admin-ui/src/reportWebVitals.js
 election-system/frontend/src/artifacts/index.text
-
-
+/election-system/frontend/public/contracts/*.json
