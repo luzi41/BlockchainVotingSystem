@@ -52,10 +52,10 @@ function VoteForm() {
   {
     ed = 1;
   }
-
+  const [electionId, setElectionId] = useState(1);
   const [contractAddress, setContractAddress] = useState(""); // mit .env vorbelegen?
   const [contract, setContract] = useState(null);
-  const [modus, setModus] = useState(0);
+  const [modus, setModus] = useState(1);
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
   const [privateKey, setPrivateKey] = useState("");
@@ -163,17 +163,17 @@ function VoteForm() {
         const provider = new JsonRpcProvider(rpcURL);
         const ctr = new Contract(contractAddress, abiJson.abi, provider);
         setContract(ctr);
-        
+        /*
         const m = await ctr.getModus();
         setModus(Number(m));
-
-        if (Number(m) === 1) {
-          const cand = await ctr.getCandidates(electionDistrictNo);
+        */
+        if (Number(modus) === 1) {
+          const cand = await ctr.getCandidates(electionId, electionDistrictNo);
           setCandidates(cand);
-          const part = await ctr.getParties();
+          const part = await ctr.getParties(electionId);
           setParties(part);
-        } else if (Number(m) === 2) {
-          const prop = await ctr.getProposals();
+        } else if (Number(modus) === 2) {
+          const prop = await ctr.getProposals(electionId);
           setProposals(prop);
         }
 
@@ -218,16 +218,16 @@ function VoteForm() {
       const ctr = new Contract(contractAddress, abiJson.abi, signer);
 
       if (modus === 1) {
-        const ed = await ctr.getElectionDistrictByNumber(electionDistrictNo);
-        const encrypted1 = await encryptVote(selectedCandidate, ed.publicKey);
-        const encrypted2 = await encryptVote(selectedParty, ed.publicKey);
-        const tx = await ctr.castEncryptedVote(encrypted1, encrypted2, tokenInput, electionDistrictNo);
+        const _electionDistrict = await ctr.getElectionDistrictByNumber(electionId, electionDistrictNo);
+        const encrypted1 = await encryptVote(selectedCandidate, _electionDistrict.publicKey);
+        const encrypted2 = await encryptVote(selectedParty, _electionDistrict.publicKey);
+        const tx = await ctr.castEncryptedVote(electionId, encrypted1, encrypted2, tokenInput, electionDistrictNo);
         await tx.wait();
         setError("✅ Erfolgreich! Transaction: " + tx.hash);
       } else if (modus === 2) {
         const publicKey = await ctr.getPublicKey();
         const encrypted = await encryptVote(selectedAnswer, publicKey);
-        const tx = await ctr.castEncryptedVote(encrypted, tokenInput);
+        const tx = await ctr.castEncryptedVote(electionId, encrypted, tokenInput);
         await tx.wait();
         setError("✅ Erfolgreich! Transaction: " + tx.hash);
       }

@@ -16,10 +16,12 @@ function App() {
   const [status, setStatus] = useState("");
   const [title, setTitle] = useState("Blockchain Voting System");
   const [rpcError, setRpcError] = useState(false);
+  const [electionId, setElectionId] = useState(1);
 
   useEffect(() => {
     async function fetchStatus() {
       try {
+        let _electionId = process.env.REACT_APP_ELECTION_ID;
         let _rpcURL = process.env.REACT_APP_RPC_URL;
         if (isElectron) {
           const ipc = window.electronAPI;
@@ -29,15 +31,16 @@ function App() {
           }
         }
 
+        setElectionId(_electionId);
+
         const provider = new JsonRpcProvider(_rpcURL);
         const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-
         const contract = new Contract(contractAddress, Election.abi, provider);
 
-        const electionTitle = await contract.getElectionTitle();
+        const electionTitle = await contract.getElectionTitle(electionId);
         if (electionTitle) setTitle(electionTitle);
 
-        const electionStatus = await contract.getElectionStatus();
+        const electionStatus = await contract.getElectionStatus(electionId);
         setStatus(`${contractAddress}: ${electionStatus}`);
         setRpcError(false); // Falls Fehler vorher auftrat
       } catch (error) {
@@ -60,7 +63,7 @@ function App() {
           <li><Link to="/extras">Extras</Link></li>
           <li className="title">
             <Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">
-              Blockchain Voting System 0.24
+              Blockchain Voting System 0.25
             </Link>
           </li>
         </ul>

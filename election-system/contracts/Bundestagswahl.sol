@@ -55,6 +55,12 @@ contract Bundestagswahl is Registry {
 
     uint256 public currentPartyId;
     uint256 public currentCandidateId;
+    uint public modus = 1; // 1 Standard (Bundestagswahl); 2 Proposal Y/N etc: new SmartContracts 
+     
+
+    function getModus() public view returns (uint) {
+        return modus;
+    }    
 
     // --- ElectionDistricts ---
     function registerElectionDistrict(
@@ -105,6 +111,14 @@ contract Bundestagswahl is Registry {
     {
         return electionDistricts[electionId];
     }
+
+    function getElectionDistrictByNumber(uint electionId, uint _number) public view returns (ElectionDistrict memory){
+        ElectionDistrict[] storage districts = electionDistricts[electionId];
+        for (uint i = 0; i < districts.length; i++) {
+            if (districts[i].nummer == _number) return districts[i];
+        }
+        revert("No election district with the given number found");
+    }    
 
     // --- Parties ---
     function registerParty(uint electionId, string memory _name, string memory _shortname, string memory _color, string memory _bgcolor, string memory _url) 

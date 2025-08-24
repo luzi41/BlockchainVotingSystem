@@ -21,6 +21,9 @@ contract Registry {
 
     // electionId => Election
     mapping(uint => Election) public elections;
+    
+    // Contract → electionId
+    mapping(address => uint) public contractToElectionId;        
 
     // electionId => Token[]
     mapping(uint => Token[]) private electionTokens;
@@ -159,5 +162,10 @@ contract Registry {
 
     function getElectionTitle(uint electionId) public view returns (string memory title) {
         return elections[electionId].title;
+    }
+
+    // Neue Getter-Funktion: electionId anhand der Contract-Adresse zurückgeben
+    function getElectionIdByContract(address contractAddress) public view returns (uint) {
+        return contractToElectionId[contractAddress];
     }
 }

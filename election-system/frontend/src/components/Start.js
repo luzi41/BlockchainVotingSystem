@@ -15,13 +15,14 @@ const ABI_REGISTRY = {
 };
 
 function Start() {
+  const [electionId, setElectionId] = useState(1);
 	const [texts, setTexts] = useState(null);
 	const [contract, setContract] = useState(null);
 	const [error, setError] = useState("");
 	const [candidates, setCandidates] = useState([]);
 	const [parties, setParties] = useState([]);
 	const [proposals, setProposals] = useState([]);
-	const [modus, setModus] = useState(0);
+	const [modus, setModus] = useState(1);
 	const { ed } = useParams();
   
 	const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
@@ -56,6 +57,8 @@ function Start() {
     async function fetchData() {
       try {
         setError("");
+        let _electionId = process.env.REACT_APP_ELECTION_ID;
+        setElectionId(_electionId);
 
         // Aktuellen Wahlkreis laden
         if (window.electronAPI?.invoke) {
@@ -114,16 +117,20 @@ function Start() {
         const address = process.env.REACT_APP_CONTRACT_ADDRESS;
         const ctr = new Contract(address, abiJson.abi, provider);
         setContract(ctr);
-        const m = await ctr.getModus();
-        setModus(Number(m));
+        /* const m = await ctr.getModus();
+        if (m) {
+          setModus(Number(m));
+        }
+        */
+        
 
-        if (Number(m) === 1) {
-          const candidatesList = await ctr.getCandidates(electionDistrictNo);
-          const partiesList = await ctr.getParties();
+        if (Number(modus) === 1) {
+          const candidatesList = await ctr.getCandidates(electionId, electionDistrictNo);
+          const partiesList = await ctr.getParties(electionId);
           setCandidates(candidatesList);
           setParties(partiesList);
-        } else if (Number(m) === 2) {
-          const proposalList = await ctr.getProposals();
+        } else if (Number(modus) === 2) {
+          const proposalList = await ctr.getProposals(electionId);
           setProposals(proposalList);
         }
       } catch (err) {
