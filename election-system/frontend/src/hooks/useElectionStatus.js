@@ -13,15 +13,15 @@ export function useElectionStatus() {
 
   useEffect(() => {
     async function loadStatus() {
-      setLoading(true);
-      const result = await fetchStatus();
-      setTitle(result.title);
-      setStatus(result.status);
-      setError(result.error);
-      setLoading(false);
-      setProvider(result.provider);
-      setAddress(result.contractAddress);
-      setElectionId(result.electionId);
+        setLoading(true);
+        const result = await fetchStatus();
+        setTitle(result.title);
+        setStatus(result.status);
+        setError(result.error);
+        setLoading(false);
+        setProvider(result.provider || null);
+        setAddress(result.contractAddress || null);
+        setElectionId(result.electionId || null);
     }
     loadStatus();
   }, []);

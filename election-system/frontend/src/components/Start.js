@@ -1,8 +1,7 @@
-// V 0.26.4
+// V 0.26.7
 import React, { useEffect, useState } from "react";
-import { Contract, JsonRpcProvider } from "ethers";
+import { Contract} from "ethers";
 import { useParams } from 'react-router-dom';
-//import { fetchStatus } from "../utils/fetchStatus";  // 👈 Import überflüssig!
 import { useElectionStatus } from "../hooks/useElectionStatus"; 
 
 // ✅ Web: statisch importierte ABIs (Registry)

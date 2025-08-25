@@ -43,6 +43,9 @@ export async function fetchStatus() {
       title: "Blockchain Voting System",
       status: "⚠️ Verbindung zum RPC-Server fehlgeschlagen!",
       error: error,
+      provider: null,          // 👈 wichtig!
+      contractAddress: null,   // 👈 wichtig!
+      electionId: null,        // 👈 wichtig!      
     };
   }
 }
