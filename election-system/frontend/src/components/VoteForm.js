@@ -1,4 +1,4 @@
-// V0.25.8
+// V0.26.4
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -121,7 +121,6 @@ function VoteForm() {
         setPrivateKey(_privateKey);
         setRpcURL(_rpcURL);
         setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
-        //setElectionDistrictNo(Number(_electionDistrict));
 
       } catch (err) {
         console.error("Fehler beim Laden des Vertrags und der Einstellungen:", err);
@@ -166,16 +165,24 @@ function VoteForm() {
         const ctr = new Contract(contractAddress, abiJson.abi, provider);
         setContract(ctr);
         
+        // ElectionId aus contract
+        const _electionId = await ctr.getElectionIdByContract(contractAddress);
+        if (!_electionId) {
+          throw new Error("41 No electionId!");
+        } else {
+          setElectionId(_electionId);
+        }          
+        
         const m = await ctr.getModus();
         setModus(Number(m));
         
         if (Number(modus) === 1) {
-          const cand = await ctr.getCandidates(electionId, electionDistrictNo);
+          const cand = await ctr.getCandidates(_electionId, electionDistrictNo);
           setCandidates(cand);
-          const part = await ctr.getParties(electionId);
+          const part = await ctr.getParties(_electionId);
           setParties(part);
         } else if (Number(modus) === 2) {
-          const prop = await ctr.getProposals(electionId);
+          const prop = await ctr.getProposals(_electionId);
           setProposals(prop);
         }
 
