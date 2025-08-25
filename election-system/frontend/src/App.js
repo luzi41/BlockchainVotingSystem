@@ -1,4 +1,4 @@
-// v0.24.4
+// v0.26.2
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { JsonRpcProvider, Contract } from "ethers";
@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     async function fetchStatus() {
       try {
-        let _electionId = process.env.REACT_APP_ELECTION_ID;
+        //let _electionId = process.env.REACT_APP_ELECTION_ID;
         let _rpcURL = process.env.REACT_APP_RPC_URL;
         if (isElectron) {
           const ipc = window.electronAPI;
@@ -31,16 +31,21 @@ function App() {
           }
         }
 
-        setElectionId(_electionId);
-
         const provider = new JsonRpcProvider(_rpcURL);
         const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
         const contract = new Contract(contractAddress, Election.abi, provider);
 
-        const electionTitle = await contract.getElectionTitle(electionId);
+        // ElectionId aus contract
+        const _electionId = await contract.getElectionIdByContract(contractAddress);
+        if (!_electionId) {
+          throw new Error("41 No electionId!");
+        } 
+        setElectionId(_electionId);
+
+        const electionTitle = await contract.getElectionTitle(_electionId);
         if (electionTitle) setTitle(electionTitle);
 
-        const electionStatus = await contract.getElectionStatus(electionId);
+        const electionStatus = await contract.getElectionStatus(_electionId);
         setStatus(`${contractAddress}: ${electionStatus}`);
         setRpcError(false); // Falls Fehler vorher auftrat
       } catch (error) {

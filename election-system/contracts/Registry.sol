@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.25.3 Multi-Election Registry
+// V 0.26.2 Multi-Election Registry
 
 contract Registry {
 
@@ -62,6 +62,9 @@ contract Registry {
             votingOpen: false,
             electionBegin: false
         });
+
+        // Mapping setzen: diese Contract-Adresse → electionId
+        contractToElectionId[address(this)] = currentElectionId;        
     }
 
     // Token-Registrierung
