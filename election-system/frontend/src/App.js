@@ -1,4 +1,4 @@
-// v0.26.2
+// v0.26.3
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { JsonRpcProvider, Contract } from "ethers";
@@ -16,7 +16,6 @@ function App() {
   const [status, setStatus] = useState("");
   const [title, setTitle] = useState("Blockchain Voting System");
   const [rpcError, setRpcError] = useState(false);
-  const [electionId, setElectionId] = useState(1);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -39,8 +38,7 @@ function App() {
         const _electionId = await contract.getElectionIdByContract(contractAddress);
         if (!_electionId) {
           throw new Error("41 No electionId!");
-        } 
-        setElectionId(_electionId);
+        }
 
         const electionTitle = await contract.getElectionTitle(_electionId);
         if (electionTitle) setTitle(electionTitle);

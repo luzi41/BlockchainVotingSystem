@@ -1,4 +1,4 @@
-// Results.tsx V 0.25.9
+// Results.tsx V 0.26.3
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
@@ -261,129 +261,143 @@ function Results() {
         const address = process.env.REACT_APP_CONTRACT_ADDRESS;
         if (!address) throw new Error("Contract address not defined.");
         const contract = new Contract(address, abiJson.abi, provider);
-        
-        const m = await contract.getModus();
-        setModus(Number(m));
-        
-        if (Number(modus) === 1) {
-          const _districts = await contract.getElectionDistricts(electionId);
-          const _parties = await contract.getParties(electionId);
-          setParties(_parties);
-
-          const results1: any[] = [];
-          const results2: any[] = [];
-
-          for (let i = 0; i < _districts.length; i++) {
-            const raw1 = await contract.getElectionResultsDistrict1(electionId, i + 1);
-            const raw2 = await contract.getElectionResultsDistrict2(electionId, i + 1);
-
-            const obj1 = safeParseTally(raw1);
-            const obj2 = safeParseTally(raw2);
-
-            results1[i] = obj1;
-            results2[i] = obj2;
-          }
-          const aggregated = aggregateObjects(results2);
-          // Wenn leer → Hinweis
-          const hasAny =
-            results1.some(r => Object.keys(r).length) ||
-            results2.some(r => Object.keys(r).length);
-          if (!hasAny) {
-            setStatus("Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!");
-          }
-
-          Results.cache.resultsParties = aggregateObjects(results2);
-          Results.cache.parties = _parties;
-
-          setHtml(
-            <div>
-              <h1>{loadedTexts.headline}</h1>
-              <p>
-                <select
-                  name="display"
-                  onChange={e => {
-                    if (e.target.value === "1") {
-                      setDisplay1("block");
-                      setDisplay2("none");
-                    } else {
-                      setDisplay2("block");
-                      setDisplay1("none");
-                    }
-                  }}
-                >
-                  <option value="0">{loadedTexts.selectView}</option>
-                  <option value="1">{loadedTexts.viewDistricts}</option>
-                  <option value="2">{loadedTexts.viewTotal}</option>
-                </select>
-              </p>
-              <DistrictResults
-                texts={loadedTexts}
-                districts={_districts}
-                results1={results1}
-                results2={results2}
-                display1={display1}
-                display2={display2}
-              />
-            </div>
-          );
-        } else if (Number(modus) === 2) {
-          // Proposal-Modus unverändert
-          const proposalList = await contract.getProposals(electionId);
-          if (!proposalList || proposalList.length === 0) throw new Error(loadedTexts.errorProposals);
-
-          const rawResult = await contract.getVotingResult(electionId);
-          const result = JSON.parse(rawResult.tally);
-          const voteNumber = await contract.getNumberOfVotes(electionId);
-
-          setHtml(
-            <div>
-              <h1>{loadedTexts.headline}</h1>
-              {proposalList.map((item: any, idx: number) => (
-                <div className="row" key={idx}>
-                  <div>
-                    {item.text} {item.answer1}/{item.answer2}
-                  </div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th style={{ width: "60%" }}>{loadedTexts.answer}</th>
-                        <th style={{ width: "40%" }}>{loadedTexts.votes}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(result).map(([name, value]) => (
-                        <tr key={name}>
-                          <td>{name}</td>
-                          <td>
-                            <div
-                              style={{
-                                color: "#000",
-                                backgroundColor: "#ccc",
-                                width: (100 * Number(value) / Number(voteNumber)).toString() + "%",
-                              }}
-                            >
-                              {fmt3.format((100 * Number(value)) / Number(voteNumber))} %
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ))}
-            </div>
-          );
-        }
-        setStatus("");
-      } catch (err: any) {
-        setStatus(err.message);
-        console.error("❌ Fehler beim Laden der Ergebnisse:", err.message);
+        // ElectionId aus contract
+        const _electionId = await contract.getElectionIdByContract(address);
+        if (!_electionId) {
+          throw new Error("267 No electionId!");
+        }        
+        const electionStatus = await contract.getElectionStatus(_electionId);
+        setStatus(electionStatus);
         setHtml(
           <div className="border">
             <h2>{texts.headline || "Wahlergebnisse"}</h2>
             <p>{status}</p>
           </div>
-        );
+        );            
+
+        if (status === "Die Wahl ist geschlossen.")
+        {
+          const m = await contract.getModus();
+          setModus(Number(m));
+          
+          if (Number(modus) === 1) {
+            const _districts = await contract.getElectionDistricts(_electionId);
+            const _parties = await contract.getParties(_electionId);
+            setParties(_parties);
+
+            const results1: any[] = [];
+            const results2: any[] = [];
+
+            for (let i = 0; i < _districts.length; i++) {
+              const raw1 = await contract.getElectionResultsDistrict1(_electionId, i + 1);
+              const raw2 = await contract.getElectionResultsDistrict2(_electionId, i + 1);
+
+              const obj1 = safeParseTally(raw1);
+              const obj2 = safeParseTally(raw2);
+
+              results1[i] = obj1;
+              results2[i] = obj2;
+            }
+            // const aggregated = aggregateObjects(results2);
+            // Wenn leer → Hinweis
+            const hasAny =
+              results1.some(r => Object.keys(r).length) ||
+              results2.some(r => Object.keys(r).length);
+            if (!hasAny) {
+              setStatus("292 Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!");
+              throw new Error(status);
+              //return;
+            }
+
+            Results.cache.resultsParties = aggregateObjects(results2);
+            Results.cache.parties = _parties;
+
+            setHtml(
+              <div>
+                <h1>{loadedTexts.headline}</h1>
+                <p>
+                  <select
+                    name="display"
+                    onChange={e => {
+                      if (e.target.value === "1") {
+                        setDisplay1("block");
+                        setDisplay2("none");
+                      } else {
+                        setDisplay2("block");
+                        setDisplay1("none");
+                      }
+                    }}
+                  >
+                    <option value="0">{loadedTexts.selectView}</option>
+                    <option value="1">{loadedTexts.viewDistricts}</option>
+                    <option value="2">{loadedTexts.viewTotal}</option>
+                  </select>
+                </p>
+                <DistrictResults
+                  texts={loadedTexts}
+                  districts={_districts}
+                  results1={results1}
+                  results2={results2}
+                  display1={display1}
+                  display2={display2}
+                />
+              </div>
+            );
+          } else if (Number(modus) === 2) {
+            // Proposal-Modus unverändert
+            const proposalList = await contract.getProposals(_electionId);
+            if (!proposalList || proposalList.length === 0) throw new Error(loadedTexts.errorProposals);
+
+            const rawResult = await contract.getVotingResult(_electionId);
+            const result = JSON.parse(rawResult.tally);
+            const voteNumber = await contract.getNumberOfVotes(_electionId);
+
+            setHtml(
+              <div>
+                <h1>{loadedTexts.headline}</h1>
+                {proposalList.map((item: any, idx: number) => (
+                  <div className="row" key={idx}>
+                    <div>
+                      {item.text} {item.answer1}/{item.answer2}
+                    </div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "60%" }}>{loadedTexts.answer}</th>
+                          <th style={{ width: "40%" }}>{loadedTexts.votes}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(result).map(([name, value]) => (
+                          <tr key={name}>
+                            <td>{name}</td>
+                            <td>
+                              <div
+                                style={{
+                                  color: "#000",
+                                  backgroundColor: "#ccc",
+                                  width: (100 * Number(value) / Number(voteNumber)).toString() + "%",
+                                }}
+                              >
+                                {fmt3.format((100 * Number(value)) / Number(voteNumber))} %
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            );
+          }
+          setStatus("Die Wahl ist geschlossen.");
+        } else {
+      
+        }
+      } catch (err: any) {
+        setStatus(err.message);
+        console.error("❌ Fehler beim Laden der Ergebnisse:", err.message);
       }
     }
     fetchResults();
