@@ -1,4 +1,4 @@
-// V0.26.7
+// V0.26.8
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -156,14 +156,8 @@ function VoteForm() {
     async function fetchData() {
       try {
         if (!address) return;
-
-        // 🧠 ABI laden
-        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-        let abiJson = await loadAbi();
-
-        const ctr = new Contract(address, abiJson.abi, provider);
-        //setContract(ctr);
-        
+        const abiJson = await loadAbi();
+        const ctr = new Contract(address, abiJson.abi, provider);        
         const m = await ctr.getModus();
         setModus(Number(m));
         
@@ -188,7 +182,7 @@ function VoteForm() {
 
   const vote = async () => {
     try {
-      let abiJson = await loadAbi();
+      const abiJson = await loadAbi();
       const signer = new Wallet(privateKey, provider);
       const ctr = new Contract(address, abiJson.abi, signer);
 
@@ -211,7 +205,6 @@ function VoteForm() {
     }
   };
 
-  //if (!contract || !texts) return <p>Load data ...</p>;
   if (!texts) return <p>Load texts ...</p>;
 
   // Bundestagswahl-Formular
