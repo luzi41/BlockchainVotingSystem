@@ -1,16 +1,10 @@
-// Results.tsx V 0.26.3
+// Results.tsx V 0.26.11
 import { useState, useEffect } from "react";
 import { JsonRpcProvider, Contract } from "ethers";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import "./Results.css";
-import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
-import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-
-const ABI_REGISTRY: Record<string, any> = {
-  Proposals: ProposalsABI,
-  Bundestagswahl: BundestagswahlABI,
-};
+import { useElectionStatus } from "../hooks/useElectionStatus"; 
+import { loadAbi } from "../utils/loadAbi";
 
 declare global {
   interface Window {
@@ -202,17 +196,17 @@ TotalResults.displayName = "TotalResults";
 
 /** Hauptkomponente */
 function Results() {
-  const [electionId, setElectionId] = useState(1);
+  const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen  
   const [modus, setModus] = useState<number>(1);
   const [status, setStatus] = useState("");
   const [texts, setTexts] = useState<Record<string, string>>({});
   const [html, setHtml] = useState<React.ReactNode>("");
-
   const [parties, setParties] = useState<any[]>([]);
   const [display1, setDisplay1] = useState("none");
   const [display2, setDisplay2] = useState("block");
 
   useEffect(() => {
+    if (!provider || !address || !electionId) return;    
     async function fetchResults() {
       try {
         // 🗣 Texte laden
@@ -233,40 +227,11 @@ function Results() {
           const fromStore = await window.electronAPI.settings.get("rpcURL");
           if (fromStore) rpcUrl = fromStore;
         }
-        const provider = new JsonRpcProvider(rpcUrl);
-
-        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Bundestagswahl";
-        let abiJson;
-
-        if (window.electronAPI?.invoke) {
-          // Electron: aus build/resources laden (IPC)
-          try {
-            abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
-          } catch {
-            abiJson = await window.electronAPI.invoke(
-              `load-json`,
-              `contracts/${name}.sol/${name}.json`
-            );
-          }
-        } else {
-          // Web: direkt aus Import (kein fetch → keine HTML-404s)
-          abiJson = ABI_REGISTRY[name];
-          if (!abiJson) {
-            throw new Error(
-              `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
-            );
-          }
-        }
-        //console.log("ABI", abiJson);
-        const address = process.env.REACT_APP_CONTRACT_ADDRESS;
-        if (!address) throw new Error("Contract address not defined.");
+        const abiJson = await loadAbi();
+        if (!address) throw new Error("Contract address is null or undefined.");
         const contract = new Contract(address, abiJson.abi, provider);
-        // ElectionId aus contract
-        const _electionId = await contract.getElectionIdByContract(address);
-        if (!_electionId) {
-          throw new Error("267 No electionId!");
-        }        
-        const electionStatus = await contract.getElectionStatus(_electionId);
+
+        const electionStatus = await contract.getElectionStatus(electionId);
         setStatus(electionStatus);
         setHtml(
           <div className="border">
@@ -281,16 +246,16 @@ function Results() {
           setModus(Number(m));
           
           if (Number(modus) === 1) {
-            const _districts = await contract.getElectionDistricts(_electionId);
-            const _parties = await contract.getParties(_electionId);
+            const _districts = await contract.getElectionDistricts(electionId);
+            const _parties = await contract.getParties(electionId);
             setParties(_parties);
 
             const results1: any[] = [];
             const results2: any[] = [];
 
             for (let i = 0; i < _districts.length; i++) {
-              const raw1 = await contract.getElectionResultsDistrict1(_electionId, i + 1);
-              const raw2 = await contract.getElectionResultsDistrict2(_electionId, i + 1);
+              const raw1 = await contract.getElectionResultsDistrict1(electionId, i + 1);
+              const raw2 = await contract.getElectionResultsDistrict2(electionId, i + 1);
 
               const obj1 = safeParseTally(raw1);
               const obj2 = safeParseTally(raw2);
@@ -298,15 +263,13 @@ function Results() {
               results1[i] = obj1;
               results2[i] = obj2;
             }
-            // const aggregated = aggregateObjects(results2);
             // Wenn leer → Hinweis
             const hasAny =
               results1.some(r => Object.keys(r).length) ||
               results2.some(r => Object.keys(r).length);
             if (!hasAny) {
-              setStatus("292 Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!");
+              setStatus("278 Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!");
               throw new Error(status);
-              //return;
             }
 
             Results.cache.resultsParties = aggregateObjects(results2);
@@ -345,12 +308,12 @@ function Results() {
             );
           } else if (Number(modus) === 2) {
             // Proposal-Modus unverändert
-            const proposalList = await contract.getProposals(_electionId);
+            const proposalList = await contract.getProposals(electionId);
             if (!proposalList || proposalList.length === 0) throw new Error(loadedTexts.errorProposals);
 
-            const rawResult = await contract.getVotingResult(_electionId);
+            const rawResult = await contract.getVotingResult(electionId);
             const result = JSON.parse(rawResult.tally);
-            const voteNumber = await contract.getNumberOfVotes(_electionId);
+            const voteNumber = await contract.getNumberOfVotes(electionId);
 
             setHtml(
               <div>
@@ -401,7 +364,7 @@ function Results() {
       }
     }
     fetchResults();
-  }, [display1, display2, modus, status, texts.headline]);
+  }, [display1, display2, modus, status, texts.headline, provider, address, electionId]);
 
   return <div>{html}</div>;
 }
