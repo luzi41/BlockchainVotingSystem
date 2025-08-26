@@ -1,4 +1,4 @@
-// V 0.26.7
+// V 0.26.9
 import React, { useEffect, useState } from "react";
 import { Contract} from "ethers";
 import { useParams } from 'react-router-dom';
@@ -53,12 +53,39 @@ function Start() {
     }
   }
 
+  async function loadAbi() { // function sollte auch ausgelagert werden!!!
+    // 🧠 ABI laden
+    const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
+    let abiJson;
+    if (window.electronAPI?.invoke) {
+      // Electron: aus build/resources laden (IPC)
+      try {
+        abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
+      } catch {
+        abiJson = await window.electronAPI.invoke(
+          `load-json`,
+          `contracts/${name}.sol/${name}.json`
+        );
+      }
+    } else {
+      // Web: direkt aus Import (kein fetch → keine HTML-404s)
+      abiJson = ABI_REGISTRY[name];
+      if (!abiJson) {
+        throw new Error(
+          `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
+        );
+      }
+    }
+    return abiJson;
+  }
+
   useEffect(() => {
+    if (!provider || !address || !electionId) return;
     async function fetchData() {
       try {
         setError("");
 
-        // Aktuellen Wahlkreis laden
+        // Aktuellen Wahlkreis laden (nur für Electron, sonst gesetzt)
         if (window.electronAPI?.invoke) {
           window.electronAPI.settings.get('electionDistrict').then((val) => {
             if (val !== undefined && val !== null) setElectionDistrictNo(val);
@@ -79,29 +106,7 @@ function Start() {
         setTexts(loadedTexts);
 
         // 🧠 ABI laden
-        //const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Bundestagswahl";
-        let abiJson;
-
-        if (window.electronAPI?.invoke) {
-          // Electron: aus build/resources laden (IPC)
-          try {
-            abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
-          } catch {
-            abiJson = await window.electronAPI.invoke(
-              `load-json`,
-              `contracts/${name}.sol/${name}.json`
-            );
-          }
-        } else {
-          // Web: direkt aus Import (kein fetch → keine HTML-404s)
-          abiJson = ABI_REGISTRY[name];
-          if (!abiJson) {
-            throw new Error(
-              `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
-            );
-          }
-        }
+        const abiJson = await loadAbi();
 
         // 📜 Contract
         const ctr = new Contract(address, abiJson.abi, provider);
@@ -130,7 +135,7 @@ function Start() {
       }
     }
     fetchData();
-  }, [electionDistrictNo, error]);
+  }, [electionDistrictNo, error, provider, address, electionId]);
 
 	//if (loading) return <p>⏳ Lade Status…</p>;
   if (!texts) return <p>Load data ...</p>;
