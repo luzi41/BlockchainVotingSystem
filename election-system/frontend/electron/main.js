@@ -55,6 +55,12 @@ ipcMain.handle('settings:get', (event, key) => store.get(key));
 ipcMain.handle('settings:set', (event, key, value) => {
     if (value === undefined || value === null) store.delete(key);
     else store.set(key, value);
+    // Sende Event an alle Fenster nach Änderung
+    BrowserWindow.getAllWindows().forEach(win => {
+        win.webContents.send('settings-changed', {
+            [key]: value
+        });
+    });    
     return true;
 });
 

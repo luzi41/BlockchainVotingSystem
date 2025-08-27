@@ -1,45 +1,49 @@
-// V 0.21.3
+// V 0.26.14
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
-import Election from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-//import { CONTRACT_ADDRESSES } from "../config";
-import { JsonRpcProvider, Contract} from "ethers";
+import { loadAbi } from "../utils/loadAbi";
+import { useElectionStatus } from "../hooks/useElectionStatus"; 
+import { Contract} from "ethers";
 
 function Signature() {
+    const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
     const [html, setHtml] = useState("");
-
 
     let { ed } = useParams();
     if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
-        {
-        ed = 1;
-        }
+    {
+    ed = 1;
+    }
+
     let { id } = useParams();
     if (isNaN(id)) // muss sein: "nicht in Stimmen vorhanden"
-        {
-        id = 1;
-        }
-
-    const provider = new JsonRpcProvider(process.env.REACT_APP_RPC_URL);
-    const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS; 
-    const contract = new Contract(contractAddress, Election.abi, provider);
+    {
+    id = 1;
+    }
 
     useEffect(() => {
+        if (!provider || !address || !electionId) return;        
         async function fetchResults() {
             try {
-                
+                // 🧠 ABI laden
+                const abiJson = await loadAbi();                
+ 
+                const contract = new Contract(address, abiJson.abi, provider);
+
                 let newResult = {};
                 
                 if (id === "1") {
-                    newResult = await contract.getElectionResultsDistrict1(ed);
+                    newResult = await contract.getElectionResultsDistrict1(electionId, ed);
                 }
                 else if (id === "2"){
-                    newResult = await contract.getElectionResultsDistrict2(ed);
+                    newResult = await contract.getElectionResultsDistrict2(electionId, ed);
                 }
                 else {
-                    throw "Ungültige Anfrage!";
+                    throw new Error("Ungültige Anfrage!");
                 }
-                
+            
+                if (!newResult[0] === "") return ("Load data...");
+
                 const htmlEl = (
                     <div>
                         <h2>Signature</h2>
@@ -49,21 +53,21 @@ function Signature() {
                                     readOnly="1"
                                     rows={4}
                                     cols={60}
-                                    value={newResult.tally}
+                                    value={newResult[0]}
                                 />
                             </div>                       
                             <div>
-                                <label for="Signature">Signature</label><br />
+                                <label htmlFor="Signature">Signature</label><br />
                                 <textarea
                                     id="Signature"
                                     readOnly="1"
                                     rows={10}
                                     cols={60}
-                                    value={newResult.signature} 
+                                    value={newResult[2]} 
                                 />
                             </div>
                             <div>
-                                <label for="PublicKey">Public Key</label><br />
+                                <label htmlFor="PublicKey">Public Key</label><br />
                                 <textarea
                                     id="PublicKey"
                                     readOnly="1"
@@ -87,12 +91,13 @@ iQIDAQAB
                 );
                 setHtml(htmlEl);
             } catch (error) {
+                console.error(error);
                 setHtml(error);
             }
 
         }
         fetchResults();
-    },[ed, id]);
+    },[provider, address, electionId]);
 
     return (<div>{html}</div>);
 }

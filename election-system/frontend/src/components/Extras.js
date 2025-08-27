@@ -1,8 +1,6 @@
-// Extras.js V 0.24.3
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+// Extras.js V 0.26.14
+import { Link } from "react-router-dom";
 
-const settings = isElectron ? (<li><Link to="/extras/settings">Einstellungen</Link></li>) : null;
 function Extras() {
   return (
     <div>
@@ -10,7 +8,7 @@ function Extras() {
       <nav className="menu">
         <ul>
           <li><Link to="http://localhost:25000" target="_blank">Explorer</Link></li>
-          {settings}
+          <li><Link to="/extras/settings">Einstellungen</Link></li>
         </ul>
       </nav>
     </div>

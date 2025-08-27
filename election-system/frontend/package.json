@@ -1,6 +1,6 @@
 {
   "name": "bvs",
-  "version": "0.25.11",
+  "version": "0.27.1",
   "description": "Blockchain Voting System",
   "author": "Louis Göttertz <louis.goettertz@gmail.com>",
   "main": "electron/main.js",
@@ -80,7 +80,7 @@
 	]
   },
   "devDependencies": {
-	"electron": "^37.2.0",
+	"electron": "^37.3.0",
 	"electron-builder": "^26.0.12"
   }
 }

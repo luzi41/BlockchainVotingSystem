@@ -1,20 +1,12 @@
-// V0.25.8
+// V0.27.1
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
-import { JsonRpcProvider, Wallet, Contract } from "ethers";
+import { Wallet, Contract } from "ethers";
+import { useElectionStatus } from "../hooks/useElectionStatus"; 
+import { loadAbi } from "../utils/loadAbi";
+import { loadTexts } from "../utils/loadTexts";
 import scanner from "../assets/scan-59.png";
-
-// ✅ Web: statisch importierte ABIs (Registry)
-import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
-import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-
-// Wenn du weitere Modi hast, hier ergänzen:
-// import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
-const ABI_REGISTRY = {
-	Proposals: ProposalsABI,
-	Bundestagswahl: BundestagswahlABI,
-};
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
 
@@ -24,45 +16,12 @@ async function encryptVote(_toVoted, _publicKey) {
   return forge.util.encode64(encrypted);
 }
 
-function VoteForm() {
-  // JSON-Lader: Electron via IPC, Web via fetch
-  async function loadJson(relativePath) {
-    // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
-    if (window.electronAPI?.invoke) {
-      return await window.electronAPI.invoke("load-json", relativePath);
-    } else {
-      const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
-      const url = `${base}/${relativePath.replace(/^\//, "")}`;
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) {
-        const body = await res.text().catch(() => "");
-        throw new Error(
-          `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
-        );
-      }
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
-      }
-    }
-  }
-
-  let { ed } = useParams();
-  if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
-  {
-    ed = 1;
-  }
-  const [electionId, setElectionId] = useState(1);
-  const [contractAddress, setContractAddress] = useState(""); // mit .env vorbelegen?
-  const [contract, setContract] = useState(null);
+function VoteForm({ ed }) {
+  const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
   const [modus, setModus] = useState(1);
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
   const [privateKey, setPrivateKey] = useState("");
-  const [electionDistrictNo, setElectionDistrictNo] = useState(ed);
-  const [rpcURL, setRpcURL] = useState("");
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
@@ -70,105 +29,98 @@ function VoteForm() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [proposals, setProposals] = useState([]);
   const [texts, setTexts] = useState(null);
+  const params = useParams();
+  const edNo = params.ed || ed || '';
+  
+  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
+      return isNaN(edNo) ? process.env.REACT_APP_ELECTION_DISTRICT : edNo;
+  });
+
+  useEffect(() => {
+    if (!isElectron) return;
+
+    const ipc = window.electronAPI;
+    // Handler-Funktion für Settings-Änderungen
+    const handleSettingsChange = async (event, newSettings) => {
+      if (newSettings.electionDistrict) {
+        setElectionDistrictNo(newSettings.electionDistrict);
+      }
+      if (newSettings.privateKey) {
+        setPrivateKey(newSettings.privateKey);
+      }
+    };
+
+    // Event-Listener registrieren
+    ipc.on('settings-changed', handleSettingsChange);
+
+    // Cleanup: Listener entfernen
+    return () => {
+      ipc.removeListener('settings-changed', handleSettingsChange);
+    };
+  }, []);  
+
+  // Synchronisiere electionDistrictNo immer mit edNo
+  useEffect(() => {
+    if (!isNaN(edNo) && edNo !== electionDistrictNo) {
+      setElectionDistrictNo(edNo);
+    }
+  }, [edNo, electionDistrictNo]);
 
   // Dynamischen ABI + Settings laden
   useEffect(() => {
+    if (!provider || !address || !electionId) return;
+
     async function fetchContractAndSettings() {
       try {
         setError("");
-
-        // 🗣 Texte laden
-        const lang = process.env.REACT_APP_LANG || "de";
-		    let loadedTexts;
-        if (window.electronAPI?.invoke) {
-			    loadedTexts = await loadJson(`texts/voteForm-texts.${lang}.json`);			
-        } else {  
-          // Aus public/texts laden
-          const textsRes = await fetch(`/texts/voteForm-texts.${lang}.json`);
-          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
-          loadedTexts = await textsRes.json();
-        }
-        setTexts(loadedTexts);
-
-        let _privateKey, _rpcURL, _electionDistrict;
+        const _texts = await loadTexts("voteForm-texts");
+        setTexts(_texts);
+        let _privateKey, _electionDistrict;
         
         if (isElectron) {
           const ipc = window.electronAPI;
-
           _privateKey = await ipc.settings.get('privateKey');
           if (!_privateKey) {
             throw new Error("Fehlende Einstellungen (_privateKey) im Electron Store");
           }          
-          _rpcURL = await ipc.settings.get('rpcURL');
-          if (!_rpcURL) {
-            throw new Error("Fehlende Einstellungen (_rpcURL) im Electron Store");
-          }
 
           _electionDistrict = await ipc.settings.get('electionDistrict');
           setElectionDistrictNo(_electionDistrict);
-
-        } else {
+        } else { // Web-Version
           _privateKey = process.env.REACT_APP_PRIVATE_KEY || Wallet.createRandom().privateKey;
-          _rpcURL = process.env.REACT_APP_RPC_URL;
-          _electionDistrict = process.env.REACT_APP_ELECTION_DISTRICT || 0;
-          
+          //_rpcURL = process.env.REACT_APP_RPC_URL;
+          _electionDistrict = process.env.REACT_APP_ELECTION_DISTRICT;
 
-          if (!_privateKey || !_rpcURL) {
+          // Nur setzen, wenn kein edNo vorhanden ist!
+          if (!edNo) {
+            setElectionDistrictNo(_electionDistrict);
+          }         
+
+          if (!_privateKey) {
             throw new Error("Fehlende Einstellungen in .env");
           }
 
         }
         setPrivateKey(_privateKey);
-        setRpcURL(_rpcURL);
-        setContractAddress(process.env.REACT_APP_CONTRACT_ADDRESS);
-        //setElectionDistrictNo(Number(_electionDistrict));
 
       } catch (err) {
         console.error("Fehler beim Laden des Vertrags und der Einstellungen:", err);
-        setError("❌ Fehler beim Laden der Konfiguration");
+        //setError("❌ Fehler beim Laden der Konfiguration");
       }
     }
 
     fetchContractAndSettings();
-  }, []);
+  }, [provider, address, electionId, edNo, modus]);
 
   // Vertragsdaten laden
   useEffect(() => {
     async function fetchData() {
       try {
-        if (!rpcURL || !contractAddress) return;
-
-        // 🧠 ABI laden
-        const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-        let abiJson;
-
-        if (window.electronAPI?.invoke) {
-          // Electron: aus build/resources laden (IPC)
-          try {
-            abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
-          } catch {
-            abiJson = await window.electronAPI.invoke(
-              `load-json`,
-              `contracts/${name}.sol/${name}.json`
-            );
-          }
-        } else {
-          // Web: direkt aus Import (kein fetch → keine HTML-404s)
-          abiJson = ABI_REGISTRY[name];
-          if (!abiJson) {
-            throw new Error(
-              `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
-            );
-          }
-        }
-
-        const provider = new JsonRpcProvider(rpcURL);
-        const ctr = new Contract(contractAddress, abiJson.abi, provider);
-        setContract(ctr);
-        
+        if (!provider || !address || !electionId) return;
+        const abiJson = await loadAbi();
+        const ctr = new Contract(address, abiJson.abi, provider);        
         const m = await ctr.getModus();
         setModus(Number(m));
-        
         if (Number(modus) === 1) {
           const cand = await ctr.getCandidates(electionId, electionDistrictNo);
           setCandidates(cand);
@@ -180,44 +132,18 @@ function VoteForm() {
         }
 
       } catch (error) {
-        console.error("Fehler beim Abrufen:", error);
-        setError("❌ Fehler beim Abrufen des Vertrags");
+        console.error("Fehler beim Abrufen der Daten:", error);
       }
     }
 
     fetchData();
-  }, [rpcURL, contractAddress, electionDistrictNo]);
+  }, [electionDistrictNo, address, electionId, provider]);
 
   const vote = async () => {
     try {
-      // 🧠 ABI laden
-//      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Proposals";
-      const name = process.env.REACT_APP_ELECTION_MODE_NAME || "Bundestagswahl";
-      let abiJson;
-
-      if (window.electronAPI?.invoke) {
-        // Electron: aus build/resources laden (IPC)
-        try {
-          abiJson = await window.electronAPI.invoke(`load-json`, `contracts/${name}.json`);
-        } catch {
-          abiJson = await window.electronAPI.invoke(
-            `load-json`,
-            `contracts/${name}.sol/${name}.json`
-          );
-        }
-      } else {
-        // Web: direkt aus Import (kein fetch → keine HTML-404s)
-        abiJson = ABI_REGISTRY[name];
-        if (!abiJson) {
-          throw new Error(
-            `ABI "${name}" nicht in ABI_REGISTRY registriert. Bitte importieren und eintragen.`
-          );
-        }
-      }
-
-      const provider = new JsonRpcProvider(rpcURL);
+      const abiJson = await loadAbi();
       const signer = new Wallet(privateKey, provider);
-      const ctr = new Contract(contractAddress, abiJson.abi, signer);
+      const ctr = new Contract(address, abiJson.abi, signer);
 
       if (modus === 1) {
         const _electionDistrict = await ctr.getElectionDistrictByNumber(electionId, electionDistrictNo);
@@ -238,7 +164,7 @@ function VoteForm() {
     }
   };
 
-  if (!contract || !texts) return <p>Load data ...</p>;
+  if (!texts) return <p>Load texts ...</p>;
 
   // Bundestagswahl-Formular
   const htmlBundestagswahl = (

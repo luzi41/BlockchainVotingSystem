@@ -2,6 +2,9 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
+  on: (...args) => ipcRenderer.on(...args),
+  removeListener: (...args) => ipcRenderer.removeListener(...args),
+
   loadJson: (relativePath) => ipcRenderer.invoke("load-json", relativePath),
   settings: {
     get: (key) => ipcRenderer.invoke("settings:get", key),
