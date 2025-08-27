@@ -1,4 +1,4 @@
-// V 0.27.1
+// V 0.27.2
 import React, { useEffect, useState } from "react";
 import { Contract} from "ethers";
 import { useParams } from 'react-router-dom';
@@ -33,6 +33,7 @@ function Start({ ed }) {
       setElectionDistrictNo(process.env.REACT_APP_ELECTION_DISTRICT);
     }
   }, [edNo]);
+
   
   useEffect(() => {
     if (!provider || !address || !electionId) return;
@@ -67,7 +68,6 @@ function Start({ ed }) {
         }        
 
         if (Number(modus) === 1) {
-          console.log("ed ", electionDistrictNo);
           const candidatesList = await ctr.getCandidates(electionId, electionDistrictNo);
           const partiesList = await ctr.getParties(electionId);
 

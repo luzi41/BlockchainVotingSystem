@@ -1,4 +1,4 @@
-// V0.27.1
+// V0.27.2
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -64,11 +64,10 @@ function VoteForm({ ed }) {
     if (!isNaN(edNo) && edNo !== electionDistrictNo) {
       setElectionDistrictNo(edNo);
     }
-  }, [edNo, electionDistrictNo]);
+  }, [edNo]);
 
   // Dynamischen ABI + Settings laden
   useEffect(() => {
-    if (!provider || !address || !electionId) return;
 
     async function fetchContractAndSettings() {
       try {
@@ -114,9 +113,10 @@ function VoteForm({ ed }) {
 
   // Vertragsdaten laden
   useEffect(() => {
+    if (!provider || !address || !electionId) return;
+    if (!electionDistrictNo) return; // <--- NEU: erst laden, wenn Wert da ist!
     async function fetchData() {
       try {
-        if (!provider || !address || !electionId) return;
         const abiJson = await loadAbi();
         const ctr = new Contract(address, abiJson.abi, provider);        
         const m = await ctr.getModus();
