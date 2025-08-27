@@ -1,5 +1,3 @@
-//import { loadJson } from "./loadJson";
-
 async function loadJson(relativePath) {
     // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
     if (window.electronAPI?.invoke) {

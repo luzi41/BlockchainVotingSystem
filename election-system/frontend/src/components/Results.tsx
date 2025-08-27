@@ -1,4 +1,4 @@
-// Results.tsx V 0.26.13
+// Results.tsx V 0.26.14
 import { useState, useEffect } from "react";
 import { Contract } from "ethers";
 import { Link } from "react-router-dom";
@@ -143,7 +143,7 @@ function TotalResults({ texts, parties}: any) {
             const p = parties.find(p => p.shortname === name);
             const fg = p?.color || "#000";
             const bg = p?.bgcolor || "#ddd";
-            const percent = (100 * Number(value)) / Stimmen;
+            
             return (
               <tr key={name}>
                 <td className="results-label">{name}</td>
@@ -176,9 +176,7 @@ function Results() {
   const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen  
   const [modus, setModus] = useState<number>(1);
   const [status, setStatus] = useState("");
-  const [texts, setTexts] = useState<Record<string, string>>({});
   const [html, setHtml] = useState<React.ReactNode>("");
-  const [parties, setParties] = useState<any[]>([]);
   const [display1, setDisplay1] = useState("none");
   const [display2, setDisplay2] = useState("block");
 
@@ -189,11 +187,6 @@ function Results() {
         // 🗣 Texte laden
         const loadedTexts = await loadTexts("results-texts");
 
-        let rpcUrl = process.env.REACT_APP_RPC_URL;
-        if (window.electronAPI?.settings?.get) {
-          const fromStore = await window.electronAPI.settings.get("rpcURL");
-          if (fromStore) rpcUrl = fromStore;
-        }
         const abiJson = await loadAbi();
         if (!address) throw new Error("Contract address is null or undefined.");
         const contract = new Contract(address, abiJson.abi, provider);
@@ -202,7 +195,7 @@ function Results() {
         setStatus(electionStatus);
         setHtml(
           <div className="border">
-            <h2>{texts.headline || "Wahlergebnisse"}</h2>
+            <h2>{loadedTexts.headline}</h2>
             <p>{status}</p>
           </div>
         );            
@@ -215,7 +208,6 @@ function Results() {
           if (Number(modus) === 1) {
             const _districts = await contract.getElectionDistricts(electionId);
             const _parties = await contract.getParties(electionId);
-            setParties(_parties);
 
             const results1: any[] = [];
             const results2: any[] = [];
@@ -331,7 +323,7 @@ function Results() {
       }
     }
     fetchResults();
-  }, [display1, display2, modus, status, texts.headline, provider, address, electionId]);
+  }, [display1, display2, modus, status, provider, address, electionId]);
 
   return <div>{html}</div>;
 }
