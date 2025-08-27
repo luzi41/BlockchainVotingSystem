@@ -1,10 +1,11 @@
-// V0.26.11
+// V0.26.13
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
 import { Wallet, Contract } from "ethers";
 import { useElectionStatus } from "../hooks/useElectionStatus"; 
 import { loadAbi } from "../utils/loadAbi";
+import { loadTexts } from "../utils/loadTexts";
 import scanner from "../assets/scan-59.png";
 
 const isElectron = navigator.userAgent.toLowerCase().includes('electron');
@@ -30,30 +31,6 @@ function VoteForm() {
   const [proposals, setProposals] = useState([]);
   const [texts, setTexts] = useState(null);
 
-  // JSON-Lader: Electron via IPC, Web via fetch
-  async function loadJson(relativePath) {
-    // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
-    if (window.electronAPI?.invoke) {
-      return await window.electronAPI.invoke("load-json", relativePath);
-    } else {
-      const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
-      const url = `${base}/${relativePath.replace(/^\//, "")}`;
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) {
-        const body = await res.text().catch(() => "");
-        throw new Error(
-          `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
-        );
-      }
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
-      }
-    }
-  }
-
   let { ed } = useParams();
   if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
   {
@@ -67,20 +44,8 @@ function VoteForm() {
     async function fetchContractAndSettings() {
       try {
         setError("");
-
-        // 🗣 Texte laden
-        const lang = process.env.REACT_APP_LANG || "de";
-		    let loadedTexts;
-        if (window.electronAPI?.invoke) {
-			    loadedTexts = await loadJson(`texts/voteForm-texts.${lang}.json`);			
-        } else {  
-          // Aus public/texts laden
-          const textsRes = await fetch(`/texts/voteForm-texts.${lang}.json`);
-          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
-          loadedTexts = await textsRes.json();
-        }
-        setTexts(loadedTexts);
-
+        const _texts = await loadTexts("voteForm-texts");
+        setTexts(_texts);
         let _privateKey, _electionDistrict;
         
         if (isElectron) {
@@ -143,6 +108,8 @@ function VoteForm() {
 
     fetchData();
   }, [electionDistrictNo]);
+
+
 
   const vote = async () => {
     try {

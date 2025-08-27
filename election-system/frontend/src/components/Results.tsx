@@ -1,10 +1,11 @@
-// Results.tsx V 0.26.11
+// Results.tsx V 0.26.13
 import { useState, useEffect } from "react";
-import { JsonRpcProvider, Contract } from "ethers";
+import { Contract } from "ethers";
 import { Link } from "react-router-dom";
 import "./Results.css";
 import { useElectionStatus } from "../hooks/useElectionStatus"; 
 import { loadAbi } from "../utils/loadAbi";
+import { loadTexts } from "../utils/loadTexts";
 
 declare global {
   interface Window {
@@ -34,30 +35,6 @@ function aggregateObjects(_object: any[]): Record<string, number> {
   return summe;
 }
 aggregateObjects.total = 0;
-
-// JSON-Lader: Electron via IPC, Web via fetch
-async function loadJson(relativePath) {
-  // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
-  if (window.electronAPI?.invoke) {
-    return await window.electronAPI.invoke("load-json", relativePath);
-  } else {
-    const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
-    const url = `${base}/${relativePath.replace(/^\//, "")}`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      throw new Error(
-        `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
-      );
-    }
-    const text = await res.text();
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
-    }
-  }
-}
 
 /** Tally sicher extrahieren (obj.tally | string | tuple[0]) */
 function extractTallyString(raw: any): string | null {
@@ -210,17 +187,7 @@ function Results() {
     async function fetchResults() {
       try {
         // 🗣 Texte laden
-        const lang = process.env.REACT_APP_LANG || "de";
-		    let loadedTexts;
-        if (window.electronAPI?.invoke) {
-			    loadedTexts = await loadJson(`texts/results-texts.${lang}.json`);			
-        } else {  
-          // Aus public/texts laden
-          const textsRes = await fetch(`/texts/results-texts.${lang}.json`);
-          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
-          loadedTexts = await textsRes.json();
-        }
-        setTexts(loadedTexts);
+        const loadedTexts = await loadTexts("results-texts");
 
         let rpcUrl = process.env.REACT_APP_RPC_URL;
         if (window.electronAPI?.settings?.get) {

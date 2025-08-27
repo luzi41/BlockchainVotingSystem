@@ -1,20 +1,10 @@
-// V 0.26.10
+// V 0.26.13
 import React, { useEffect, useState } from "react";
 import { Contract} from "ethers";
 import { useParams } from 'react-router-dom';
 import { useElectionStatus } from "../hooks/useElectionStatus"; 
 import { loadAbi } from "../utils/loadAbi";
-
-// ✅ Web: statisch importierte ABIs (Registry)
-import ProposalsABI from "../artifacts/contracts/Proposals.sol/Proposals.json";
-// Wenn du weitere Modi hast, hier ergänzen:
-import BundestagswahlABI from "../artifacts/contracts/Bundestagswahl.sol/Bundestagswahl.json";
-// import OtherABI from "../artifacts/contracts/Other.sol/Other.json";
-const ABI_REGISTRY = {
-	Proposals: ProposalsABI,
-	Bundestagswahl: BundestagswahlABI,
-  // Other: OtherABI,
-};
+import { loadTexts } from "../utils/loadTexts";
 
 function Start() {
   const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
@@ -29,31 +19,7 @@ function Start() {
 	const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
     	return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
   });
-
-  // JSON-Lader: Electron via IPC, Web via fetch
-  async function loadJson(relativePath) {
-    // relativePath OHNE führenden Slash übergeben, z.B. "texts/start-texts.de.json"
-    if (window.electronAPI?.invoke) {
-      return await window.electronAPI.invoke("load-json", relativePath);
-    } else {
-      const base = (process.env.PUBLIC_URL || "").replace(/\/$/, "");
-      const url = `${base}/${relativePath.replace(/^\//, "")}`;
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) {
-        const body = await res.text().catch(() => "");
-        throw new Error(
-          `fetch ${url} -> ${res.status} ${res.statusText}; body starts: ${body.slice(0, 120)}`
-        );
-      }
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        throw new Error(`Invalid JSON at ${url}; body starts: ${text.slice(0, 120)}`);
-      }
-    }
-  }
-
+ 
   useEffect(() => {
     if (!provider || !address || !electionId) return;
     async function fetchData() {
@@ -67,18 +33,8 @@ function Start() {
           });
         }
         // 🗣 Texte laden
-        const lang = process.env.REACT_APP_LANG || "de";
-		    let loadedTexts;
-
-        if (window.electronAPI?.invoke) {
-			    loadedTexts = await loadJson(`texts/start-texts.${lang}.json`);			
-        } else {
-          // Aus public/texts laden
-          const textsRes = await fetch(`/texts/start-texts.${lang}.json`);
-          if (!textsRes.ok) throw new Error("Textdatei nicht gefunden");
-          loadedTexts = await textsRes.json();
-        }
-        setTexts(loadedTexts);
+        const _texts = await loadTexts("start-texts");
+        setTexts(_texts);
 
         // 🧠 ABI laden
         const abiJson = await loadAbi();
