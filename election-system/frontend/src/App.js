@@ -1,5 +1,5 @@
-// v0.27.0
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
+// v0.27.1
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Start from "./components/Start";
 import VoteForm from "./components/VoteForm";
 import Results from "./components/Results.tsx";
@@ -21,8 +21,8 @@ function AppContent() {
   const navLinks = {
     start: edParam ? `/start/${edParam}` : '/start',
     vote: edParam ? `/vote/${edParam}` : '/vote',
-    results: edParam ? `/results/` : '/results',
-    extras: edParam ? `/extras/` : '/extras'
+    results: edParam ? `/results/${edParam}` : '/results',
+    extras: edParam ? `/extras/${edParam}` : '/extras'
   };
 
   const { title, status, error } = useElectionStatus();  // 👈 Hook nutzen
@@ -72,7 +72,9 @@ function AppContent() {
         <Route path="/vote/:ed" element={<VoteForm />} />
         <Route path="/vote/:ed/:token" element={<VoteForm />} />
         <Route path="/results" element={<Results ed={edParam} />} />
+        <Route path="/results/:ed" element={<Results ed={edParam} />} />        
         <Route path="/extras" element={<Extras ed={edParam} />} />
+        <Route path="/extras/:ed" element={<Extras ed={edParam} />} />
         <Route path="/extras/settings" element={<SettingsForm ed={edParam} />} />
         <Route path="/results/signature/:ed/:id" element={<Signature />} />
       </Routes>

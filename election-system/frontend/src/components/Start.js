@@ -1,4 +1,4 @@
-// V 0.27.0
+// V 0.27.1
 import React, { useEffect, useState } from "react";
 import { Contract} from "ethers";
 import { useParams } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { useElectionStatus } from "../hooks/useElectionStatus";
 import { loadAbi } from "../utils/loadAbi";
 import { loadTexts } from "../utils/loadTexts";
 
-function Start(ed) {
+function Start({ ed }) {
   const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
 	const [texts, setTexts] = useState(null);
 	const [error, setError] = useState("");
@@ -14,16 +14,30 @@ function Start(ed) {
 	const [parties, setParties] = useState([]);
 	const [proposals, setProposals] = useState([]);
 	const [modus, setModus] = useState(1);
-	const params = useParams();
+  const params = useParams();
   const edNo = params.ed || ed || '';
   
-	const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
-    	return isNaN(edNo) ? process.env.REACT_APP_ELECTION_DISTRICT : edNo;
-  });
-  //console.log("ed ", edNo);
- 
+  // Initialwert: leer lassen, damit wir gezielt setzen können
+  const [electionDistrictNo, setElectionDistrictNo] = useState('');
+
+
+  // 1. Wahlkreis aus Settings laden, falls Electron und kein edNo gesetzt
+  useEffect(() => {
+    if (!edNo && window.electronAPI?.settings?.get) {
+      window.electronAPI.settings.get('electionDistrict').then((val) => {
+        if (val !== undefined && val !== null) setElectionDistrictNo(val);
+      });
+    } else if (edNo) {
+      setElectionDistrictNo(edNo);
+    } else {
+      setElectionDistrictNo(process.env.REACT_APP_ELECTION_DISTRICT);
+    }
+  }, [edNo]);
+  
   useEffect(() => {
     if (!provider || !address || !electionId) return;
+    if (!electionDistrictNo) return; // <--- NEU: erst laden, wenn Wert da ist!
+
     async function fetchData() {
       try {
         setError("");
@@ -53,6 +67,7 @@ function Start(ed) {
         }        
 
         if (Number(modus) === 1) {
+          console.log("ed ", electionDistrictNo);
           const candidatesList = await ctr.getCandidates(electionId, electionDistrictNo);
           const partiesList = await ctr.getParties(electionId);
 

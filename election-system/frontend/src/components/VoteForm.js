@@ -1,4 +1,4 @@
-// V0.27.0
+// V0.27.1
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -64,7 +64,7 @@ function VoteForm({ ed }) {
     if (!isNaN(edNo) && edNo !== electionDistrictNo) {
       setElectionDistrictNo(edNo);
     }
-  }, [edNo]);
+  }, [edNo, electionDistrictNo]);
 
   // Dynamischen ABI + Settings laden
   useEffect(() => {
@@ -105,18 +105,18 @@ function VoteForm({ ed }) {
 
       } catch (err) {
         console.error("Fehler beim Laden des Vertrags und der Einstellungen:", err);
-        setError("❌ Fehler beim Laden der Konfiguration");
+        //setError("❌ Fehler beim Laden der Konfiguration");
       }
     }
 
     fetchContractAndSettings();
-  }, [provider, address, electionId, edNo]);
+  }, [provider, address, electionId, edNo, modus]);
 
   // Vertragsdaten laden
   useEffect(() => {
     async function fetchData() {
       try {
-        if (!address) return;
+        if (!provider || !address || !electionId) return;
         const abiJson = await loadAbi();
         const ctr = new Contract(address, abiJson.abi, provider);        
         const m = await ctr.getModus();
@@ -132,13 +132,12 @@ function VoteForm({ ed }) {
         }
 
       } catch (error) {
-        console.error("Fehler beim Abrufen:", error);
-        setError("❌ Fehler beim Abrufen des Vertrags");
+        console.error("Fehler beim Abrufen der Daten:", error);
       }
     }
 
     fetchData();
-  }, [electionDistrictNo, address, electionId, provider, modus]);
+  }, [electionDistrictNo, address, electionId, provider]);
 
   const vote = async () => {
     try {
