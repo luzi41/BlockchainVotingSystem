@@ -11,5 +11,8 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+        working-directory: election-system/frontend
       - run: npm test
+        working-directory: election-system/frontend
       - run: npm audit --production
+        working-directory: election-system/frontend
