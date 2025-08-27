@@ -1,4 +1,4 @@
-// V0.26.13
+// V0.27.0
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import forge from "node-forge";
@@ -16,13 +16,12 @@ async function encryptVote(_toVoted, _publicKey) {
   return forge.util.encode64(encrypted);
 }
 
-function VoteForm() {
+function VoteForm({ ed }) {
   const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
   const [modus, setModus] = useState(1);
   const [error, setError] = useState("");
   const [tokenInput, setTokenInput] = useState("");
   const [privateKey, setPrivateKey] = useState("");
-  const [electionDistrictNo, setElectionDistrictNo] = useState(1);
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
@@ -30,12 +29,42 @@ function VoteForm() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [proposals, setProposals] = useState([]);
   const [texts, setTexts] = useState(null);
+  const params = useParams();
+  const edNo = params.ed || ed || '';
+  
+  const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
+      return isNaN(edNo) ? process.env.REACT_APP_ELECTION_DISTRICT : edNo;
+  });
 
-  let { ed } = useParams();
-  if (isNaN(ed)) // muss sein: "nicht in Wahlkreisen vorhanden"
-  {
-    ed = 1;
-  }
+  useEffect(() => {
+    if (!isElectron) return;
+
+    const ipc = window.electronAPI;
+    // Handler-Funktion für Settings-Änderungen
+    const handleSettingsChange = async (event, newSettings) => {
+      if (newSettings.electionDistrict) {
+        setElectionDistrictNo(newSettings.electionDistrict);
+      }
+      if (newSettings.privateKey) {
+        setPrivateKey(newSettings.privateKey);
+      }
+    };
+
+    // Event-Listener registrieren
+    ipc.on('settings-changed', handleSettingsChange);
+
+    // Cleanup: Listener entfernen
+    return () => {
+      ipc.removeListener('settings-changed', handleSettingsChange);
+    };
+  }, []);  
+
+  // Synchronisiere electionDistrictNo immer mit edNo
+  useEffect(() => {
+    if (!isNaN(edNo) && edNo !== electionDistrictNo) {
+      setElectionDistrictNo(edNo);
+    }
+  }, [edNo]);
 
   // Dynamischen ABI + Settings laden
   useEffect(() => {
@@ -50,18 +79,22 @@ function VoteForm() {
         
         if (isElectron) {
           const ipc = window.electronAPI;
-
           _privateKey = await ipc.settings.get('privateKey');
           if (!_privateKey) {
             throw new Error("Fehlende Einstellungen (_privateKey) im Electron Store");
           }          
 
           _electionDistrict = await ipc.settings.get('electionDistrict');
-        } else {
+          setElectionDistrictNo(_electionDistrict);
+        } else { // Web-Version
           _privateKey = process.env.REACT_APP_PRIVATE_KEY || Wallet.createRandom().privateKey;
           //_rpcURL = process.env.REACT_APP_RPC_URL;
-          _electionDistrict = process.env.REACT_APP_ELECTION_DISTRICT || 0;
-          
+          _electionDistrict = process.env.REACT_APP_ELECTION_DISTRICT;
+
+          // Nur setzen, wenn kein edNo vorhanden ist!
+          if (!edNo) {
+            setElectionDistrictNo(_electionDistrict);
+          }         
 
           if (!_privateKey) {
             throw new Error("Fehlende Einstellungen in .env");
@@ -69,7 +102,6 @@ function VoteForm() {
 
         }
         setPrivateKey(_privateKey);
-        setElectionDistrictNo(_electionDistrict);
 
       } catch (err) {
         console.error("Fehler beim Laden des Vertrags und der Einstellungen:", err);
@@ -78,7 +110,7 @@ function VoteForm() {
     }
 
     fetchContractAndSettings();
-  }, [provider, address, electionId]);
+  }, [provider, address, electionId, edNo]);
 
   // Vertragsdaten laden
   useEffect(() => {
@@ -89,7 +121,6 @@ function VoteForm() {
         const ctr = new Contract(address, abiJson.abi, provider);        
         const m = await ctr.getModus();
         setModus(Number(m));
-        
         if (Number(modus) === 1) {
           const cand = await ctr.getCandidates(electionId, electionDistrictNo);
           setCandidates(cand);
@@ -107,9 +138,7 @@ function VoteForm() {
     }
 
     fetchData();
-  }, [electionDistrictNo]);
-
-
+  }, [electionDistrictNo, address, electionId, provider, modus]);
 
   const vote = async () => {
     try {

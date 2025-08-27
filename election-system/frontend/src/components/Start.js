@@ -1,4 +1,4 @@
-// V 0.26.13
+// V 0.27.0
 import React, { useEffect, useState } from "react";
 import { Contract} from "ethers";
 import { useParams } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { useElectionStatus } from "../hooks/useElectionStatus";
 import { loadAbi } from "../utils/loadAbi";
 import { loadTexts } from "../utils/loadTexts";
 
-function Start() {
+function Start(ed) {
   const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
 	const [texts, setTexts] = useState(null);
 	const [error, setError] = useState("");
@@ -14,11 +14,13 @@ function Start() {
 	const [parties, setParties] = useState([]);
 	const [proposals, setProposals] = useState([]);
 	const [modus, setModus] = useState(1);
-	const { ed } = useParams();
+	const params = useParams();
+  const edNo = params.ed || ed || '';
   
 	const [electionDistrictNo, setElectionDistrictNo] = useState(() => {
-    	return isNaN(ed) ? process.env.REACT_APP_ELECTION_DISTRICT : ed;
+    	return isNaN(edNo) ? process.env.REACT_APP_ELECTION_DISTRICT : edNo;
   });
+  //console.log("ed ", edNo);
  
   useEffect(() => {
     if (!provider || !address || !electionId) return;
