@@ -1,4 +1,4 @@
-// v0.27.1
+// v0.28.4
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Start from "./components/Start";
 import VoteForm from "./components/VoteForm";
@@ -38,7 +38,7 @@ function AppContent() {
           <li><Link to={navLinks.extras}>Extras</Link></li>
           <li className="title">
             <Link to="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">
-              Blockchain Voting System 0.27
+              Blockchain Voting System 0.28
             </Link>
           </li>
         </ul>

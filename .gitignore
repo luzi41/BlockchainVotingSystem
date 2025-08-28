@@ -80,3 +80,5 @@ election-system/admin-ui/src/reportWebVitals.js
 election-system/frontend/src/artifacts/index.text
 /election-system/frontend/public/contracts/*.json
 election-system/frontend/npmAudit.txt
+election-system/admin-ui/.next/cache/*
+election-system/admin-ui/.next/server/chunks/*
