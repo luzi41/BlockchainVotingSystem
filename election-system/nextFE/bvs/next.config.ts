@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
-
+/*
+module.exports = {
+  devIndicators: {
+    buildActivity: false,
+  },
+}
+*/
 const nextConfig: NextConfig = {
   /* config options here */
-  //const turbopack.root= "../",
+  devIndicators: {
+    buildActivity: false,
+  },
 };
 
 export default nextConfig;

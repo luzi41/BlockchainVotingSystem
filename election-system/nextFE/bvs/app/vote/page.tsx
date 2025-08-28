@@ -1,5 +1,4 @@
-"use client";
-import * as React from 'react';
+// app/vote/page.tsx
 import VoteForm from "@components/VoteForm";
 
 interface PageProps {
@@ -7,9 +6,14 @@ interface PageProps {
 }
 
 export default function VotePage({ searchParams }: PageProps) {
-  // Optional: ed aus query params lesen
-  //const ed = typeof searchParams?.ed === "string" ? searchParams.ed : undefined;
-  const ed = React.use(searchParams);
+  const edParam = searchParams?.ed;
+  const ed = typeof edParam === "string" ? edParam : undefined;
 
-  return <VoteForm ed={ed} />;
+  return (
+    <div className="flex justify-center p-6">
+      <div className="w-full max-w-3xl">
+        <VoteForm ed={ed} />
+      </div>
+    </div>
+  );
 }
