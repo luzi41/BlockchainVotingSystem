@@ -1,7 +1,8 @@
 // components/utils/loadTexts.ts
 import { VoteFormTexts } from "@components/types/VoteFormTypes";
+import { StartTexts } from "@components/types/StartTypes";
 
-const FALLBACK_TEXTS: VoteFormTexts = {
+const FALLBACK_TEXTS = {
   yourToken: "Your token",
   token: "Enter token",
   yourElectionDistrict: "Your election district",
@@ -16,9 +17,9 @@ const FALLBACK_TEXTS: VoteFormTexts = {
  * ns z.B. "voteForm-texts"
  */
 export async function loadTexts(
-  ns: "voteForm-texts",
+  ns: string,
   lang?: string
-): Promise<VoteFormTexts> {
+) {
   // Sprache bestimmen (z.B. "de" oder "en")
   const guessed =
     (lang ||
@@ -32,10 +33,12 @@ export async function loadTexts(
 
   for (const l of candidates) {
     const url = `/texts/${l}/${ns}.json`;
+    //console.log("Texte benutzt: ", url);
     try {
       const res = await fetch(url, { cache: "force-cache" });
+      //const res = await fetch(url);
       if (res.ok) {
-        const data = (await res.json()) as VoteFormTexts;
+        const data = (await res.json());
         return data;
       }
     } catch {

@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "PORT=3004 next dev --turbopack",
+    "artifacts:copy": "node scripts/copy-artifacts.js",
     "build": "next build --turbopack",
     "start": "PORT=3002 next start",
     "lint": "eslint",
     "electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3004 && electron electron/main.js\""
   },
   "dependencies": {
+    "ethers": "^6.15.0",
     "next": "15.5.2",
+    "node-forge": "^1.3.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },

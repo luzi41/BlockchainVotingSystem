@@ -1,32 +1,32 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+import { fetchStatus } from "../utils/fetchStatus";
 
 export function useElectionStatus() {
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
-  const [address, setAddress] = useState<string>("");
-  const [electionId, setElectionId] = useState<string>("1"); // Default ID
+  const [title, setTitle] = useState("Blockchain Voting System");
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [provider, setProvider] = useState<any>(null);
+  const [address, setAddress] = useState<string | null>(null);
+  const [electionId, setElectionId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    async function initProvider() {
-      const eth = window.ethereum;
-      if (!eth) return;
-
-      const prov = new ethers.BrowserProvider(eth);
-      setProvider(prov);
-
-      const signer = await prov.getSigner();
-      try {
-        const addr = await signer.getAddress();
-        setAddress(addr);
-      } catch {
-        setAddress("");
-      }
+    async function loadStatus() {
+      setLoading(true);
+      const result = await fetchStatus();
+      setTitle(result.title);
+      setStatus(result.status);
+      setError(result.error);
+      setProvider(result.provider || null);
+      setAddress(result.contractAddress || null);
+      setElectionId(result.electionId || null);
+      setLoading(false);
     }
 
-    initProvider();
+    loadStatus();
   }, []);
 
-  return { provider, address, electionId };
+  return { title, status, error, loading, provider, address, electionId };
 }

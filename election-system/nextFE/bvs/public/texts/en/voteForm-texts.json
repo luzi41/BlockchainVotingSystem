@@ -1,0 +1,9 @@
+{
+  "yourToken": "Your token",
+  "token": "Enter token",
+  "yourElectionDistrict": "Your election district",
+  "firstVote": "First vote",
+  "secondVote": "Second vote",
+  "survey": "Survey",
+  "btnSend": "Send"
+}

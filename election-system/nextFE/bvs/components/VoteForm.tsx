@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wallet, Contract, InterfaceAbi } from "ethers";
+import { Contract, Wallet } from "ethers";
 import forge from "node-forge";
 import Image from "next/image";
 
-import { useElectionStatus } from "@components/hooks/useElectionStatus";
-import { loadTexts } from "@components/utils/loadTexts";
-import scanner from "@public/scan-59.png";
+import { useElectionStatus } from "./hooks/useElectionStatus";
+import { loadTexts } from "./utils/loadTexts";
 
-import { Candidate, Party, Proposal, VoteFormTexts } from "@components/types/VoteFormTypes";
+import scanner from "@public/scan-59.png";
+import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
 
 const isElectron =
   typeof navigator !== "undefined" &&
@@ -27,15 +27,17 @@ async function encryptVote(_toVoted: string | number, _publicKey: string): Promi
 }
 
 interface VoteFormProps {
-  ed?: string;
+  electionDistrict: string;
+  availableDistricts?: string[];
 }
 
-export default function VoteForm({ ed }: VoteFormProps) {
+export default function VoteForm({ electionDistrict, availableDistricts = [] }: VoteFormProps) {
   const { provider, address, electionId } = useElectionStatus();
 
+  const [abi, setAbi] = useState<any[]>([]);
   const [modus, setModus] = useState<number>(1);
   const [error, setError] = useState<string>("");
-  const [tokenInput, setTokenInput] = useState<string | number>("");
+  const [tokenInput, setTokenInput] = useState<string>("");
   const [privateKey, setPrivateKey] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [parties, setParties] = useState<Party[]>([]);
@@ -44,18 +46,17 @@ export default function VoteForm({ ed }: VoteFormProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [texts, setTexts] = useState<VoteFormTexts | null>(null);
-
-  const edNo = ed || process.env.NEXT_PUBLIC_ELECTION_DISTRICT || "";
-  const [electionDistrictNo, setElectionDistrictNo] = useState<string | number>(edNo);
+  const [loading, setLoading] = useState(true);
+  const [electionDistrictNo, setElectionDistrictNo] = useState<string>(electionDistrict);
 
   // Electron Settings Listener
   useEffect(() => {
     if (!isElectron) return;
     const ipc = window.electronAPI;
-    if (!ipc) return; // Fallback, falls Web
+    if (!ipc) return;
 
     const handleSettingsChange = (_event: unknown, newSettings: ElectronSettings) => {
-      if (newSettings.electionDistrict) setElectionDistrictNo(newSettings.electionDistrict);
+      if (newSettings.electionDistrict) setElectionDistrictNo(String(newSettings.electionDistrict));
       if (newSettings.privateKey) setPrivateKey(newSettings.privateKey);
     };
 
@@ -69,20 +70,20 @@ export default function VoteForm({ ed }: VoteFormProps) {
         const _texts = await loadTexts("voteForm-texts");
         setTexts(_texts);
 
-        let _privateKey;
-        let _electionDistrict: string | number = edNo;
+        let _privateKey: string;
+        let _electionDistrict: string = electionDistrict;
 
         if (isElectron) {
           const ipc = window.electronAPI;
-          if (!ipc) return; // Fallback, falls Web
-          _privateKey = await ipc.settings.get("privateKey");
-          if (!_privateKey) throw new Error("Fehlende privateKey im Electron Store");
-          _electionDistrict = (await ipc.settings.get("electionDistrict")) || edNo;
+          if (!ipc) return;
+          const pk = await ipc.settings.get("privateKey");
+          if (!pk) throw new Error("Fehlende privateKey im Electron Store");
+          _privateKey = pk;
+          const ed = await ipc.settings.get("electionDistrict");
+          _electionDistrict = ed ? String(ed) : electionDistrict;
         } else {
-          _privateKey = 
-            process.env.NEXT_PUBLIC_PRIVATE_KEY || Wallet.createRandom().privateKey;
-          _electionDistrict =
-            edNo || process.env.NEXT_PUBLIC_ELECTION_DISTRICT || "";
+          _privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || Wallet.createRandom().privateKey;
+          _electionDistrict = electionDistrict || process.env.NEXT_PUBLIC_ELECTION_DISTRICT || "";
         }
 
         setPrivateKey(String(_privateKey));
@@ -94,20 +95,23 @@ export default function VoteForm({ ed }: VoteFormProps) {
     }
 
     fetchTextsAndSettings();
-  }, [edNo]);
+  }, [electionDistrict]);
 
   // Vertragsdaten laden
   useEffect(() => {
-    if (!provider || !address || !electionId) return;
-    if (!electionDistrictNo) return;
+    if (!provider || !address || !electionId || !electionDistrictNo) return;
 
     async function fetchData() {
       try {
         const res = await fetch("/api/abi");
-        const json = await res.json();
-        const abi: InterfaceAbi = json.abi;
+        const abiJson = await res.json();
+        const contractAbi = abiJson.abi.abi;
 
-        const ctr = new Contract(address, abi, provider);
+        setAbi(contractAbi);
+        //console.log("ABI JSON geladen:", abiJson);
+        //console.log("ABI Array:", abiJson.abi);
+
+        const ctr = new Contract(address, contractAbi, provider);
         const m = await ctr.getModus();
         setModus(Number(m));
 
@@ -122,6 +126,8 @@ export default function VoteForm({ ed }: VoteFormProps) {
         }
       } catch (err: unknown) {
         console.error("Fehler beim Abrufen der Daten:", err);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -131,15 +137,6 @@ export default function VoteForm({ ed }: VoteFormProps) {
   const vote = async () => {
     if (!privateKey || !provider) return;
     try {
-      const res = await fetch("/api/abi");
-      const json = await res.json();
-      const abi: InterfaceAbi = json.abi;
-
-      if (!privateKey || typeof privateKey !== "string") {
-        setError("Fehlender privater Schlüssel");
-        return;
-      } 
-
       const signer = new Wallet(privateKey, provider);
       const ctr = new Contract(address, abi, signer);
 
@@ -167,11 +164,8 @@ export default function VoteForm({ ed }: VoteFormProps) {
         setError("✅ Erfolgreich! Transaction: " + tx.hash);
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError("❌ Fehler: " + err.message);
-      } else {
-        setError("❌ Unbekannter Fehler");
-      }
+      if (err instanceof Error) setError("❌ Fehler: " + err.message);
+      else setError("❌ Unbekannter Fehler!");
     }
   };
 
@@ -188,18 +182,29 @@ export default function VoteForm({ ed }: VoteFormProps) {
               type="text"
               placeholder={texts.token}
               value={tokenInput}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setTokenInput(e.target.value)
-              }
+              onChange={(e) => setTokenInput(e.target.value)}
             />
-            <button name="scanToken" className=".btn">
+            <button name="scanToken" className="btn">
               <Image src={scanner} alt="Scan icon" width={13} height={13} />
             </button>
           </p>
         </div>
         <div className="col-50">
           <p>{texts.yourElectionDistrict}</p>
-          <p>{electionDistrictNo}</p>
+          {availableDistricts.length > 1 ? (
+            <select
+              value={electionDistrictNo}
+              onChange={(e) => setElectionDistrictNo(e.target.value)}
+            >
+              {availableDistricts.map((d) => (
+                <option key={d} value={d}>
+                  Bezirk {d}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p>{electionDistrictNo}</p>
+          )}
         </div>
       </div>
 
@@ -219,9 +224,7 @@ export default function VoteForm({ ed }: VoteFormProps) {
                     className="vote"
                     value={c.name}
                     name="candidate"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSelectedCandidate(e.target.value)
-                    }
+                    onChange={(e) => setSelectedCandidate(e.target.value)}
                   />
                 </div>
               </div>
@@ -243,9 +246,7 @@ export default function VoteForm({ ed }: VoteFormProps) {
                     className="radio"
                     value={p.shortname}
                     name="party"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSelectedParty(e.target.value)
-                    }
+                    onChange={(e) => setSelectedParty(e.target.value)}
                   />
                 </div>
               </div>
@@ -267,9 +268,7 @@ export default function VoteForm({ ed }: VoteFormProps) {
                   className="radio"
                   value={p.answer1}
                   name="accepted"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSelectedAnswer(e.target.value)
-                  }
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
                 />
               </div>
               <div className="col-10">
@@ -279,9 +278,7 @@ export default function VoteForm({ ed }: VoteFormProps) {
                   className="radio"
                   value={p.answer2}
                   name="accepted"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSelectedAnswer(e.target.value)
-                  }
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
                 />
               </div>
             </div>

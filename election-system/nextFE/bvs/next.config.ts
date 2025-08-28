@@ -8,8 +8,8 @@ module.exports = {
 */
 const nextConfig: NextConfig = {
   /* config options here */
-  devIndicators: {
-    buildActivity: false,
+  turbopack: {
+    root: "/home/louis/Projekte/BlockchainVotingSystem/election-system/nextFE/bvs",
   },
 };
 

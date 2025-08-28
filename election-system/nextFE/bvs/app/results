@@ -1,6 +1,0 @@
-// app/api/election/route.ts
-export async function POST(req: Request) {
-  const body = await req.json();
-  // … Smart Contract Call …
-  return Response.json({ success: true });
-}
