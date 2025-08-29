@@ -1,16 +1,11 @@
-import Link from 'next/link';
-interface PageProps {
-	searchParams: Promise<{ ed?: string }>;
-}
+import Extras from "@components/Extras";
 
-export default function ExtrasPage({ searchParams }: PageProps) {
-	<div>
-		<h3>Extras</h3>
-		<nav className="menu">
-			<ul>
-				<li><Link href="http://localhost:25000" target="_blank">Explorer</Link></li>
-				<li><Link href="/extras/settings">Einstellungen</Link></li>
-			</ul>
-		</nav>
-	</div>
+export default function ExtrasPage() {
+	return (
+	<div className="flex justify-center p-6">
+		<div className="w-full max-w-3xl">
+			<Extras />
+		</div>
+	</div>		
+	);
 }
