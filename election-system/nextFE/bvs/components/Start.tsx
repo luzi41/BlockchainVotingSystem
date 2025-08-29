@@ -63,13 +63,13 @@ export default function Start({ electionDistrict, availableDistricts = [] }: Vot
                 if (!ctr) {
                     throw new Error("126 Konnte SmartContract nicht laden!");
                 }
-                /*
+                
                 const m = await ctr.getModus();
                 
                 if (m) {
                     setModus(Number(m));
                 }        
-                */
+                
                 if (Number(modus) === 1) {
                     
                     const candidatesList = await ctr.getCandidates(electionId, electionDistrictNo);

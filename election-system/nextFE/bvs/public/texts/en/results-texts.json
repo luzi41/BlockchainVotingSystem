@@ -1,0 +1,22 @@
+{
+  "resultsText": "The results will follow after decryption and release by the election officer.",
+  "headline": "Election results",
+  "selectView": "Select view",
+  "viewDistricts": "constituencies",
+  "viewTotal": "Total",
+  "party" : "Party",
+  "firstVotes": "First vote",
+  "secondVotes": "Second vote",
+  "totalParties": "Parties overall",
+  "answer": "Answer",
+  "votes": "Votes",
+  "title" : "Title of election",
+  "details": "Details",
+  "errorElectronSettingsRpcURL": "Fehlende Einstellungen (_rpcURL) im Electron Store",
+  "errorFetchData": "Fehler beim Abrufen der Daten",
+  "errorLoadModule": "Fehler beim Laden des Moduls",
+  "errorProposals": "Proposals nicht geladen.",
+  "errorNetwork": "Netzwerkfehler",
+  "errorContractAddress": "SmartContract-Adresse nicht definiert.",
+  "loadContract": "Lade Vertrag ..."
+}
