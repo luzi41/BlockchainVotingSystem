@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from "next";
 import LanguageSwitcher from "@components/LanguageSwitcher";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -23,6 +24,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const status = "Nicht implementiert!";
   return (
     <html lang="en">
       <body
@@ -30,22 +32,24 @@ export default function RootLayout({
       >
         <nav className="main p-4 border-b" id="nav">
           <ul>
-            <li><a href="/">Informationen zur Wahl</a></li>
-            <li><a href="/vote">Abstimmen</a></li>
-            <li><a href="/results">Ergebnisse</a></li>
-            <li><a href="/extras">Extras</a></li>
+            <li><Link href="/">Informationen zur Wahl</Link></li>
+            <li><Link href="/vote">Abstimmen</Link></li>
+            <li><Link href="/results">Ergebnisse</Link></li>
+            <li><Link href="/extras">Extras</Link></li>
             <li className="lang"><LanguageSwitcher /></li>
             <li className="title">
-              <a href="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">
+              <Link href="https://github.com/luzi41/BlockchainVotingSystem" target="_blank">
                 Blockchain Voting System 0.29
-              </a>
+              </Link>
             </li>
             
           </ul>
           
-        </nav>        
-    
+        </nav>    
         {children}
+        <footer id="footer" className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+          <span id="ContractAddress">{status}</span>
+        </footer>        
       </body>
     </html>
   );

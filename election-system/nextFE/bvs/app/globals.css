@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+h3 {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+a {
+  text-decoration: underline;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -131,7 +140,7 @@ ul.lists-default li {
   flex: auto;
   position:fixed;
   width: 100%;
-  bottom: -10px;
+  bottom: 0px;
   height: 20px;
   background-color: white;
 }

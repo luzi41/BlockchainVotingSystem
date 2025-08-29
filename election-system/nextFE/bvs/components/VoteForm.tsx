@@ -78,7 +78,7 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
           if (!ipc) return;
           const pk = await ipc.settings.get("privateKey");
           if (!pk) throw new Error("Fehlende privateKey im Electron Store");
-          _privateKey = pk;
+          _privateKey = String(pk);
           const ed = await ipc.settings.get("electionDistrict");
           _electionDistrict = ed ? String(ed) : electionDistrict;
         } else {
@@ -111,7 +111,7 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
         //console.log("ABI JSON geladen:", abiJson);
         //console.log("ABI Array:", abiJson.abi);
 
-        const ctr = new Contract(address, contractAbi, provider);
+        const ctr = new Contract(String(address), contractAbi, provider);
         const m = await ctr.getModus();
         setModus(Number(m));
 
@@ -138,7 +138,7 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
     if (!privateKey || !provider) return;
     try {
       const signer = new Wallet(privateKey, provider);
-      const ctr = new Contract(address, abi, signer);
+      const ctr = new Contract(String(address), abi, signer);
 
       if (modus === 1) {
         const _electionDistrict = await ctr.getElectionDistrictByNumber(

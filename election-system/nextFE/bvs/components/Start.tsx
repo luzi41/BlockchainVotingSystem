@@ -12,6 +12,7 @@ const isElectron =
 interface ElectronSettings {
   electionDistrict?: number;
   privateKey?: string;
+  invoke?:any;
 }
 
 interface VoteFormProps {
@@ -42,7 +43,7 @@ export default function Start({ electionDistrict, availableDistricts = [] }: Vot
                 // Aktuellen Wahlkreis laden (nur für Electron, sonst gesetzt)
                 if (window.electronAPI?.invoke) {
                 window.electronAPI.settings.get('electionDistrict').then((val) => {
-                    if (val !== undefined && val !== null) setElectionDistrictNo(val);
+                    if (val !== undefined && val !== null) setElectionDistrictNo(String(val));
                 });
                 }
                 // 🗣 Texte laden
@@ -58,7 +59,7 @@ export default function Start({ electionDistrict, availableDistricts = [] }: Vot
                 console.log("ABI Array:", abiJson.abi);
 
                 // 📜 Contract
-                const ctr = new Contract(address, contractAbi, provider);
+                const ctr = new Contract(String(address), contractAbi, provider);
                 if (!ctr) {
                     throw new Error("126 Konnte SmartContract nicht laden!");
                 }
