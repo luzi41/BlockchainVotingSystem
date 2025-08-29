@@ -4,7 +4,7 @@ const { spawn } = require("child_process");
 const isDev = process.env.NODE_ENV !== "production";
 const fs = require("node:fs/promises");
 const dotenv = require("dotenv");
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../frontend/.env") });
 
 const Store = require("electron-store").default;
 const store = new Store({
@@ -29,7 +29,7 @@ function createWindow() {
     },
   });
 
-  const port = isDev ? 3030: 3035;
+  const port = isDev ? 3040: 3035;
   const nextCommand = isDev ? ["next", "dev", "-p", port] : ["next", "start", "-p", port];
 
   nextProcess = spawn("npx", nextCommand, {

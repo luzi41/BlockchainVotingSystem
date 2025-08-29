@@ -12,7 +12,7 @@
     "build": "next build --turbopack",
     "start": "PORT=3002 next start",
     "lint": "eslint",
-    "electron": "electron .",
+    "electron": "cross-env NODE_ENV=development electron .",
     "export": "next build --turbopack && next export",
     "dist": "next build --turbopack && electron-builder --linux --win --x64"
   },
@@ -65,6 +65,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "cross-env": "^7.0.3"
   }
 }

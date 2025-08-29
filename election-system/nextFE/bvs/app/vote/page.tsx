@@ -1,6 +1,6 @@
 // app/vote/page.tsx
 "use client";
-
+import dynamic from "next/dynamic";
 import { use } from "react";
 import VoteForm from "@components/VoteForm";
 

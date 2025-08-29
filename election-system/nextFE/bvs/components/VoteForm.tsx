@@ -68,27 +68,6 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
   const [errorTexts, setErrorTexts] = useState<string | null>(null);
   const [errorSettings, setErrorSettings] = useState<string | null>(null);
 
-  // Electron Settings Listener
-  useEffect(() => {
-    try {
-      if (!isElectron) return;
-      const ipc = window.electronAPI;
-      if (!ipc) return;
-
-      const handleSettingsChange = (_event: unknown, newSettings: ElectronSettings) => {
-        if (newSettings.electionDistrict) setElectionDistrictNo(String(newSettings.electionDistrict));
-        if (newSettings.privateKey) setPrivateKey(newSettings.privateKey);
-      };
-
-      electronAPI.settings.onChanged(handleSettingsChange); 
-           
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      //setLoading(false);
-    }
-
-  }, []);
 
   // Texte laden
   useEffect(() => {

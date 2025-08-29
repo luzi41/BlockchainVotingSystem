@@ -1,4 +1,5 @@
-import { use } from "react";
+"use client";
+import { use } from "react"
 import Image from "next/image";
 import Start from "@components/Start";
 
