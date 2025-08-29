@@ -82,9 +82,6 @@ election-system/frontend/src/artifacts/index.text
 election-system/frontend/npmAudit.txt
 election-system/admin-ui/.next/cache/*
 election-system/admin-ui/.next/server/chunks/*
-election-system/nextFE/bvs/public/contracts/Registry.sol/Registry.json
-election-system/nextFE/bvs/public/contracts/Registry.sol/Registry.dbg.json
-election-system/nextFE/bvs/public/contracts/Proposals.sol/Proposals.json
-election-system/nextFE/bvs/public/contracts/Proposals.sol/Proposals.dbg.json
-election-system/nextFE/bvs/public/contracts/Bundestagswahl.sol/Bundestagswahl.json
-election-system/nextFE/bvs/public/contracts/Bundestagswahl.sol/Bundestagswahl.dbg.json
+election-system/nextFE/bvs/public/contracts/*
+election-system/nextFE/bvs/dist/*
+

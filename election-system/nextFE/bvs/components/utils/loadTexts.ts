@@ -1,6 +1,6 @@
 // components/utils/loadTexts.ts
-import { VoteFormTexts } from "@components/types/VoteFormTypes";
-import { StartTexts } from "@components/types/StartTypes";
+//import { VoteFormTexts } from "@components/types/VoteFormTypes";
+//import { StartTexts } from "@components/types/StartTypes";
 
 const FALLBACK_TEXTS = {
   yourToken: "Your token",

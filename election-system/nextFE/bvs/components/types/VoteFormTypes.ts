@@ -1,6 +1,7 @@
 export interface Candidate {
   name: string;
   partei: string;
+  url: string;
 }
 
 export interface Party {

@@ -11,6 +11,20 @@ import { loadTexts } from "./utils/loadTexts";
 import scanner from "@public/scan-59.png";
 import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
 
+/*
+import { useFetchWithRetry } from "@components/hooks/useFetchWithRetry";
+
+const { data: abi, error, loading } = useFetchWithRetry({
+  url: "/contracts/Bundestagswahl.sol/Bundestagswahl.json",
+  transform: (json) => json.abi, // nur den ABI-Teil extrahieren
+});
+
+const { data: texts, error, loading } = useFetchWithRetry({
+  url: "/texts/voteForm-texts.json",
+});
+
+*/
+
 const isElectron =
   typeof navigator !== "undefined" &&
   navigator.userAgent.toLowerCase().includes("electron");
@@ -46,30 +60,58 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [texts, setTexts] = useState<VoteFormTexts | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingTexts, setLoadingTexts] = useState(true);
+  const [loadingAbi, setLoadingAbi] = useState(true);
+  const [loadingSettings, setLoadingSettings] = useState(true);
   const [electionDistrictNo, setElectionDistrictNo] = useState<string>(electionDistrict);
+  const [errorAbi, setErrorAbi] = useState<string | null>(null);
+  const [errorTexts, setErrorTexts] = useState<string | null>(null);
+  const [errorSettings, setErrorSettings] = useState<string | null>(null);
 
   // Electron Settings Listener
   useEffect(() => {
-    if (!isElectron) return;
-    const ipc = window.electronAPI;
-    if (!ipc) return;
+    try {
+      if (!isElectron) return;
+      const ipc = window.electronAPI;
+      if (!ipc) return;
 
-    const handleSettingsChange = (_event: unknown, newSettings: ElectronSettings) => {
-      if (newSettings.electionDistrict) setElectionDistrictNo(String(newSettings.electionDistrict));
-      if (newSettings.privateKey) setPrivateKey(newSettings.privateKey);
-    };
+      const handleSettingsChange = (_event: unknown, newSettings: ElectronSettings) => {
+        if (newSettings.electionDistrict) setElectionDistrictNo(String(newSettings.electionDistrict));
+        if (newSettings.privateKey) setPrivateKey(newSettings.privateKey);
+      };
 
-    ipc.onSettingsChanged(handleSettingsChange);
+      ipc.onSettingsChanged(handleSettingsChange); 
+           
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      //setLoading(false);
+    }
+
   }, []);
 
-  // Texte und privateKey laden
+  // Texte laden
   useEffect(() => {
-    async function fetchTextsAndSettings() {
+    const fetchTexts = async () => { 
+      setErrorTexts(null);
+      setLoadingTexts(true);      
       try {
         const _texts = await loadTexts("voteForm-texts");
-        setTexts(_texts);
+        if (_texts !== null) {
+          setTexts(_texts);
+        } else {
+          setErrorTexts("Keine Texte gefunden");
+        }
+      } catch (err: any) {
+        console.error("Fehler beim Laden der Texte:", err);
+        setErrorTexts("Fehler beim Laden der Texte");
+      } finally {
+        setLoadingTexts(false);
+      }
+    }
 
+    async function fetchSettings() {
+      try {
         let _privateKey: string;
         let _electionDistrict: string = electionDistrict;
 
@@ -85,16 +127,18 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
           _privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || Wallet.createRandom().privateKey;
           _electionDistrict = electionDistrict || process.env.NEXT_PUBLIC_ELECTION_DISTRICT || "";
         }
-
         setPrivateKey(String(_privateKey));
         setElectionDistrictNo(_electionDistrict);
       } catch (err: unknown) {
-        console.error("Fehler beim Laden der Texte/Settings:", err);
+        console.error("Fehler beim Laden der Settings:", err);
         setError("❌ Fehler beim Laden der Konfiguration");
+        setErrorSettings(String(err));
+      } finally {
+        setLoadingSettings(false);
       }
     }
-
-    fetchTextsAndSettings();
+    fetchTexts()
+    fetchSettings();
   }, [electionDistrict]);
 
   // Vertragsdaten laden
@@ -127,7 +171,7 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
       } catch (err: unknown) {
         console.error("Fehler beim Abrufen der Daten:", err);
       } finally {
-        setLoading(false);
+        setLoadingAbi(false);
       }
     }
 
@@ -163,15 +207,33 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
         await tx.wait();
         setError("✅ Erfolgreich! Transaction: " + tx.hash);
       }
+      
     } catch (err: unknown) {
       if (err instanceof Error) setError("❌ Fehler: " + err.message);
       else setError("❌ Unbekannter Fehler!");
+    } finally {
+      //setLoading(false);
     }
   };
 
-  if (!texts) return <p>Load texts ...</p>;
+  // if (loadingTexts || loadingAbi || loadingSettings) return <p>Load data ...</p>;
+  if (loadingAbi || loadingTexts) {
+    return <p className="text-gray-500">⏳ Daten werden geladen ...</p>;
+  }
 
-  return (
+  if (errorAbi || errorTexts || loadingSettings) {
+    return (
+      <div className="p-4 bg-red-100 text-red-700 rounded-lg">
+        <h3 className="font-bold">Fehler</h3>
+        <ul className="list-disc pl-5">
+          {errorAbi && <li>ABI konnte nicht geladen werden: {errorAbi}</li>}
+
+        </ul>
+      </div>
+    );
+  }  
+
+  if (texts) return (
     <div>
       <div className="row">
         <div className="col-50">

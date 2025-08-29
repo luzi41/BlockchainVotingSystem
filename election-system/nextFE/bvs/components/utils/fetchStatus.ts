@@ -12,7 +12,7 @@ export async function fetchStatus() {
     if (isElectron && window.electronAPI) {
       const ipc = window.electronAPI;
       const ipcRpc = await ipc.settings.get("rpcURL");
-      if (ipcRpc) rpcURL = ipcRpc;
+      if (ipcRpc) rpcURL = String(ipcRpc);
       else throw new Error("Fehlende RPC-URL im Electron Store");
     }
 
@@ -20,11 +20,11 @@ export async function fetchStatus() {
 
     const provider = new JsonRpcProvider(rpcURL);
 
-    let contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    let contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
     if (isElectron && window.electronAPI) {
       const ipc = window.electronAPI;
       const ipcAddress = await ipc.settings.get("contractAddress");
-      if (ipcAddress) contractAddress = ipcAddress;
+      if (ipcAddress) contractAddress = String(ipcAddress);
     }
 
     if (!contractAddress) throw new Error("Keine Contract-Adresse gesetzt!");

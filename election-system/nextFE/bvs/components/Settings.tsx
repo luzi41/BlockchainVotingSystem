@@ -2,12 +2,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { loadTexts } from "./utils/loadTexts";
-import { Contract, Wallet } from "ethers";
-import { useElectionStatus } from "./hooks/useElectionStatus";
 import { SettingsFormTexts } from "./types/SettingsFormTexts";
-import forge from "node-forge";
+import { Wallet } from "ethers";
 
-interface VoteFormProps {
+
+interface SettingsProps {
   electionDistrict: string;
   availableDistricts?: string[];
 }
@@ -16,8 +15,9 @@ const isElectron =
   typeof navigator !== "undefined" &&
   navigator.userAgent.toLowerCase().includes("electron");
 
-export default function SettingsForm({ electionDistrict, availableDistricts = [] }: VoteFormProps) {
-    const { Wallet } = require('ethers');
+export default function SettingsForm({ electionDistrict, availableDistricts = [] }: SettingsProps) {
+    
+    //const { Wallet } = require('ethers');
     const [language, setLanguage] = useState("de");
     const [texts, setTexts] = useState<SettingsFormTexts | null>(null);
     const [privateKey, setPrivateKey] = useState("");
@@ -124,7 +124,7 @@ export default function SettingsForm({ electionDistrict, availableDistricts = []
             <input
                 type="number"
                 value={electionDistrictNo}
-                onChange={(e) => setElectionDistrict(e.target.value)}
+                onChange={(e) => setElectionDistrictNo(e.target.value)}
             />
             </div>
 
@@ -169,6 +169,6 @@ export default function SettingsForm({ electionDistrict, availableDistricts = []
     </div>
     );
 
-    return window.electronAPI?.invoke ? settingsElectron : webVersion;
+    return window.electronAPI ? settingsElectron : webVersion;
 
 }

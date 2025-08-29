@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useElectionStatus } from "./hooks/useElectionStatus";
 import { loadTexts } from "./utils/loadTexts";
 import { Contract } from "ethers";
-import { StartTexts } from "./types/StartTypes";
+import { StartTexts, Candidate, Party } from "./types/StartTypes";
 
 const isElectron =
   typeof navigator !== "undefined" &&
@@ -22,12 +22,12 @@ interface VoteFormProps {
 
 export default function Start({ electionDistrict, availableDistricts = [] }: VoteFormProps) {
     const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
-    const [abi, setAbi] = useState<any[]>([]);
+    const [abi, setAbi] = useState([]);
     const [texts, setTexts] = useState<StartTexts | null>(null);
     const [error, setError] = useState("");
-    const [candidates, setCandidates] = useState([]);
-    const [parties, setParties] = useState([]);
-    const [proposals, setProposals] = useState([]);
+    const [candidates, setCandidates] = useState<Candidate[]>([]);
+    const [parties, setParties] = useState<Party[]>([]);
+    const [proposals, setProposals] = useState<Candidate[]>([]);
     const [modus, setModus] = useState(1);
   
     const [electionDistrictNo, setElectionDistrictNo] = useState<string>(electionDistrict);
@@ -41,7 +41,7 @@ export default function Start({ electionDistrict, availableDistricts = [] }: Vot
                 setError("");
 
                 // Aktuellen Wahlkreis laden (nur für Electron, sonst gesetzt)
-                if (window.electronAPI?.invoke) {
+                if (window.electronAPI) {
                 window.electronAPI.settings.get('electionDistrict').then((val) => {
                     if (val !== undefined && val !== null) setElectionDistrictNo(String(val));
                 });
@@ -82,7 +82,7 @@ export default function Start({ electionDistrict, availableDistricts = [] }: Vot
                     setProposals(proposalList);
                 }
             } catch (err) {
-                setError(String(err?.message || err));
+                setError(String(err));
                 console.error("❌ Fehler beim Laden der Contract-Daten:", err);
             }
         }
