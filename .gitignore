@@ -85,3 +85,5 @@ election-system/admin-ui/.next/server/chunks/*
 election-system/nextFE/bvs/public/contracts/*
 election-system/nextFE/bvs/dist/*
 
+election-system/nextFE/bvs/package-lock.json
+election-system/nextFE/.next/trace

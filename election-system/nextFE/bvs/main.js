@@ -1,48 +1,75 @@
-// V0.23.32
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require("node:path");
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
+const { spawn } = require("child_process");
+const isDev = process.env.NODE_ENV !== "production";
 const fs = require("node:fs/promises");
-const dotenv = require('dotenv');
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const dotenv = require("dotenv");
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-const Store = require('electron-store');
+const Store = require("electron-store").default;
 const store = new Store({
   defaults: {
-    rpcURL: process.env.REACT_APP_RPC_URL || '',
-    electionDistrict: process.env.REACT_APP_ELECTION_DISTRICT || '0',
-    privateKey: process.env.REACT_APP_PRIVATE_KEY || '0'
-  }
+    rpcURL: process.env.REACT_APP_RPC_URL || "",
+    electionDistrict: process.env.REACT_APP_ELECTION_DISTRICT || "0",
+    privateKey: process.env.REACT_APP_PRIVATE_KEY || "0",
+  },
 });
 
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false
-    }
-  });
-  // Entfernt das Standardmenü
-  // win.removeMenu()  
+let mainWindow;
+let nextProcess;
 
-  if (process.env.ELECTRON_DEV) {
-    // Electron Dev: React läuft auf localhost:3000
-    win.loadURL('http://localhost:3002');
-  } else {
-    // Prod: React aus build laden (file://)
-    win.loadFile(path.join(__dirname, '../build/index.html'));
-  }
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  const port = isDev ? 3030: 3035;
+  const nextCommand = isDev ? ["next", "dev", "-p", port] : ["next", "start", "-p", port];
+
+  nextProcess = spawn("npx", nextCommand, {
+    cwd: __dirname,
+    shell: true,
+    stdio: "inherit",
+  });
+
+  // Lade URL, warte kurz auf Serverstart
+  const url = `http://localhost:${port}`;
+  setTimeout(() => {
+    mainWindow.loadURL(url).catch((err) => {
+      console.error("Fehler beim Laden der URL:", err);
+    });
+  }, 3000);
+
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
 }
+
+// --- IPC Handler ---
+ipcMain.handle("settings-get", (event, key) => store.get(key));
+ipcMain.handle("settings-set", (event, key, value) => {
+  if (value === undefined || value === null) store.delete(key);
+  else store.set(key, value);
+
+  // Broadcast an alle Fenster
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win.webContents.send("settings-changed", { [key]: value });
+  });
+
+  return true;
+});
 
 ipcMain.handle("load-json", async (event, relativePath) => {
   let basePath;
-  if (process.env.ELECTRON_DEV) {
-    // während der Entwicklung -> React public/
+  if (isDev) {
     basePath = path.join(__dirname, "../public");
   } else {
-    // im Build -> resources/app/build
     basePath = path.join(process.resourcesPath, "app.asar", "build");
   }
 
@@ -51,17 +78,14 @@ ipcMain.handle("load-json", async (event, relativePath) => {
   return JSON.parse(content);
 });
 
-ipcMain.handle('settings:get', (event, key) => store.get(key));
-ipcMain.handle('settings:set', (event, key, value) => {
-    if (value === undefined || value === null) store.delete(key);
-    else store.set(key, value);
-    // Sende Event an alle Fenster nach Änderung
-    BrowserWindow.getAllWindows().forEach(win => {
-        win.webContents.send('settings-changed', {
-            [key]: value
-        });
-    });    
-    return true;
+// --- App Events ---
+app.on("ready", createWindow);
+
+app.on("window-all-closed", () => {
+  if (nextProcess) nextProcess.kill();
+  if (process.platform !== "darwin") app.quit();
 });
 
-app.whenReady().then(createWindow);
+app.on("activate", () => {
+  if (!mainWindow) createWindow();
+});

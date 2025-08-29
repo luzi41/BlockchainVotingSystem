@@ -80,7 +80,7 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
         if (newSettings.privateKey) setPrivateKey(newSettings.privateKey);
       };
 
-      ipc.onSettingsChanged(handleSettingsChange); 
+      electronAPI.settings.onChanged(handleSettingsChange); 
            
     } catch (error) {
       console.error("Error:", error);

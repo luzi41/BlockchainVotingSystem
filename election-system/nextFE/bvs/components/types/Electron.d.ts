@@ -1,4 +1,17 @@
 // components/types/Electron.d.ts
+declare global {
+  interface Window {
+    electronAPI: {
+      settings: {
+        get: (key: string) => Promise<any>;
+        set: (key: string, value: any) => Promise<void>;
+        onChanged: (callback: (changes: Record<string, any>) => void) => void;
+      };
+      dynamicImport: (path: string) => Promise<any>;
+    };
+  }
+}
+
 export interface ElectronAPI {
   settings: {
     get: (key: string) => Promise<string | number | undefined>;
