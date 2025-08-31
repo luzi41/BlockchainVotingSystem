@@ -30,6 +30,7 @@ function createWindow() {
   });
 
   const port = isDev ? 3040: 3035;
+  /*
   const nextCommand = isDev ? ["next", "dev", "-p", port] : ["next", "start", "-p", port];
 
   nextProcess = spawn("npx", nextCommand, {
@@ -37,7 +38,7 @@ function createWindow() {
     shell: true,
     stdio: "inherit",
   });
-
+  */
   // Lade URL, warte kurz auf Serverstart
   const url = `http://localhost:${port}`;
   setTimeout(() => {
