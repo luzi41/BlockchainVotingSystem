@@ -14,14 +14,15 @@
     "lint": "eslint",
     "electron": "cross-env NODE_ENV=development electron .",
     "export": "next build --turbopack && next export",
-    "dist": "next build --turbopack && cross-env NODE_ENV=development electron-builder --linux --x64"
+    "dist": "next build --turbopack && cross-env NODE_ENV=development electron-builder --linux --x64",
+    "tauri": "tauri"
   },
   "build": {
     "asar": true,
-    "appId": "com.bvs.app",
+    "appId": "com.goettertz.bvs.app",
     "productName": "BVS",
     "files": [
-      "out/**/*",
+      ".next/**/*",
       "main.js",
       "preload.js"
     ],
