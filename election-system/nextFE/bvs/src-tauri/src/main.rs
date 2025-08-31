@@ -1,36 +1,46 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use tauri::Manager;
-use std::process::{Command, Stdio, Child};
-use std::sync::{Arc, Mutex};
 
+use tauri::{Manager};
+use std::process::{Command, Stdio};
 
 fn main() {
-  // Hier speichern wir den Next.js-Prozess, damit wir ihn später beenden können
-  let child_process: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
-  let process_handle = child_process.clone();
-
-  // Next.js Server nur im Release-Modus starten (im Dev macht Tauri -> npm run dev)
-  #[cfg(not(debug_assertions))]
-  {
-    let mut child = Command::new("npm")
-      .args(&["run", "start"])
-      .current_dir("../nextFE/bvs") // Pfad zu deinem Next.js Projekt
-      .stdout(Stdio::null())
-      .stderr(Stdio::null())
-      .spawn()
-      .expect("Failed to start Next.js server");
-
-    *process_handle.lock().unwrap() = Some(child);
-  }
-
   tauri::Builder::default()
     .setup(|app| {
-      let window = app.get_webview_window("main").unwrap();
-      // Lade Next.js Frontend
-      window.eval("window.location.replace('http://localhost:3002');").unwrap();
+      // Prüfen, ob wir im Release-Build sind
+      #[cfg(not(debug_assertions))]
+      {
+        let app_handle = app.handle();
+
+        // Next.js Server starten
+        tauri::async_runtime::spawn(async move {
+          let mut child = Command::new("node")
+            .arg("server.js") // das erzeugst du gleich im Next.js Root
+            .current_dir("../nextFE/bvs") // Pfad anpassen
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("Konnte Next.js Server nicht starten");
+
+          // kleinen Delay geben, bis der Server läuft
+          std::thread::sleep(std::time::Duration::from_secs(3));
+
+          // BrowserWindow auf localhost öffnen
+          tauri::WindowBuilder::new(
+            &app_handle,
+            "main",
+            tauri::WindowUrl::External("http://localhost:3002".parse().unwrap())
+          )
+          .title("BVS Wahlplattform")
+          .build()
+          .unwrap();
+
+          // Kindprozess bleibt bestehen, solange App läuft
+          let _ = child.wait();
+        });
+      }
+
       Ok(())
     })
-
     .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .expect("error while running tauri app");
 }
