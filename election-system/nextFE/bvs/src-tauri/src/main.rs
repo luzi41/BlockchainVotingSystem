@@ -1,23 +1,36 @@
-#![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
-)]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use tauri::Manager;
+use std::process::{Command, Stdio, Child};
+use std::sync::{Arc, Mutex};
 
-use std::process::{Command, Stdio};
 
 fn main() {
-    // Stelle sicher, dass Next.js im Hintergrund gestartet wird (Production)
-    #[cfg(not(debug_assertions))]
-    {
-        Command::new("npm")
-            .args(&["run", "start"])  // Für den Production-Server
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .expect("Konnte Next.js nicht starten");
-    }
+  // Hier speichern wir den Next.js-Prozess, damit wir ihn später beenden können
+  let child_process: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
+  let process_handle = child_process.clone();
 
-    tauri::Builder::default()
-        .run(tauri::generate_context!())
-        .expect("Fehler beim Starten der Tauri-App");
+  // Next.js Server nur im Release-Modus starten (im Dev macht Tauri -> npm run dev)
+  #[cfg(not(debug_assertions))]
+  {
+    let mut child = Command::new("npm")
+      .args(&["run", "start"])
+      .current_dir("../nextFE/bvs") // Pfad zu deinem Next.js Projekt
+      .stdout(Stdio::null())
+      .stderr(Stdio::null())
+      .spawn()
+      .expect("Failed to start Next.js server");
+
+    *process_handle.lock().unwrap() = Some(child);
+  }
+
+  tauri::Builder::default()
+    .setup(|app| {
+      let window = app.get_webview_window("main").unwrap();
+      // Lade Next.js Frontend
+      window.eval("window.location.replace('http://localhost:3002');").unwrap();
+      Ok(())
+    })
+
+    .run(tauri::generate_context!())
+    .expect("error while running tauri application");
 }

@@ -10,7 +10,7 @@
     "dev": "PORT=3004 next dev --turbopack",
     "artifacts:copy": "node scripts/copy-artifacts.js",
     "build": "next build --turbopack",
-    "start": "next build --turbopack && PORT=3002 next start",
+    "start": "PORT=3002 next start",
     "lint": "eslint",
     "electron": "cross-env NODE_ENV=development electron .",
     "export": "next build --turbopack && next export",
