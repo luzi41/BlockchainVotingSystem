@@ -1,22 +1,22 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "bvs",
-  "version": "0.29.15",
-  "identifier": "com.goettertz.bvs.dev",
+  "productName": "BVS",
+  "version": "0.29.16",
+  "identifier": "com.goettertz.bvs",
   "build": {
-    "frontendDist": "../.next",
-    "devUrl": "http://localhost:3004",
+    "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "devUrl": "http://localhost:3002",
+    "frontendDist": "../.next"
   },
   "app": {
     "windows": [
       {
-        "title": "bvs",
-        "width": 800,
-        "height": 600,
+        "title": "BVS",
+        "width": 1200,
+        "height": 800,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "url": "http://localhost:3002"
       }
     ],
     "security": {
@@ -33,5 +33,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  }
+  },
+  "plugins": {}
 }
