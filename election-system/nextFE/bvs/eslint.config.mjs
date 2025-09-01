@@ -18,7 +18,7 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
-      "src-tauri/**"
+      "src-tauri/target/release/**"
     ],
     rules: [
       "@typescript-eslint/no-explicit-any": "off", // turn off the rule

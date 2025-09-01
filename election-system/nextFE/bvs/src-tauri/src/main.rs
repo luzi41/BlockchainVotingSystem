@@ -1,46 +1,38 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{Manager};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::sync::{Arc, Mutex};
+use tauri::{RunEvent};
 
 fn main() {
-  tauri::Builder::default()
-    .setup(|app| {
-      // Prüfen, ob wir im Release-Build sind
-      #[cfg(not(debug_assertions))]
-      {
-        let app_handle = app.handle();
+    let child_process: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
+    let child_process_clone = Arc::clone(&child_process);
 
-        // Next.js Server starten
-        tauri::async_runtime::spawn(async move {
-          let mut child = Command::new("node")
-            .arg("server.js") // das erzeugst du gleich im Next.js Root
-            .current_dir("../nextFE/bvs") // Pfad anpassen
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .expect("Konnte Next.js Server nicht starten");
+    tauri::Builder::default()
+        .setup(move |_app| {
+            #[cfg(not(debug_assertions))]
+            {
+                // Release: Next.js Server starten
+                let child = Command::new("npm")
+                    .args(&["run", "start"])
+                    .current_dir("../nextFE/bvs") // Next.js-Root
+                    .stdout(Stdio::inherit())
+                    .stderr(Stdio::inherit())
+                    .spawn()
+                    .expect("Failed to start Next.js server");
 
-          // kleinen Delay geben, bis der Server läuft
-          std::thread::sleep(std::time::Duration::from_secs(3));
-
-          // BrowserWindow auf localhost öffnen
-          tauri::WindowBuilder::new(
-            &app_handle,
-            "main",
-            tauri::WindowUrl::External("http://localhost:3002".parse().unwrap())
-          )
-          .title("BVS Wahlplattform")
-          .build()
-          .unwrap();
-
-          // Kindprozess bleibt bestehen, solange App läuft
-          let _ = child.wait();
+                *child_process.lock().unwrap() = Some(child);
+            }
+            Ok(())
+        })
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application")
+        .run(move |_app_handle, event| {
+            if let RunEvent::ExitRequested { .. } = event {
+                // Child-Prozess beim Schließen killen
+                if let Some(mut child) = child_process_clone.lock().unwrap().take() {
+                    let _ = child.kill();
+                }
+            }
         });
-      }
-
-      Ok(())
-    })
-    .run(tauri::generate_context!())
-    .expect("error while running tauri app");
 }
