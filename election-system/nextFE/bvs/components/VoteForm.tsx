@@ -11,20 +11,6 @@ import { loadTexts } from "./utils/loadTexts";
 import scanner from "@public/scan-59.png";
 import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
 
-/*
-import { useFetchWithRetry } from "@components/hooks/useFetchWithRetry";
-
-const { data: abi, error, loading } = useFetchWithRetry({
-  url: "/contracts/Bundestagswahl.sol/Bundestagswahl.json",
-  transform: (json) => json.abi, // nur den ABI-Teil extrahieren
-});
-
-const { data: texts, error, loading } = useFetchWithRetry({
-  url: "/texts/voteForm-texts.json",
-});
-
-*/
-
 const isElectron =
   typeof navigator !== "undefined" &&
   navigator.userAgent.toLowerCase().includes("electron");
