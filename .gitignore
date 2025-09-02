@@ -74,4 +74,5 @@ election-system/nextFE/.next/trace
 *lock.json
 election-system/frontend.zip
 
-release/*
+release*
+election-system/nextFE/bvs/electron.zip
