@@ -12,6 +12,7 @@ struct AppSettings {
     election_district: String,
     rpc_url: String,
     contract_address: String,
+    language: String,
 }
 
 impl Default for AppSettings {
@@ -20,6 +21,7 @@ impl Default for AppSettings {
             election_district: "default-district".into(),
             rpc_url: "http://127.0.0.1:8545".into(),
             contract_address: "0x0000000000000000000000000000000000000000".into(),
+            language: "de".into(),
         }
     }
 }

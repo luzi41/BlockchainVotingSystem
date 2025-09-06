@@ -26,6 +26,7 @@ export interface AppSettings {
   election_district: string;
   rpc_url: string;
   contract_address: string;
+  language: string;
 }
 
 // Verbesserte Tauri-Erkennung für V2
@@ -58,7 +59,7 @@ export default function SettingsForm({
   const [isTauri, setIsTauri] = useState<boolean | null>(null); // null = noch nicht ermittelt
 
   // FE-lokale (nicht persistente) Felder
-  const [language, setLanguage] = useState("de");
+  const [localLanguage, setLocalLanguage] = useState<string>("en");
   const [privateKey, setPrivateKey] = useState("");
 
   // Persistente (Rust) Settings
@@ -95,9 +96,6 @@ export default function SettingsForm({
 
     async function init() {
       try {
-        const t = await loadTexts("settingsForm-texts");
-        if (!cancelled) setTexts(t);
-
         // Erweiterte Tauri-Erkennung
         let tauriDetected = checkIsTauri();
         
@@ -110,12 +108,7 @@ export default function SettingsForm({
             tauriDetected = false;
           }
         }
-        /*
-        if (!cancelled) {
-          setIsTauri(tauriDetected);
-          console.log(`Tauri-Modus erkannt: ${tauriDetected}`);
-        }
-        */
+
         if (tauriDetected && invoke) {
             setIsTauri(true);
             console.log("Tauri-Modus: Lade Settings aus Rust");
@@ -126,6 +119,7 @@ export default function SettingsForm({
           console.log("Web-Modus: Verwende Fallback-Settings");
           // Web-Fallback (read-only)
           const fallback: AppSettings = {
+            language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
             election_district:
               electionDistrict ||
               process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
@@ -141,9 +135,14 @@ export default function SettingsForm({
 
         // FE-only Defaults
         if (!cancelled) {
-          setLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+          setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
           setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
         }
+
+        const t = await loadTexts("settingsForm-texts", localLanguage);
+        if (!cancelled) setTexts(t);
+
+
       } catch (err) {
         console.error("❌ Fehler beim Initialisieren der Settings:", err);
         if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
@@ -208,8 +207,8 @@ export default function SettingsForm({
       <div className="mb-4">
         <label className="block mb-1">{texts.language} (nur lokal)</label>
         <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          value={localLanguage}
+          onChange={(e) => setLocalLanguage(e.target.value)}
           className="border p-2 w-full"
         >
           <option value="de">Deutsch</option>

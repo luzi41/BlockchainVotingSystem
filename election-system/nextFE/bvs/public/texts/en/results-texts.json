@@ -12,11 +12,11 @@
   "votes": "Votes",
   "title" : "Title of election",
   "details": "Details",
-  "errorElectronSettingsRpcURL": "Fehlende Einstellungen (_rpcURL) im Electron Store",
-  "errorFetchData": "Fehler beim Abrufen der Daten",
-  "errorLoadModule": "Fehler beim Laden des Moduls",
-  "errorProposals": "Proposals nicht geladen.",
-  "errorNetwork": "Netzwerkfehler",
-  "errorContractAddress": "SmartContract-Adresse nicht definiert.",
-  "loadContract": "Lade Vertrag ..."
+  "errorElectronSettingsRpcURL": "No settings (_rpcURL)",
+  "errorFetchData": "Error fetch data",
+  "errorLoadModule": "Error load module",
+  "errorProposals": "Error load proposals",
+  "errorNetwork": "Network error",
+  "errorContractAddress": "SmartContract-Address not defined.",
+  "loadContract": "Load contract ..."
 }

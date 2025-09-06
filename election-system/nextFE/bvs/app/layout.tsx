@@ -19,16 +19,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/*
-// Metadata
-export const metadata: Metadata = {
-  title: "Blockchain Voting System",
-  description: "Blockchain Voting System",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
-*/
 function Navigation() {
   const pathname = usePathname();
 

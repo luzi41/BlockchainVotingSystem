@@ -168,7 +168,7 @@ function Results() {
 
   const [modus, setModus] = useState<number>(1);
   const [status, setStatus] = useState<string>("");
-  const [displayMode, setDisplayMode] = useState<"districts" | "total" | "none">("none");
+  const [displayMode, setDisplayMode] = useState<"districts" | "total" | "none">("total");
 
   const [results1, setResults1] = useState<Record<string, number>[]>([]);
   const [results2, setResults2] = useState<Record<string, number>[]>([]);
@@ -260,7 +260,7 @@ function Results() {
               setParties(_parties);
               setResults1(_results1);
               setResults2(_results2);
-              setDisplayMode("districts");
+              setDisplayMode("total");
             }
           } else {
             // Proposal mode
@@ -334,7 +334,7 @@ function Results() {
               setDisplayMode("total");
             }
           }}
-          defaultValue={displayMode === "districts" ? "1" : "2"}
+          defaultValue={displayMode === "total" ? "2" : "1"}
         >
           <option value="0">{texts.selectView}</option>
           <option value="1">{texts.viewDistricts}</option>
