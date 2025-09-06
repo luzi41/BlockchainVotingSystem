@@ -10,9 +10,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-        working-directory: election-system/frontend
       - run: npm test
-        working-directory: election-system/frontend
+        working-directory: election-system/nextFE/bvs
       - run: npm audit --production
-        working-directory: election-system/frontend
+        working-directory: election-system/nextFE/bvs
