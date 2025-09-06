@@ -5,21 +5,22 @@ import { Contract, Wallet } from "ethers";
 import forge from "node-forge";
 import Image from "next/image";
 import { invoke } from "@tauri-apps/api/core";
-
 import { useElectionStatus } from "./hooks/useElectionStatus";
 import { loadTexts } from "./utils/loadTexts";
-
 import scanner from "@public/scan-59.png";
 import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
 
-const isElectron =
-  typeof navigator !== "undefined" &&
-  navigator.userAgent.toLowerCase().includes("electron");
+// Dynamic import für Tauri API um SSR Probleme zu vermeiden
+const loadTauriAPI = async () => {
+    try {
+        const { invoke } = await import('@tauri-apps/api/core');
+        return { invoke };
+    } catch (err) {
+        console.warn('Tauri API nicht verfügbar:', err);
+        return null;
+    }
+};
 
-interface ElectronSettings {
-  electionDistrictNo?: number;
-  privateKey?: string;
-}
 
 async function encryptVote(_toVoted: string | number, _publicKey: string): Promise<string> {
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
@@ -33,7 +34,7 @@ interface VoteFormProps {
 }
 
 export interface AppSettings {
-  electionDistrictNo: string;
+  election_district: string;
   rpc_url: string;
   contract_address: string;
 }
@@ -91,17 +92,16 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
     async function fetchSettings() {
       let cancelled = false;
       try {
-        const t = await loadTexts("settingsForm-texts");
-        if (!cancelled) setTexts(t);
 
         if (isTauri) {
           // Echte Settings aus Tauri
           const s = await invoke<AppSettings>("get_all_settings");
           if (!cancelled) setSettings(s);
+          setElectionDistrictNo(s.election_district);
         } else {
           // Web-Fallback (read-only)
           const fallback: AppSettings = {
-            electionDistrictNo:
+            election_district:
               electionDistrictNo ||
               process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
               "1",
@@ -112,6 +112,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
               "0x0000000000000000000000000000000000000000",
           };
           if (!cancelled) setSettings(fallback);
+          setElectionDistrictNo(fallback.election_district);
         }
 
         // FE-only Defaults
@@ -123,7 +124,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
         console.error("❌ Fehler beim Initialisieren der Settings:", err);
         if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoadingSettings(false);
       }
     }
     fetchTexts()
@@ -133,10 +134,15 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
 
   // Vertragsdaten laden
   useEffect(() => {
-    if (!provider || !address || !electionId || !electionDistrictNo) return;
+    if (!provider || !address || !electionId || !electionDistrictNo) {
+      console.log("!provider || !address || !electionId || !electionDistrictNo");
+      return
+    };
 
     async function fetchData() {
       try {
+        console.log("Jetzt provider && address && electionId && electionDistrictNo");
+
         // ABI von statischer Datei laden (statt API Route)
         const abiResponse = await fetch('/contracts/Bundestagswahl.sol/Bundestagswahl.json');
         if (!abiResponse.ok) {
@@ -212,8 +218,11 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   };
 
   // if (loadingTexts || loadingAbi || loadingSettings) return <p>Load data ...</p>;
-  if (loadingAbi || loadingTexts) {
-    return <p className="text-gray-500">⏳ Daten werden geladen ...</p>;
+  if (loadingAbi ) {
+    return <p className="text-gray-500">⏳ Abi wird geladen ...</p>;
+  }
+  if (loadingTexts) {
+    return <p className="text-gray-500">⏳ Texte werden geladen ...</p>;
   }
 
   if (errorAbi || errorTexts || loadingSettings) {
