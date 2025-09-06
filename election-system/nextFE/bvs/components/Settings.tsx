@@ -53,10 +53,12 @@ export default function SettingsForm({
         if (!cancelled) setTexts(t);
 
         if (isTauri) {
+            console.log("Tauri! (56)");
           // Echte Settings aus Tauri
           const s = await invoke<AppSettings>("get_all_settings");
           if (!cancelled) setSettings(s);
         } else {
+            console.log("Kein Tauri! (61)");
           // Web-Fallback (read-only)
           const fallback: AppSettings = {
             election_district:
@@ -96,8 +98,9 @@ export default function SettingsForm({
     if (!settings) return;
 
     if (!isTauri) {
-      setStatus("🌐 Web-Modus: Speichern ist nur in der Desktop-App möglich.");
-      return;
+        console.log("Kein Tauri! (100)", settings);
+        setStatus("🌐 Web-Modus: Speichern ist nur in der Desktop-App möglich.");
+        return;
     }
 
     try {

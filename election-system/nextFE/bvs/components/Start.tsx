@@ -338,9 +338,7 @@ export default function Start() {
     // Main UI
     const mainUI = (
         <div className="flex flex-col items-center gap-6">
-            <h1 className="text-3xl font-bold text-center">
-                Blockchain Voting System
-            </h1>
+
             
             {settings && (
                 <div className="text-center text-gray-600">
@@ -385,8 +383,11 @@ export default function Start() {
 
     return (
         <div>
-            {mainUI}
+            <h1 className="text-3xl font-bold text-center">
+                Blockchain Voting System
+            </h1>
             {htmlContent}
+            {mainUI}
         </div>
     );
 }
