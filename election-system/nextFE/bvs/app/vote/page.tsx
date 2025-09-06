@@ -5,12 +5,12 @@ import { use } from "react";
 import VoteForm from "@components/VoteForm";
 
 interface PageProps {
-  searchParams: Promise<{ ed?: string }>;
+  //searchParams: Promise<{ ed?: string }>;
 }
 
-export default function VotePage({ searchParams }: PageProps) {
+export default function VotePage() {
   // asynchrones searchParams via React.use() auflösen
-  const params = use(searchParams);
+  //const params = use(searchParams);
 
   const defaultDistrict =
     process.env.NEXT_PUBLIC_ELECTION_DISTRICT ?? "1";
@@ -25,12 +25,12 @@ export default function VotePage({ searchParams }: PageProps) {
 
   // Aktueller Bezirk: entweder aus URL oder Default
   // Wert aus URL oder Fallback aus env
-  const ed = params.ed ?? defaultDistrict;
+  //const ed = params.ed ?? defaultDistrict;
 
   return (
     <div className="flex justify-center p-6">
       <div className="w-full max-w-3xl">
-        <VoteForm electionDistrict={ed} availableDistricts={districts} />
+        <VoteForm electionDistrict="default" />
       </div>
     </div>
   );

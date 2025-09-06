@@ -1,9 +1,14 @@
+// app/layout.tsx
+"use client";
 import Link from "next/link";
 import type { Metadata } from "next";
 import LanguageSwitcher from "@components/LanguageSwitcher";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
+// Fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -14,48 +19,93 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/*
+// Metadata
 export const metadata: Metadata = {
   title: "Blockchain Voting System",
   description: "Blockchain Voting System",
   icons: {
-    icon: "/favicon.ico", // ✅ liegt in /public
+    icon: "/favicon.ico",
   },
 };
+*/
+function Navigation() {
+  const pathname = usePathname();
+
+  const links = [
+    { href: "/", label: "Informationen zur Wahl" },
+    { href: "/vote", label: "Abstimmen" },
+    { href: "/results", label: "Ergebnisse" },
+    { href: "/extras", label: "Extras" },
+  ];
+
+  return (
+    <nav className="main p-4 border-b" aria-label="Hauptnavigation">
+      <ul className="flex gap-4 items-center">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className={pathname === link.href ? "font-bold underline" : ""}
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+        <li className="ml-auto">
+          <LanguageSwitcher />
+        </li>
+        <li>
+          <Link
+            href="https://github.com/luzi41/BlockchainVotingSystem"
+            target="_blank"
+          >
+            Blockchain Voting System 0.30
+          </Link>
+        </li>
+      </ul>
+    </nav>
+  );
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const status = "Nicht implementiert!";
+}: Readonly<{ children: React.ReactNode }>) {
+  const [contractAddress, setContractAddress] = useState("Lade...");
+
+  useEffect(() => {
+    // Dynamische Daten aus Tauri laden
+    if ("__TAURI__" in window) {
+      import("@tauri-apps/api/core").then(({ invoke }) => {
+        invoke<string>("get_contract_address")
+          .then(setContractAddress)
+          .catch(() => setContractAddress("Fehler beim Laden"));
+      });
+
+      // Navigation-Eventlistener
+      import("@tauri-apps/api/event").then(({ listen }) => {
+        listen<string>("navigate", (event) => {
+          const newPath = event.payload;
+          window.location.hash = newPath; // später Router.push()
+        });
+      });
+    }
+  }, []);
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <nav className="main p-4 border-b" id="nav">
-          <ul>
-            <li><Link href="/">Informationen zur Wahl</Link></li>
-            <li><Link href="/vote">Abstimmen</Link></li>
-            <li><Link href="/results">Ergebnisse</Link></li>
-            <li><Link href="/extras">Extras</Link></li>
-            <li className="lang"><LanguageSwitcher /></li>
-            <li className="title">
-              <Link
-                href="https://github.com/luzi41/BlockchainVotingSystem"
-                target="_blank"
-              >
-                Blockchain Voting System 0.29
-              </Link>
-            </li>
-          </ul>
-        </nav>
+        <Navigation />
         {children}
         <footer
           id="footer"
-          className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"
+          className="p-4 border-t flex justify-center items-center"
         >
-          <span id="ContractAddress">{status}</span>
+          <span id="ContractAddress">
+            Contract: <code>{contractAddress}</code>
+          </span>
         </footer>
       </body>
     </html>

@@ -1,90 +1,101 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
 
-use std::process::{Child, Command, Stdio};
-use std::sync::{Arc, Mutex};
-use tauri::RunEvent;
-use std::thread;
-use std::time::Duration;
+use serde::{Deserialize, Serialize};
+use std::path::{Path, PathBuf};
+use tauri::{State, Emitter, Window};
+use tokio::sync::RwLock;
+use tokio::fs;
 
-fn main() {
-    let child_process: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
-    let child_process_clone = Arc::clone(&child_process);
+// -------------------- Settings Struct --------------------
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct AppSettings {
+    election_district: String,
+    rpc_url: String,
+    contract_address: String,
+}
+
+impl Default for AppSettings {
+    fn default() -> Self {
+        AppSettings {
+            election_district: "default-district".into(),
+            rpc_url: "http://127.0.0.1:8545".into(),
+            contract_address: "0x0000000000000000000000000000000000000000".into(),
+        }
+    }
+}
+
+// -------------------- State --------------------
+struct AppState {
+    settings: RwLock<AppSettings>,
+}
+
+// -------------------- Settings Helper --------------------
+fn settings_file_path() -> PathBuf {
+    let mut path = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
+    path.push("BVS");
+    path.push("settings.json");
+    path
+}
+
+async fn load_settings_from_file() -> AppSettings {
+    let path = settings_file_path();
+    if path.exists() {
+        match fs::read_to_string(&path).await {
+            Ok(contents) => match serde_json::from_str::<AppSettings>(&contents) {
+                Ok(parsed) => return parsed,
+                Err(e) => eprintln!("⚠️ Fehler beim Parsen der Settings: {e}"),
+            },
+            Err(e) => eprintln!("⚠️ Fehler beim Lesen von {:?}: {e}", path),
+        }
+    }
+    AppSettings::default()
+}
+
+async fn save_settings_to_file(settings: &AppSettings) -> Result<(), String> {
+    let path = settings_file_path();
+    let parent = path.parent().unwrap_or(Path::new("."));
+    if !parent.exists() {
+        fs::create_dir_all(parent)
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+    let json = serde_json::to_string_pretty(settings).map_err(|e| e.to_string())?;
+    fs::write(path, json).await.map_err(|e| e.to_string())
+}
+
+// -------------------- Commands --------------------
+#[tauri::command]
+async fn get_all_settings(state: State<'_, AppState>) -> Result<AppSettings, String> {
+    let settings = state.settings.read().await;
+    Ok(settings.clone())
+}
+
+#[tauri::command]
+async fn update_all_settings(state: State<'_, AppState>, new_settings: AppSettings) -> Result<(), String> {
+    let mut settings = state.settings.write().await;
+    *settings = new_settings;
+    save_settings_to_file(&*settings).await
+}
+
+#[tauri::command]
+fn navigate_to(window: Window, path: String) -> Result<(), String> {
+    window.emit("navigate", path).map_err(|e| e.to_string())
+}
+
+// -------------------- Main --------------------
+#[tokio::main]
+async fn main() {
+    let initial_settings = load_settings_from_file().await;
 
     tauri::Builder::default()
-        .setup(move |_app| {
-            #[cfg(not(debug_assertions))]
-            {
-                println!("Starting Next.js server in production mode...");
-                
-                // Erstelle das Build-Verzeichnis falls es nicht existiert
-                let build_result = Command::new("npm")
-                    .args(&["run", "build"])
-                    .current_dir("/home/louis/Projekte/BlockchainVotingsSystem/election-system/nextFE/bvs")
-                    .output();
-                
-                match build_result {
-                    Ok(output) => {
-                        if !output.status.success() {
-                            eprintln!("Next.js build failed: {}", String::from_utf8_lossy(&output.stderr));
-                            eprintln!("Build stdout: {}", String::from_utf8_lossy(&output.stdout));
-                        } else {
-                            println!("Next.js build completed successfully");
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("Failed to run build command: {}", e);
-                    }
-                }
-                
-                // Server starten
-                println!("Starting Next.js server...");
-                let child = Command::new("npm")
-                    .args(&["run", "start"])
-                    .current_dir("/home/louis/Projekte/BlockchainVotingsSystem/election-system/nextFE/bvs")
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .spawn();
-
-                match child {
-                    Ok(mut process) => {
-                        // Überwache Server-Output in separatem Thread
-                        if let Some(stdout) = process.stdout.take() {
-                            thread::spawn(move || {
-                                use std::io::{BufRead, BufReader};
-                                let reader = BufReader::new(stdout);
-                                for line in reader.lines() {
-                                    if let Ok(line) = line {
-                                        println!("Next.js: {}", line);
-                                    }
-                                }
-                            });
-                        }
-
-                        *child_process.lock().unwrap() = Some(process);
-                        
-                        // Warten bis Server bereit ist
-                        println!("Waiting for server to start...");
-                        thread::sleep(Duration::from_secs(8));
-                        println!("Server should be ready now - opening window");
-                    }
-                    Err(e) => {
-                        eprintln!("Failed to start Next.js server: {}", e);
-                    }
-                }
-            }
-
-            Ok(())
+        .manage(AppState {
+            settings: RwLock::new(initial_settings),
         })
-        .build(tauri::generate_context!())
-        .expect("error while running tauri application")
-        .run(move |_app_handle, event| {
-            if let RunEvent::ExitRequested { .. } = event {
-                println!("Application closing - shutting down Next.js server...");
-                if let Some(mut child) = child_process_clone.lock().unwrap().take() {
-                    let _ = child.kill();
-                    let _ = child.wait();
-                    println!("Next.js server shut down.");
-                }
-            }
-        });
+        .invoke_handler(tauri::generate_handler![
+            get_all_settings,
+            update_all_settings,
+            navigate_to
+        ])
+        .run(tauri::generate_context!())
+        .expect("❌ Fehler beim Starten der Tauri-Anwendung");
 }

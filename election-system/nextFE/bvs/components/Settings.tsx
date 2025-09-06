@@ -1,174 +1,240 @@
-// V0.29.6
+// components/Settings.tsx
 "use client";
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { Wallet } from "ethers";
 import { loadTexts } from "./utils/loadTexts";
 import { SettingsFormTexts } from "./types/SettingsFormTexts";
-import { Wallet } from "ethers";
-
 
 interface SettingsProps {
   electionDistrict: string;
   availableDistricts?: string[];
 }
 
-const isElectron =
-  typeof navigator !== "undefined" &&
-  navigator.userAgent.toLowerCase().includes("electron");
+// Muss den Rust-Struct-Namen/Feldnamen 1:1 spiegeln
+export interface AppSettings {
+  election_district: string;
+  rpc_url: string;
+  contract_address: string;
+}
 
-export default function SettingsForm({ electionDistrict, availableDistricts = [] }: SettingsProps) {
-    
-    //const { Wallet } = require('ethers');
-    const [language, setLanguage] = useState("de");
-    const [texts, setTexts] = useState<SettingsFormTexts | null>(null);
-    const [privateKey, setPrivateKey] = useState("");
-    const [rpcURL, setRpcURL] = useState("");
-    const [electionDistrictNo, setElectionDistrictNo] = useState<string>(electionDistrict); 
+const isTauri =
+  typeof window !== "undefined" && "__TAURI__" in window; // sicherer Check fürs FE
 
-    function handleSave(language: string, privateKey: string, electionDistrict: string, rpcURL: string) {
-        if (!window.electronAPI || !window.electronAPI.settings) return;
+export default function SettingsForm({
+  electionDistrict,
+  availableDistricts = [],
+}: SettingsProps) {
+  const [texts, setTexts] = useState<SettingsFormTexts | null>(null);
 
-        window.electronAPI.settings.set("language", language);
-        window.electronAPI.settings.set("privateKey", privateKey);
-        window.electronAPI.settings.set("electionDistrict", electionDistrict);
-        window.electronAPI.settings.set("rpcURL", rpcURL);
+  // FE-lokale (nicht persistente) Felder
+  const [language, setLanguage] = useState("de");
+  const [privateKey, setPrivateKey] = useState("");
 
-        //if (onClose) onClose(); // optional: Schließen nach Speichern
-    }
+  // Persistente (Rust) Settings
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string>("");
 
-    function createNewKey() {
-        const wallet = Wallet.createRandom();
-        setPrivateKey(wallet.privateKey);
-    }
+  // -------- Helpers
+  const createNewKey = () => {
+    const wallet = Wallet.createRandom();
+    setPrivateKey(wallet.privateKey);
+  };
 
-    useEffect(() => {
-        if (!window.electronAPI || !window.electronAPI.settings) return;
+  // -------- Initiales Laden
+  useEffect(() => {
+    let cancelled = false;
 
-        window.electronAPI.settings.get('language').then((val) => {
-            if (val !== undefined && val !== null) setLanguage(String(val));
-        });
+    async function init() {
+      try {
+        const t = await loadTexts("settingsForm-texts");
+        if (!cancelled) setTexts(t);
 
-        window.electronAPI.settings.get('privateKey').then((val) => {
-            if (val !== undefined && val !== null) setPrivateKey(String(val));
-        });
-
-        window.electronAPI.settings.get('electionDistrict').then((val) => {
-            if (val !== undefined && val !== null) setElectionDistrictNo(String(val));
-        });
-
-        window.electronAPI.settings.get('rpcURL').then((val) => {
-            if (val !== undefined && val !== null) {
-                setRpcURL(String(val));
-            } else {
-                setRpcURL(String(process.env.NEXT_PUBLIC_RPC_URL));
-            }
-        });
-
-
-    }, []);
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                // 🗣 Texte laden
-                const _texts = await loadTexts("settingsForm-texts");
-                setTexts(_texts);
-
-                let _electionDistrict: string = electionDistrict;
-
-                if (isElectron) {
-                    const ipc = window.electronAPI;
-                    if (!ipc) return;
-                    const ed = await ipc.settings.get("electionDistrict");
-                    _electionDistrict = ed ? String(ed) : electionDistrict;
-                } else {
-                    _electionDistrict = electionDistrict || process.env.NEXT_PUBLIC_ELECTION_DISTRICT || "";
-                    setElectionDistrictNo(_electionDistrict);
-                }              
-            } catch (error) {
-                console.error("❌ Fehler beim Laden der Texte:", error);
-            }
+        if (isTauri) {
+          // Echte Settings aus Tauri
+          const s = await invoke<AppSettings>("get_all_settings");
+          if (!cancelled) setSettings(s);
+        } else {
+          // Web-Fallback (read-only)
+          const fallback: AppSettings = {
+            election_district:
+              electionDistrict ||
+              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
+              "1",
+            rpc_url:
+              process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+            contract_address:
+              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+              "0x0000000000000000000000000000000000000000",
+          };
+          if (!cancelled) setSettings(fallback);
         }
-        fetchData();
-    }, [electionDistrict]);
-    
 
-    if (!texts) return <p>Load texts ...</p>;
+        // FE-only Defaults
+        if (!cancelled) {
+          setLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+          setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
+        }
+      } catch (err) {
+        console.error("❌ Fehler beim Initialisieren der Settings:", err);
+        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
 
-    const settingsElectron = (
-        <div className="settings">
-            <h3>{texts.settings}</h3>
-            <div>
-            <label>{texts.language}:</label><br />
-            <select 
-                value={language} 
-                onChange={(e) => setLanguage(e.target.value)}
-            >
-                <option value="de">Deutsch</option>
-                <option value="en">English</option>
-            </select>
-            </div>
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, [electionDistrict]);
 
-            <div>
-            <label>{texts.privateKey}:</label><br />
-            <textarea
-                value={privateKey}
-                onChange={(e) => setPrivateKey(e.target.value)}
-                placeholder="0x..."
-                rows={4}
-            /><br />
-            <button onClick={createNewKey}>Neuen Schlüssel generieren</button>
-            </div>
+  // -------- Speichern
+  const handleSave = async () => {
+    if (!settings) return;
 
-            <div>
-            <label>{texts.electionDistrict}:</label><br />
-            <input
-                type="number"
-                value={electionDistrictNo}
-                onChange={(e) => setElectionDistrictNo(e.target.value)}
-            />
-            </div>
+    if (!isTauri) {
+      setStatus("🌐 Web-Modus: Speichern ist nur in der Desktop-App möglich.");
+      return;
+    }
 
-            <div>
-            <label>{texts.rpcServer}:</label><br />
-            <input
-                type="text"
-                value={rpcURL}
-                placeholder="http://localhost:8545"
-                onChange={(e) => setRpcURL(e.target.value)}
-            />
-            </div>
+    try {
+      setStatus("Speichern …");
 
-            <div>
-            <button onClick={() => handleSave(language, privateKey, electionDistrict, rpcURL)}>
-                Speichern
-            </button>
-            </div>
-        </div>
-    );
+      // ✅ Variante A: Rust erwartet ein komplettes Objekt (new_settings: AppSettings)
+      try {
+        await invoke("update_all_settings", { newSettings: settings });
+      } catch (eA) {
+        // ✅ Variante B: Rust erwartet 3 einzelne Strings (new_district, new_rpc_url, new_contract_address)
+        await invoke("update_all_settings", {
+          newDistrict: settings.election_district,
+          newRpcUrl: settings.rpc_url,
+          newContractAddress: settings.contract_address,
+        });
+      }
 
-    const webVersion = (
-    <div>
-        <h3>{texts.settings}</h3>
-        <p>(read only)</p>
-        <table>
-        <tbody>
-            <tr>
-            <td>{texts.privateKey}:</td>
-            <td>{process.env.NEXT_PUBLIC_PRIVATE_KEY}</td>
-            </tr>
-            <tr>
-            <td>{texts.electionDistrict}:</td>
-            <td>{electionDistrictNo}</td>
-            </tr>
-            <tr>
-            <td>{texts.rpcServer}:</td>
-            <td>{process.env.NEXT_PUBLIC_RPC_URL}</td>
-            </tr>
-        </tbody>
-        </table>
+      setStatus("✅ Einstellungen gespeichert.");
+    } catch (err) {
+      console.error("❌ Fehler beim Speichern:", err);
+      setStatus("❌ Fehler beim Speichern.");
+    }
+  };
+
+  if (loading || !texts || !settings) {
+    return <p className="p-4">Lade Einstellungen …</p>;
+  }
+
+  return (
+    <div className="settings max-w-3xl">
+      <h3 className="text-xl font-semibold mb-4">{texts.settings}</h3>
+
+      {/* Sprache (nur FE) */}
+      <div className="mb-4">
+        <label className="block mb-1">{texts.language} (nur lokal)</label>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="border p-2 w-full"
+        >
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      {/* Privater Schlüssel (nur FE) */}
+      <div className="mb-4">
+        <label className="block mb-1">{texts.privateKey} (nur lokal)</label>
+        <textarea
+          value={privateKey}
+          onChange={(e) => setPrivateKey(e.target.value)}
+          placeholder="0x..."
+          rows={4}
+          className="border p-2 w-full"
+        />
+        <button
+          type="button"
+          onClick={createNewKey}
+          className="mt-2 border px-3 py-1 rounded"
+        >
+          Neuen Schlüssel generieren
+        </button>
+      </div>
+
+      {/* Wahlbezirk (persistiert) */}
+      <div className="mb-4">
+        <label className="block mb-1">{texts.electionDistrict}</label>
+        {availableDistricts.length > 0 ? (
+          <select
+            value={settings.election_district}
+            onChange={(e) =>
+              setSettings({ ...settings, election_district: e.target.value })
+            }
+            className="border p-2 w-full"
+          >
+            {availableDistricts.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="number"
+            value={settings.election_district}
+            onChange={(e) =>
+              setSettings({ ...settings, election_district: e.target.value })
+            }
+            className="border p-2 w-full"
+          />
+        )}
+      </div>
+
+      {/* RPC URL (persistiert) */}
+      <div className="mb-4">
+        <label className="block mb-1">{texts.rpcServer}</label>
+        <input
+          type="text"
+          value={settings.rpc_url}
+          placeholder="http://localhost:8545"
+          onChange={(e) =>
+            setSettings({ ...settings, rpc_url: e.target.value })
+          }
+          className="border p-2 w-full"
+        />
+      </div>
+
+      {/* Contract Address (persistiert) */}
+      <div className="mb-6">
+        <label className="block mb-1">{texts.contractAddress ?? "Contract Address"}</label>
+        <input
+          type="text"
+          value={settings.contract_address}
+          onChange={(e) =>
+            setSettings({ ...settings, contract_address: e.target.value })
+          }
+          className="border p-2 w-full"
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Speichern
+        </button>
+        {status && <span className="text-sm opacity-80">{status}</span>}
+      </div>
+
+      {!isTauri && (
+        <p className="mt-3 text-sm opacity-75">
+          Hinweis: Im Browser werden Einstellungen nicht gespeichert (read-only
+          Fallback über <code>NEXT_PUBLIC_…</code>).
+        </p>
+      )}
     </div>
-    );
-
-    return window.electronAPI ? settingsElectron : webVersion;
-
+  );
 }

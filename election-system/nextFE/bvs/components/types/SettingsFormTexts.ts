@@ -12,4 +12,5 @@ export interface SettingsFormTexts {
   secondVote: string;
   survey: string;
   btnSend: string;
+  contractAddress: string;
 }

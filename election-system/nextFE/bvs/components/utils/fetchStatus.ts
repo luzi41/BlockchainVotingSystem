@@ -1,33 +1,47 @@
 import { JsonRpcProvider, Contract } from "ethers";
 import Registry from "../../public/contracts/Registry.sol/Registry.json";
 
-const isElectron =
-  typeof navigator !== "undefined" &&
-  navigator.userAgent.toLowerCase().includes("electron");
+// Tauri-Dynamic Import → funktioniert auch im Web
+const loadTauriAPI = async () => {
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return { invoke };
+  } catch {
+    return null;
+  }
+};
+
+// Typisierung für die Settings aus Rust
+interface AppSettings {
+  election_district: string;
+  rpc_url: string;
+  contract_address: string;
+}
 
 export async function fetchStatus() {
   try {
-    let rpcURL = process.env.NEXT_PUBLIC_RPC_URL;
+    let rpcURL: string | undefined;
+    let contractAddress: string | undefined;
 
-    if (isElectron && window.electronAPI) {
-      const ipc = window.electronAPI;
-      const ipcRpc = await ipc.settings.get("rpcURL");
-      if (ipcRpc) rpcURL = String(ipcRpc);
-      else throw new Error("Fehlende RPC-URL im Electron Store");
+    // 🔎 Prüfen, ob wir in Tauri laufen
+    const isTauri = typeof window !== "undefined" && "__TAURI__" in window;
+
+    if (isTauri) {
+      const tauriAPI = await loadTauriAPI();
+      if (!tauriAPI) throw new Error("Tauri API konnte nicht geladen werden!");
+      const s = await tauriAPI.invoke<AppSettings>("get_all_settings");
+      rpcURL = s.rpc_url;
+      contractAddress = s.contract_address;
+    } else {
+      // 🌍 Browser/Web-Fallback
+      rpcURL = process.env.NEXT_PUBLIC_RPC_URL;
+      contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     }
 
     if (!rpcURL) throw new Error("Keine RPC-URL gesetzt!");
+    if (!contractAddress) throw new Error("Keine Contract-Adresse gesetzt!");
 
     const provider = new JsonRpcProvider(rpcURL);
-
-    let contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
-    if (isElectron && window.electronAPI) {
-      const ipc = window.electronAPI;
-      const ipcAddress = await ipc.settings.get("contractAddress");
-      if (ipcAddress) contractAddress = String(ipcAddress);
-    }
-
-    if (!contractAddress) throw new Error("Keine Contract-Adresse gesetzt!");
 
     const contract = new Contract(contractAddress, Registry.abi, provider);
 

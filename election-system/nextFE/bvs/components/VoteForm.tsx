@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Contract, Wallet } from "ethers";
 import forge from "node-forge";
 import Image from "next/image";
+import { invoke } from "@tauri-apps/api/core";
 
 import { useElectionStatus } from "./hooks/useElectionStatus";
 import { loadTexts } from "./utils/loadTexts";
@@ -16,7 +17,7 @@ const isElectron =
   navigator.userAgent.toLowerCase().includes("electron");
 
 interface ElectronSettings {
-  electionDistrict?: number;
+  electionDistrictNo?: number;
   privateKey?: string;
 }
 
@@ -31,7 +32,16 @@ interface VoteFormProps {
   availableDistricts?: string[];
 }
 
-export default function VoteForm({ electionDistrict, availableDistricts = [] }: VoteFormProps) {
+export interface AppSettings {
+  electionDistrictNo: string;
+  rpc_url: string;
+  contract_address: string;
+}
+
+const isTauri =
+  typeof window !== "undefined" && "__TAURI__" in window; // sicherer Check fürs FE
+
+export default function VoteForm({  electionDistrict, availableDistricts = [], }: VoteFormProps) {
   const { provider, address, electionId } = useElectionStatus();
 
   const [abi, setAbi] = useState<any[]>([]);
@@ -49,11 +59,14 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
   const [loadingTexts, setLoadingTexts] = useState(true);
   const [loadingAbi, setLoadingAbi] = useState(true);
   const [loadingSettings, setLoadingSettings] = useState(true);
-  const [electionDistrictNo, setElectionDistrictNo] = useState<string>(electionDistrict);
+  const [electionDistrictNo, setElectionDistrictNo] = useState<string>("");
   const [errorAbi, setErrorAbi] = useState<string | null>(null);
   const [errorTexts, setErrorTexts] = useState<string | null>(null);
   const [errorSettings, setErrorSettings] = useState<string | null>(null);
-
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState("de");
+  const [status, setStatus] = useState<string>("");
 
   // Texte laden
   useEffect(() => {
@@ -76,35 +89,47 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
     }
 
     async function fetchSettings() {
+      let cancelled = false;
       try {
-        let _privateKey: string;
-        let _electionDistrict: string = electionDistrict;
+        const t = await loadTexts("settingsForm-texts");
+        if (!cancelled) setTexts(t);
 
-        if (isElectron) {
-          const ipc = window.electronAPI;
-          if (!ipc) return;
-          const pk = await ipc.settings.get("privateKey");
-          if (!pk) throw new Error("Fehlende privateKey im Electron Store");
-          _privateKey = String(pk);
-          const ed = await ipc.settings.get("electionDistrict");
-          _electionDistrict = ed ? String(ed) : electionDistrict;
+        if (isTauri) {
+          // Echte Settings aus Tauri
+          const s = await invoke<AppSettings>("get_all_settings");
+          if (!cancelled) setSettings(s);
         } else {
-          _privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || Wallet.createRandom().privateKey;
-          _electionDistrict = electionDistrict || process.env.NEXT_PUBLIC_ELECTION_DISTRICT || "";
+          // Web-Fallback (read-only)
+          const fallback: AppSettings = {
+            electionDistrictNo:
+              electionDistrictNo ||
+              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
+              "1",
+            rpc_url:
+              process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+            contract_address:
+              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+              "0x0000000000000000000000000000000000000000",
+          };
+          if (!cancelled) setSettings(fallback);
         }
-        setPrivateKey(String(_privateKey));
-        setElectionDistrictNo(_electionDistrict);
-      } catch (err: unknown) {
-        console.error("Fehler beim Laden der Settings:", err);
-        setError("❌ Fehler beim Laden der Konfiguration");
-        setErrorSettings(String(err));
+
+        // FE-only Defaults
+        if (!cancelled) {
+          setLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+          setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
+        }
+      } catch (err) {
+        console.error("❌ Fehler beim Initialisieren der Settings:", err);
+        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
       } finally {
-        setLoadingSettings(false);
+        if (!cancelled) setLoading(false);
       }
     }
     fetchTexts()
     fetchSettings();
-  }, [electionDistrict]);
+    
+  }, [electionDistrictNo]);
 
   // Vertragsdaten laden
   useEffect(() => {
@@ -112,15 +137,20 @@ export default function VoteForm({ electionDistrict, availableDistricts = [] }: 
 
     async function fetchData() {
       try {
-        const res = await fetch("/api/abi");
-        const abiJson = await res.json();
-        const contractAbi = abiJson.abi.abi;
+        // ABI von statischer Datei laden (statt API Route)
+        const abiResponse = await fetch('/contracts/Bundestagswahl.sol/Bundestagswahl.json');
+        if (!abiResponse.ok) {
+            throw new Error(`ABI laden fehlgeschlagen: ${abiResponse.status}`);
+        }
+        
+        const abiData = await abiResponse.json();
+        const abi = abiData.abi || abiData; // Fallback falls die Struktur variiert
 
-        setAbi(contractAbi);
+        setAbi(abi);
         //console.log("ABI JSON geladen:", abiJson);
         //console.log("ABI Array:", abiJson.abi);
 
-        const ctr = new Contract(String(address), contractAbi, provider);
+        const ctr = new Contract(String(address), abi, provider);
         const m = await ctr.getModus();
         setModus(Number(m));
 

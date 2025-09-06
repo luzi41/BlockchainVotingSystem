@@ -1,10 +1,12 @@
 {
   "productName": "BVS",
-  "version": "0.29.20",
+  "version": "0.30.0",
   "identifier": "com.goettertz.bvs",
   "build": {
     "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run dev"
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:3002",
+    "frontendDist": "../out"
   },
   "app": {
     "windows": [
@@ -14,6 +16,7 @@
         "height": 800,
         "resizable": true,
         "fullscreen": false
+        
       }
     ],
     "security": {
@@ -30,6 +33,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {}
+  }
 }

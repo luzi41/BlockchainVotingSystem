@@ -163,7 +163,7 @@ function TotalResults({ texts, parties, aggregated }: { texts: ResultsTexts; par
 
 /* ---------- Hauptkomponente (ohne setHtml) ---------- */
 
-const Results: ResultsComponent = ({ electionDistrict, availableDistricts = [] }) => {
+function Results() {
   const { provider, address, electionId } = useElectionStatus();
 
   const [modus, setModus] = useState<number>(1);
@@ -203,11 +203,17 @@ const Results: ResultsComponent = ({ electionDistrict, availableDistricts = [] }
       // Now fetch blockchain results
       setLoadingResults(true);
       try {
-        const res = await fetch("/api/abi");
-        const abiJson = await res.json();
-        const contractAbi = abiJson.abi.abi;
+        // ABI von statischer Datei laden (statt API Route)
+        const abiResponse = await fetch('/contracts/Bundestagswahl.sol/Bundestagswahl.json');
+        if (!abiResponse.ok) {
+            throw new Error(`ABI laden fehlgeschlagen: ${abiResponse.status}`);
+        }
+        
+        const abiData = await abiResponse.json();
+        const abi = abiData.abi || abiData; // Fallback falls die Struktur variiert
+        
         if (!address) throw new Error("Contract address is null or undefined.");
-        const contract = new Contract(String(address), contractAbi, provider);
+        const contract = new Contract(String(address), abi, provider);
 
         const electionStatus = await contract.getElectionStatus(electionId);
         if (!mounted) return;
