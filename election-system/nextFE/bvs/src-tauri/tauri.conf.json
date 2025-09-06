@@ -1,6 +1,6 @@
 {
   "productName": "BVS",
-  "version": "0.30.2",
+  "version": "0.30.3",
   "identifier": "com.goettertz.bvs",
   "build": {
     "beforeBuildCommand": "npm run build",
@@ -9,6 +9,7 @@
     "frontendDist": "../out"
   },
   "app": {
+    "withGlobalTauri": true,    
     "windows": [
       {
         "title": "BVS",

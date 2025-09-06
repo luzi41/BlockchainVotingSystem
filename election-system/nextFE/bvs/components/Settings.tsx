@@ -2,10 +2,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { Wallet } from "ethers";
 import { loadTexts } from "./utils/loadTexts";
 import { SettingsFormTexts } from "./types/SettingsFormTexts";
+
+// Sichere Tauri API Imports mit korrekten Types
+let invoke: ((cmd: string, args?: any) => Promise<any>) | null = null;
+try {
+  // Dynamischer Import für Tauri APIs
+  const tauriCore = require("@tauri-apps/api/core");
+  invoke = tauriCore.invoke;
+} catch (error) {
+  console.log("Tauri APIs nicht verfügbar (Web-Modus)");
+}
 
 interface SettingsProps {
   electionDistrict: string;
@@ -19,14 +28,34 @@ export interface AppSettings {
   contract_address: string;
 }
 
-const isTauri =
-  typeof window !== "undefined" && "__TAURI__" in window; // sicherer Check fürs FE
+// Verbesserte Tauri-Erkennung für V2
+const checkIsTauri = (): boolean => {
+  if (typeof window === "undefined") return false;
+  
+  // Wichtig: Erst prüfen ob invoke überhaupt verfügbar ist
+  if (!invoke) return false;
+  
+  // Methode 1: __TAURI__ global check
+  if ("__TAURI__" in window) return true;
+  
+  // Methode 2: Tauri-spezifische APIs prüfen
+  try {
+    // @ts-ignore - Tauri globals
+    if (window.__TAURI_INTERNALS__) return true;
+  } catch {}
+  
+  // Methode 3: User Agent prüfen - NUR wenn invoke verfügbar ist
+  if (navigator.userAgent.includes('Tauri')) return true;
+  
+  return false;
+};
 
 export default function SettingsForm({
   electionDistrict,
   availableDistricts = [],
 }: SettingsProps) {
   const [texts, setTexts] = useState<SettingsFormTexts | null>(null);
+  const [isTauri, setIsTauri] = useState<boolean | null>(null); // null = noch nicht ermittelt
 
   // FE-lokale (nicht persistente) Felder
   const [language, setLanguage] = useState("de");
@@ -43,6 +72,23 @@ export default function SettingsForm({
     setPrivateKey(wallet.privateKey);
   };
 
+  // Async Tauri-Test durch invoke-Aufruf
+  const testTauriConnection = async (): Promise<boolean> => {
+    try {
+      // Prüfe erst, ob invoke überhaupt verfügbar ist
+      if (!invoke || typeof invoke !== 'function') {
+        return false;
+      }
+      
+      // Teste mit einem einfachen invoke-Aufruf
+      await invoke("get_all_settings");
+      return true;
+    } catch (error) {
+      console.log("Tauri invoke test failed:", error);
+      return false;
+    }
+  };
+
   // -------- Initiales Laden
   useEffect(() => {
     let cancelled = false;
@@ -52,13 +98,32 @@ export default function SettingsForm({
         const t = await loadTexts("settingsForm-texts");
         if (!cancelled) setTexts(t);
 
-        if (isTauri) {
-            console.log("Tauri! (56)");
-          // Echte Settings aus Tauri
-          const s = await invoke<AppSettings>("get_all_settings");
-          if (!cancelled) setSettings(s);
+        // Erweiterte Tauri-Erkennung
+        let tauriDetected = checkIsTauri();
+        
+        // Falls der erste Check negativ war und invoke verfügbar ist, teste async mit invoke
+        if (!tauriDetected && invoke) {
+          try {
+            tauriDetected = await testTauriConnection();
+          } catch (error) {
+            console.log("Async Tauri test failed:", error);
+            tauriDetected = false;
+          }
+        }
+        /*
+        if (!cancelled) {
+          setIsTauri(tauriDetected);
+          console.log(`Tauri-Modus erkannt: ${tauriDetected}`);
+        }
+        */
+        if (tauriDetected && invoke) {
+            setIsTauri(true);
+            console.log("Tauri-Modus: Lade Settings aus Rust");
+            // Echte Settings aus Tauri (ohne generics wegen any-Type)
+            const s = await invoke("get_all_settings") as AppSettings;
+            if (!cancelled) setSettings(s);
         } else {
-            console.log("Kein Tauri! (61)");
+          console.log("Web-Modus: Verwende Fallback-Settings");
           // Web-Fallback (read-only)
           const fallback: AppSettings = {
             election_district:
@@ -97,10 +162,10 @@ export default function SettingsForm({
   const handleSave = async () => {
     if (!settings) return;
 
-    if (!isTauri) {
-        console.log("Kein Tauri! (100)", settings);
-        setStatus("🌐 Web-Modus: Speichern ist nur in der Desktop-App möglich.");
-        return;
+    if (!isTauri || !invoke) {
+      console.log("Web-Modus: Speichern nicht möglich", settings);
+      setStatus("🌐 Web-Modus: Speichern ist nur in der Desktop-App möglich.");
+      return;
     }
 
     try {
@@ -109,29 +174,35 @@ export default function SettingsForm({
       // ✅ Variante A: Rust erwartet ein komplettes Objekt (new_settings: AppSettings)
       try {
         await invoke("update_all_settings", { newSettings: settings });
+        setStatus("✅ Einstellungen gespeichert (Variante A).");
       } catch (eA) {
+        console.log("Variante A fehlgeschlagen, versuche Variante B:", eA);
         // ✅ Variante B: Rust erwartet 3 einzelne Strings (new_district, new_rpc_url, new_contract_address)
         await invoke("update_all_settings", {
           newDistrict: settings.election_district,
           newRpcUrl: settings.rpc_url,
           newContractAddress: settings.contract_address,
         });
+        setStatus("✅ Einstellungen gespeichert (Variante B).");
       }
-
-      setStatus("✅ Einstellungen gespeichert.");
     } catch (err) {
       console.error("❌ Fehler beim Speichern:", err);
       setStatus("❌ Fehler beim Speichern.");
     }
   };
 
-  if (loading || !texts || !settings) {
+  if (loading || !texts || !settings ) {
     return <p className="p-4">Lade Einstellungen …</p>;
   }
 
   return (
     <div className="settings max-w-3xl">
       <h3 className="text-xl font-semibold mb-4">{texts.settings}</h3>
+
+      {/* Debug Info */}
+      <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
+        <strong>Modus:</strong> {isTauri ? "🖥️ Tauri Desktop-App" : "🌐 Web-Browser"}
+      </div>
 
       {/* Sprache (nur FE) */}
       <div className="mb-4">
@@ -225,14 +296,19 @@ export default function SettingsForm({
         <button
           type="button"
           onClick={handleSave}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className={`px-4 py-2 rounded text-white ${
+            isTauri && invoke
+              ? "bg-blue-600 hover:bg-blue-700" 
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
+          disabled={!isTauri || !invoke}
         >
           Speichern
         </button>
         {status && <span className="text-sm opacity-80">{status}</span>}
       </div>
 
-      {!isTauri && (
+      {(!isTauri || !invoke) && (
         <p className="mt-3 text-sm opacity-75">
           Hinweis: Im Browser werden Einstellungen nicht gespeichert (read-only
           Fallback über <code>NEXT_PUBLIC_…</code>).
