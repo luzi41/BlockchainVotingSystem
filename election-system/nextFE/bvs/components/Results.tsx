@@ -269,7 +269,7 @@ function Results() {
             if (!cancelled) setSettings(s);
         } else {
           console.log("Web-Modus: Verwende Fallback-Settings");
-
+           // FE-only Defaults
           s = {
               language: process.env.NEXT_PUBLIC_LANG || "de",
               election_district:
@@ -281,36 +281,16 @@ function Results() {
                 process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
                 "0x0000000000000000000000000000000000000000",
           };
-          
-          if (!cancelled) {
-            setSettings(s);
-            console.log("Settings:", s);
-            const t = await loadTexts("settingsForm-texts", s.language);
-            setTexts(t);
-          } 
-          console.log("Settings:", settings);
         }
         
-        // FE-only Defaults
-        if (!cancelled) {
-          // State-Update für Settings und Texte in EINEM Schritt
-          setSettings(s);
-          console.log("Settings:", s);
-          const t = await loadTexts("settingsForm-texts", s.language);
-          setLoadingTexts(true);
-          setTexts(t);
-        }
-        
-
-        try {
-          const t = await loadTexts("results-texts", localLanguage);
-          if (!cancelled) setTexts(t);          
-        } catch (error) {
-          throw new Error("Konnte Texte nicht laden.");
-        } finally {
-          setLoadingTexts(false);
-        }
-
+      if (!cancelled) {
+        // State-Update für Settings und Texte in EINEM Schritt
+        setSettings(s);
+        //console.log("Settings:", s);
+        const t = await loadTexts("results-texts", s.language);
+        setTexts(t);
+        setLoadingTexts(false);
+      }
 
 
       } catch (err) {

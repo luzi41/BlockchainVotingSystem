@@ -1,6 +1,6 @@
 [package]
 name = "BVS"
-version = "0.30.5"
+version = "0.30.7"
 description = "BlockchainVotingSystem"
 authors = ["Louis Göttertz"]
 license = ""
