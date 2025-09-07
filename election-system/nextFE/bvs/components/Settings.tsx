@@ -133,7 +133,7 @@ export default function SettingsForm({
 
       // FE-only Defaults
       if (!cancelled) {
-        setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+        //setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
         setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
 
         // State-Update für Settings und Texte in EINEM Schritt

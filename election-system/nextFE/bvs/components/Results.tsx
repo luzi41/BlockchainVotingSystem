@@ -260,37 +260,47 @@ function Results() {
             tauriDetected = false;
           }
         }
-
+        let s: AppSettings;
         if (tauriDetected && invoke) {
             setIsTauri(true);
             console.log("Tauri-Modus: Lade Settings aus Rust");
             // Echte Settings aus Tauri (ohne generics wegen any-Type)
-            const s = await invoke("get_all_settings") as AppSettings;
+            s = await invoke("get_all_settings") as AppSettings;
             if (!cancelled) setSettings(s);
         } else {
           console.log("Web-Modus: Verwende Fallback-Settings");
-          // Web-Fallback (read-only)
-          const fallback: AppSettings = {
-            language: process.env.NEXT_PUBLIC_LANG || "de",
-            election_district:
-              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
-              "1",
-            rpc_url:
-              process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
-            contract_address:
-              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-              "0x0000000000000000000000000000000000000000",
+
+          s = {
+              language: process.env.NEXT_PUBLIC_LANG || "de",
+              election_district:
+                process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
+                "1",
+              rpc_url:
+                process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+              contract_address:
+                process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+                "0x0000000000000000000000000000000000000000",
           };
-          console.log("Fallback:", fallback);
-          if (!cancelled) setSettings(fallback);
+          
+          if (!cancelled) {
+            setSettings(s);
+            console.log("Settings:", s);
+            const t = await loadTexts("settingsForm-texts", s.language);
+            setTexts(t);
+          } 
           console.log("Settings:", settings);
         }
         
         // FE-only Defaults
         if (!cancelled) {
-          setLocalLanguage(settings?.language || process.env.NEXT_PUBLIC_LANGUAGE || "de");
+          // State-Update für Settings und Texte in EINEM Schritt
+          setSettings(s);
+          console.log("Settings:", s);
+          const t = await loadTexts("settingsForm-texts", s.language);
+          setLoadingTexts(true);
+          setTexts(t);
         }
-        setLoadingTexts(true);
+        
 
         try {
           const t = await loadTexts("results-texts", localLanguage);
