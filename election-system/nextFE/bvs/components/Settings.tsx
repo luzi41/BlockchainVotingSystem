@@ -94,61 +94,61 @@ export default function SettingsForm({
   useEffect(() => {
     let cancelled = false;
 
-  async function init() {
-    try {
-      let tauriDetected = checkIsTauri();
+    async function init() {
+      try {
+        let tauriDetected = checkIsTauri();
 
-      // Falls der erste Check negativ war, aber invoke verfügbar ist -> async testen
-      if (!tauriDetected && invoke) {
-        try {
-          tauriDetected = await testTauriConnection();
-        } catch (error) {
-          console.log("Async Tauri test failed:", error);
-          tauriDetected = false;
+        // Falls der erste Check negativ war, aber invoke verfügbar ist -> async testen
+        if (!tauriDetected && invoke) {
+          try {
+            tauriDetected = await testTauriConnection();
+          } catch (error) {
+            console.log("Async Tauri test failed:", error);
+            tauriDetected = false;
+          }
         }
+
+        let s: AppSettings;
+
+        if (tauriDetected && invoke) {
+          setIsTauri(true);
+          console.log("Tauri-Modus: Lade Settings aus Rust");
+
+          s = await invoke("get_all_settings") as AppSettings;
+        } else {
+          console.log("Web-Modus: Verwende Fallback-Settings");
+
+          s = {
+            language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
+            election_district:
+              electionDistrict ||
+              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
+              "1",
+            rpc_url: process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+            contract_address:
+              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+              "0x0000000000000000000000000000000000000000",
+          };
+        }
+
+        // FE-only Defaults
+        if (!cancelled) {
+          //setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+          setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
+
+          // State-Update für Settings und Texte in EINEM Schritt
+          setSettings(s);
+          console.log("Settings:", s);
+          const t = await loadTexts("settingsForm-texts", s.language);
+          setTexts(t);
+        }
+      } catch (err) {
+        console.error("❌ Fehler beim Initialisieren der Settings:", err);
+        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      let s: AppSettings;
-
-      if (tauriDetected && invoke) {
-        setIsTauri(true);
-        console.log("Tauri-Modus: Lade Settings aus Rust");
-
-        s = await invoke("get_all_settings") as AppSettings;
-      } else {
-        console.log("Web-Modus: Verwende Fallback-Settings");
-
-        s = {
-          language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
-          election_district:
-            electionDistrict ||
-            process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
-            "1",
-          rpc_url: process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
-          contract_address:
-            process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-            "0x0000000000000000000000000000000000000000",
-        };
-      }
-
-      // FE-only Defaults
-      if (!cancelled) {
-        //setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
-        setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
-
-        // State-Update für Settings und Texte in EINEM Schritt
-        setSettings(s);
-        console.log("Settings:", s);
-        const t = await loadTexts("settingsForm-texts", s.language);
-        setTexts(t);
-      }
-    } catch (err) {
-      console.error("❌ Fehler beim Initialisieren der Settings:", err);
-      if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
-    } finally {
-      if (!cancelled) setLoading(false);
     }
-  }
 
     init();
     

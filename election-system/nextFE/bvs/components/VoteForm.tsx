@@ -4,23 +4,21 @@ import { useState, useEffect } from "react";
 import { Contract, Wallet } from "ethers";
 import forge from "node-forge";
 import Image from "next/image";
-import { invoke } from "@tauri-apps/api/core";
+//import { invoke } from "@tauri-apps/api/core";
 import { useElectionStatus } from "./hooks/useElectionStatus";
 import { loadTexts } from "./utils/loadTexts";
 import scanner from "@public/scan-59.png";
 import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
 
-// Dynamic import für Tauri API um SSR Probleme zu vermeiden
-const loadTauriAPI = async () => {
-    try {
-        const { invoke } = await import('@tauri-apps/api/core');
-        return { invoke };
-    } catch (err) {
-        console.warn('Tauri API nicht verfügbar:', err);
-        return null;
-    }
-};
-
+// Sichere Tauri API Imports mit korrekten Types
+let invoke: ((cmd: string, args?: any) => Promise<any>) | null = null;
+try {
+  // Dynamischer Import für Tauri APIs
+  const tauriCore = require("@tauri-apps/api/core");
+  invoke = tauriCore.invoke;
+} catch (error) {
+  console.log("Tauri APIs nicht verfügbar (Web-Modus)");
+}
 
 async function encryptVote(_toVoted: string | number, _publicKey: string): Promise<string> {
   const pubKey = forge.pki.publicKeyFromPem(_publicKey);
@@ -37,10 +35,30 @@ export interface AppSettings {
   election_district: string;
   rpc_url: string;
   contract_address: string;
+  language: string;
 }
 
-const isTauri =
-  typeof window !== "undefined" && "__TAURI__" in window; // sicherer Check fürs FE
+// Verbesserte Tauri-Erkennung für V2
+const checkIsTauri = (): boolean => {
+  if (typeof window === "undefined") return false;
+  
+  // Wichtig: Erst prüfen ob invoke überhaupt verfügbar ist
+  if (!invoke) return false;
+  
+  // Methode 1: __TAURI__ global check
+  if ("__TAURI__" in window) return true;
+  
+  // Methode 2: Tauri-spezifische APIs prüfen
+  try {
+    // @ts-ignore - Tauri globals
+    if (window.__TAURI_INTERNALS__) return true;
+  } catch {}
+  
+  // Methode 3: User Agent prüfen - NUR wenn invoke verfügbar ist
+  if (navigator.userAgent.includes('Tauri')) return true;
+  
+  return false;
+};
 
 export default function VoteForm({  electionDistrict, availableDistricts = [], }: VoteFormProps) {
   const { provider, address, electionId } = useElectionStatus();
@@ -68,67 +86,91 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState("de");
   const [status, setStatus] = useState<string>("");
+  const [isTauri, setIsTauri] = useState<boolean | null>(null); // null = noch nicht ermittelt
+  const [localLanguage, setLocalLanguage] = useState<string>("en");
 
-  // Texte laden
-  useEffect(() => {
-    const fetchTexts = async () => { 
-      setErrorTexts(null);
-      setLoadingTexts(true);      
-      try {
-        const _texts = await loadTexts("voteForm-texts");
-        if (_texts !== null) {
-          setTexts(_texts);
-        } else {
-          setErrorTexts("Keine Texte gefunden");
-        }
-      } catch (err: any) {
-        console.error("Fehler beim Laden der Texte:", err);
-        setErrorTexts("Fehler beim Laden der Texte");
-      } finally {
-        setLoadingTexts(false);
+    // Async Tauri-Test durch invoke-Aufruf
+  const testTauriConnection = async (): Promise<boolean> => {
+    try {
+      // Prüfe erst, ob invoke überhaupt verfügbar ist
+      if (!invoke || typeof invoke !== 'function') {
+        return false;
       }
+      
+      // Teste mit einem einfachen invoke-Aufruf
+      await invoke("get_all_settings");
+      return true;
+    } catch (error) {
+      console.log("Tauri invoke test failed:", error);
+      return false;
     }
+  };
 
-    async function fetchSettings() {
-      let cancelled = false;
+   // -------- Initiales Laden
+  useEffect(() => {
+    let cancelled = false;
+
+    async function init() {
       try {
+        let tauriDetected = checkIsTauri();
 
-        if (isTauri) {
-          // Echte Settings aus Tauri
-          const s = await invoke<AppSettings>("get_all_settings");
-          if (!cancelled) setSettings(s);
-          setElectionDistrictNo(s.election_district);
+        // Falls der erste Check negativ war, aber invoke verfügbar ist -> async testen
+        if (!tauriDetected && invoke) {
+          try {
+            tauriDetected = await testTauriConnection();
+          } catch (error) {
+            console.log("Async Tauri test failed:", error);
+            tauriDetected = false;
+          }
+        }
+
+        let s: AppSettings;
+
+        if (tauriDetected && invoke) {
+          setIsTauri(true);
+          console.log("Tauri-Modus: Lade Settings aus Rust");
+
+          s = await invoke("get_all_settings") as AppSettings;
         } else {
-          // Web-Fallback (read-only)
-          const fallback: AppSettings = {
+          console.log("Web-Modus: Verwende Fallback-Settings");
+
+          s = {
+            language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
             election_district:
-              electionDistrictNo ||
               process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
               "1",
-            rpc_url:
-              process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+            rpc_url: process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
             contract_address:
               process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
               "0x0000000000000000000000000000000000000000",
           };
-          if (!cancelled) setSettings(fallback);
-          setElectionDistrictNo(fallback.election_district);
         }
 
         // FE-only Defaults
         if (!cancelled) {
-          setLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+          //setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
           setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
+          
+          // State-Update für Settings und Texte in EINEM Schritt
+          setSettings(s);
+          console.log("Settings:", s);
+          setElectionDistrictNo(s.election_district);
+          const t = await loadTexts("voteForm-texts", s.language);
+          setTexts(t);
         }
       } catch (err) {
         console.error("❌ Fehler beim Initialisieren der Settings:", err);
         if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
       } finally {
-        if (!cancelled) setLoadingSettings(false);
+        if (!cancelled) {
+          setLoading(false);
+          setLoadingTexts(false);
+          setLoadingSettings(false);
+        }
       }
     }
-    fetchTexts()
-    fetchSettings();
+    //fetchTexts()
+    init();
     
   }, [electionDistrictNo]);
 
