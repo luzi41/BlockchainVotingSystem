@@ -94,64 +94,64 @@ export default function SettingsForm({
   useEffect(() => {
     let cancelled = false;
 
-    async function init() {
-      try {
-        // Erweiterte Tauri-Erkennung
-        let tauriDetected = checkIsTauri();
-        
-        // Falls der erste Check negativ war und invoke verfügbar ist, teste async mit invoke
-        if (!tauriDetected && invoke) {
-          try {
-            tauriDetected = await testTauriConnection();
-          } catch (error) {
-            console.log("Async Tauri test failed:", error);
-            tauriDetected = false;
-          }
+  async function init() {
+    try {
+      let tauriDetected = checkIsTauri();
+
+      // Falls der erste Check negativ war, aber invoke verfügbar ist -> async testen
+      if (!tauriDetected && invoke) {
+        try {
+          tauriDetected = await testTauriConnection();
+        } catch (error) {
+          console.log("Async Tauri test failed:", error);
+          tauriDetected = false;
         }
-
-        if (tauriDetected && invoke) {
-            setIsTauri(true);
-            console.log("Tauri-Modus: Lade Settings aus Rust");
-            // Echte Settings aus Tauri (ohne generics wegen any-Type)
-            const s = await invoke("get_all_settings") as AppSettings;
-            if (!cancelled) setSettings(s);
-        } else {
-          console.log("Web-Modus: Verwende Fallback-Settings");
-          // Web-Fallback (read-only)
-          const fallback: AppSettings = {
-            language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
-            election_district:
-              electionDistrict ||
-              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
-              "1",
-            rpc_url:
-              process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
-            contract_address:
-              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-              "0x0000000000000000000000000000000000000000",
-          };
-          if (!cancelled) setSettings(fallback);
-        }
-
-        // FE-only Defaults
-        if (!cancelled) {
-          setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
-          setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
-        }
-
-        const t = await loadTexts("settingsForm-texts", localLanguage);
-        if (!cancelled) setTexts(t);
-
-
-      } catch (err) {
-        console.error("❌ Fehler beim Initialisieren der Settings:", err);
-        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
-      } finally {
-        if (!cancelled) setLoading(false);
       }
+
+      let s: AppSettings;
+
+      if (tauriDetected && invoke) {
+        setIsTauri(true);
+        console.log("Tauri-Modus: Lade Settings aus Rust");
+
+        s = await invoke("get_all_settings") as AppSettings;
+      } else {
+        console.log("Web-Modus: Verwende Fallback-Settings");
+
+        s = {
+          language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
+          election_district:
+            electionDistrict ||
+            process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
+            "1",
+          rpc_url: process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+          contract_address:
+            process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+            "0x0000000000000000000000000000000000000000",
+        };
+      }
+
+      // FE-only Defaults
+      if (!cancelled) {
+        setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
+        setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
+
+        // State-Update für Settings und Texte in EINEM Schritt
+        setSettings(s);
+        console.log("Settings:", s);
+        const t = await loadTexts("settingsForm-texts", s.language);
+        setTexts(t);
+      }
+    } catch (err) {
+      console.error("❌ Fehler beim Initialisieren der Settings:", err);
+      if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
+    } finally {
+      if (!cancelled) setLoading(false);
     }
+  }
 
     init();
+    
     return () => {
       cancelled = true;
     };
@@ -176,20 +176,25 @@ export default function SettingsForm({
         setStatus("✅ Einstellungen gespeichert (Variante A).");
       } catch (eA) {
         console.log("Variante A fehlgeschlagen, versuche Variante B:", eA);
-        // ✅ Variante B: Rust erwartet 3 einzelne Strings (new_district, new_rpc_url, new_contract_address)
+        // ✅ Variante B: Rust erwartet 4 einzelne Strings
         await invoke("update_all_settings", {
           newDistrict: settings.election_district,
           newRpcUrl: settings.rpc_url,
           newContractAddress: settings.contract_address,
+          newLanguage: settings.language,
         });
         setStatus("✅ Einstellungen gespeichert (Variante B).");
       }
+
+      // 🔄 Texte nach dem Speichern mit der neuen Sprache laden
+      const updatedTexts = await loadTexts("settingsForm-texts", settings.language);
+      setTexts(updatedTexts);
+
     } catch (err) {
       console.error("❌ Fehler beim Speichern:", err);
       setStatus("❌ Fehler beim Speichern.");
     }
   };
-
   if (loading || !texts || !settings ) {
     return <p className="p-4">Lade Einstellungen …</p>;
   }
@@ -205,10 +210,12 @@ export default function SettingsForm({
 
       {/* Sprache (nur FE) */}
       <div className="mb-4">
-        <label className="block mb-1">{texts.language} (nur lokal)</label>
+        <label className="block mb-1">{texts.language}</label>
         <select
-          value={localLanguage}
-          onChange={(e) => setLocalLanguage(e.target.value)}
+          value={settings.language}
+            onChange={(e) =>
+              setSettings({ ...settings, language: e.target.value })
+            }
           className="border p-2 w-full"
         >
           <option value="de">Deutsch</option>
@@ -218,7 +225,7 @@ export default function SettingsForm({
 
       {/* Privater Schlüssel (nur FE) */}
       <div className="mb-4">
-        <label className="block mb-1">{texts.privateKey} (nur lokal)</label>
+        <label className="block mb-1">{texts.privateKey}</label>
         <textarea
           value={privateKey}
           onChange={(e) => setPrivateKey(e.target.value)}

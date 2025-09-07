@@ -76,3 +76,4 @@ election-system/frontend.zip
 
 release*
 election-system/nextFE/bvs/electron.zip
+*.lock

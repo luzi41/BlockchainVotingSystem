@@ -16,6 +16,7 @@ interface AppSettings {
   election_district: string;
   rpc_url: string;
   contract_address: string;
+  language:string
 }
 
 export async function fetchStatus() {

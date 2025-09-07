@@ -18,6 +18,47 @@ type ResultsComponent = React.FC<ResultsProps> & {
   };
 };
 
+// Muss den Rust-Struct-Namen/Feldnamen 1:1 spiegeln
+export interface AppSettings {
+  election_district: string;
+  rpc_url: string;
+  contract_address: string;
+  language: string;
+}
+
+// Sichere Tauri API Imports mit korrekten Types
+let invoke: ((cmd: string, args?: any) => Promise<any>) | null = null;
+try {
+  // Dynamischer Import für Tauri APIs
+  const tauriCore = require("@tauri-apps/api/core");
+  invoke = tauriCore.invoke;
+} catch (error) {
+  console.log("Tauri APIs nicht verfügbar (Web-Modus)");
+}
+
+// Verbesserte Tauri-Erkennung für V2
+const checkIsTauri = (): boolean => {
+  if (typeof window === "undefined") return false;
+  
+  // Wichtig: Erst prüfen ob invoke überhaupt verfügbar ist
+  if (!invoke) return false;
+  
+  // Methode 1: __TAURI__ global check
+  if ("__TAURI__" in window) return true;
+  
+  // Methode 2: Tauri-spezifische APIs prüfen
+  try {
+    // @ts-ignore - Tauri globals
+    if (window.__TAURI_INTERNALS__) return true;
+  } catch {}
+  
+  // Methode 3: User Agent prüfen - NUR wenn invoke verfügbar ist
+  if (navigator.userAgent.includes('Tauri')) return true;
+  
+  return false;
+};
+
+
 const fmt3 = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 /* ---------- Helfer (wie vorher) ---------- */
@@ -179,6 +220,102 @@ function Results() {
   const [loadingTexts, setLoadingTexts] = useState<boolean>(true);
   const [loadingResults, setLoadingResults] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isTauri, setIsTauri] = useState<boolean | null>(null); // null = noch nicht ermittelt
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [localLanguage, setLocalLanguage] = useState<string>("en");
+  const [loading, setLoading] = useState(true);
+
+    // Async Tauri-Test durch invoke-Aufruf
+  const testTauriConnection = async (): Promise<boolean> => {
+    try {
+      // Prüfe erst, ob invoke überhaupt verfügbar ist
+      if (!invoke || typeof invoke !== 'function') {
+        return false;
+      }
+      
+      // Teste mit einem einfachen invoke-Aufruf
+      await invoke("get_all_settings");
+      return true;
+    } catch (error) {
+      console.log("Tauri invoke test failed:", error);
+      return false;
+    }
+  };
+
+  // -------- Initiales Laden
+  useEffect(() => {
+    let cancelled = false;
+
+    async function init() {
+      try {
+        // Erweiterte Tauri-Erkennung
+        let tauriDetected = checkIsTauri();
+        
+        // Falls der erste Check negativ war und invoke verfügbar ist, teste async mit invoke
+        if (!tauriDetected && invoke) {
+          try {
+            tauriDetected = await testTauriConnection();
+          } catch (error) {
+            console.log("Async Tauri test failed:", error);
+            tauriDetected = false;
+          }
+        }
+
+        if (tauriDetected && invoke) {
+            setIsTauri(true);
+            console.log("Tauri-Modus: Lade Settings aus Rust");
+            // Echte Settings aus Tauri (ohne generics wegen any-Type)
+            const s = await invoke("get_all_settings") as AppSettings;
+            if (!cancelled) setSettings(s);
+        } else {
+          console.log("Web-Modus: Verwende Fallback-Settings");
+          // Web-Fallback (read-only)
+          const fallback: AppSettings = {
+            language: process.env.NEXT_PUBLIC_LANG || "de",
+            election_district:
+              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
+              "1",
+            rpc_url:
+              process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
+            contract_address:
+              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+              "0x0000000000000000000000000000000000000000",
+          };
+          console.log("Fallback:", fallback);
+          if (!cancelled) setSettings(fallback);
+          console.log("Settings:", settings);
+        }
+        
+        // FE-only Defaults
+        if (!cancelled) {
+          setLocalLanguage(settings?.language || process.env.NEXT_PUBLIC_LANGUAGE || "de");
+        }
+        setLoadingTexts(true);
+
+        try {
+          const t = await loadTexts("results-texts", localLanguage);
+          if (!cancelled) setTexts(t);          
+        } catch (error) {
+          throw new Error("Konnte Texte nicht laden.");
+        } finally {
+          setLoadingTexts(false);
+        }
+
+
+
+      } catch (err) {
+        console.error("❌ Fehler beim Initialisieren der Settings:", err);
+        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, []);  
 
   useEffect(() => {
     if (!provider || !address || !electionId) return;
@@ -187,6 +324,7 @@ function Results() {
     setError(null);
 
     const loadAll = async () => {
+      /*
       setLoadingTexts(true);
       try {
         const _texts = await loadTexts("results-texts");
@@ -199,6 +337,7 @@ function Results() {
       } finally {
         if (mounted) setLoadingTexts(false);
       }
+      */
 
       // Now fetch blockchain results
       setLoadingResults(true);
