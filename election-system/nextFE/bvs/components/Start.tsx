@@ -1,33 +1,60 @@
 "use client";
 import { useState, useEffect, ReactElement } from "react";
 import { useElectionStatus } from "./hooks/useElectionStatus";
-import { invoke } from "@tauri-apps/api/core";
 import { Contract } from "ethers";
 import { loadTexts } from "./utils/loadTexts";
 import { StartTexts, Candidate, Party } from "./types/StartTypes";
+import { useAppSettings } from "./hooks/useAppSettings";
+import { useRouter } from "next/navigation";
+
 
 // Dynamic import für Tauri API um SSR Probleme zu vermeiden
 const loadTauriAPI = async () => {
-    try {
-        const { invoke } = await import('@tauri-apps/api/core');
-        return { invoke };
-    } catch (err) {
-        console.warn('Tauri API nicht verfügbar:', err);
-        return null;
-    }
+  if (typeof window !== "undefined" && "__TAURI__" in window) {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return { invoke };
+  }
+  return null;
 };
 
+interface SettingsProps {
+  electionDistrict: string;
+  availableDistricts?: string[];
+}
+/*
 // Muss den Rust-Struct-Namen/Feldnamen 1:1 spiegeln
 export interface AppSettings {
   election_district: string;
   rpc_url: string;
   //contract_address: string;
 }
-
+*/
 const isTauri =
   typeof window !== "undefined" && "__TAURI__" in window; // sicherer Check fürs FE
 
-export default function Start() {
+export function useNavigate() {
+  const router = useRouter();
+
+  return async (path: string) => {
+    if (isTauri) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("navigate_to", { path });
+    } else {
+      router.push(path); // ✅ funktioniert in Next.js normal
+    }
+  };
+}
+
+
+
+export default function Start({
+  electionDistrict,
+  availableDistricts = [],
+}: SettingsProps) {
+  const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+    electionDistrict,
+    "de"
+  );    
     interface TextContent {
         titleRegistration: string;
         textRegistration: string;
@@ -35,108 +62,34 @@ export default function Start() {
         titleParties: string;
         details: string;
     }    
-    const { provider, address, electionId } = useElectionStatus();  // 👈 Hook nutzen
-    const { title, status, loading, error } = useElectionStatus();
-    const [settings, setSettings] = useState<AppSettings | null>(null);
+    const { provider, address, electionId, status } = useElectionStatus();  // 👈 Hook nutzen
     const [parties, setParties] = useState<Party[]>([]);
     const [contract, setContract] = useState<Contract | null>(null);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [proposals, setProposals] = useState<Candidate[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    //const [error, setError] = useState<string | null>(null);
     const [texts, setTexts] = useState<TextContent | null>(null);
     const [modus, setModus] = useState(0);
-    const [electionDistrictNo, setElectionDistrictNo] = useState<string>("");
-    const [htmlContent, setHtmlContent] = useState<ReactElement | null>(null);
-    //const [loading, setLoading] = useState(true);
-    //const [status, setStatus] = useState<string>("");
-    const [language, setLanguage] = useState("de");
-    const [privateKey, setPrivateKey] = useState("");
+    const [htmlContent, setHtmlContent] = useState<ReactElement | null>(null);   
 
-    // Tauri Settings laden - FIX mit Dynamic Import
+    // -------- Initiales Laden
     useEffect(() => {
-        let cancelled = false;
-        const loadSettings = async () => {
-            try {
-                setIsLoading(true)
-                if (isTauri) {
-                    console.log("Tauri-Modus!");
-                    // Echte Settings aus Tauri
-                    const s = await invoke<AppSettings>("get_all_settings");
-                    if (!cancelled) setSettings(s);
-                        setElectionDistrictNo(s.election_district);
-                        console.log("Kein Fallback:", electionDistrictNo);
-                    } else {
-                        console.log("Fallback:", cancelled);
-                        // Web-Fallback (read-only)
-                        const fallback: AppSettings = {
-                            election_district:
-                            electionDistrictNo ||
-                            process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
-                            "1",
-                            rpc_url:
-                            process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
-                            
-                            /*
-                            contract_address:
-                            process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-                            "0x0000000000000000000000000000000000000000",
-                            */
-                        };
-                        setElectionDistrictNo(fallback.election_district);
-                        if (!cancelled) setSettings(fallback);
-                        console.log("Kein Tauri!");
-                        
-                    }
-
-
-                // FE-only Defaults
-                if (!cancelled) {
-                    setLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
-                    setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
-                }
-            } catch (err) {
-                console.error("❌ Fehler beim Initialisieren der Settings:", err);
-                //if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
-            } finally {
-                if (!cancelled) setIsLoading(false);
-            }
-
-        };
-
-        loadSettings();
-    }, []);
-
-    useEffect(() => {
-
-        async function fetchTexts() {
-            try {
-                //setError("");
-
-                // 🗣 Texte laden
-                const _texts = await loadTexts("start-texts");
-                setTexts(_texts);        
- 
-            } catch (err) {
-                //setError(String(err));
-                console.error("❌ Fehler beim Laden der Texte:", err);
-            }
-        }
-        fetchTexts();
-      
-    }, [language]); 
+    if (settings) {
+        loadTexts("start-texts", settings.language).then(setTexts);
+    }
+    }, [settings]);
 
     // Smart Contract Setup
     useEffect(() => {
         const initializeContract = async () => {
             
             if (!provider || !address || !electionId) {
-                //console.log("Settings oder Provider oder address oder electionId nicht geladen.")
+                //console.error("Settings oder Provider oder address oder electionId nicht geladen.", error)
                 return;
             };
 
             try {
-                console.log("Provider, address und electionId geladen.")
+                //console.log("Provider, address und electionId geladen.")
                 setIsLoading(true);
                 
                 // ABI von statischer Datei laden (statt API Route)
@@ -150,76 +103,40 @@ export default function Start() {
 
                 // Contract mit provider aus Hook initialisieren
                 const contractInstance = new Contract(address, abi, provider);
-                //if (contractInstance) console.log("contractInstance geladen!");
                 setContract(contractInstance);
-                if (contract) console.log("Contract geladen!");
-
-                
-            } catch (err) {
-                console.error('Contract initialization error:', err);
-                //setError(`Fehler beim Initialisieren des Smart Contracts: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`);
-            } finally {
-                
-                setIsLoading(false);
-            }
-        };
-
-        initializeContract();
-    }, [settings, provider]);
-
-    // Contract Daten laden - KORRIGIERT
-    useEffect(() => {
-        async function fetchData() {
-            
-            if (!contract) {
-                //console.log("Contract nicht geladen!");
-                return
-            };
-            if (!electionId) {
-                console.log("electionId nicht geladen!");
-                return
-            };
-            if (!electionDistrictNo) {
-                console.log("electionDistrictNo nicht geladen!");
-                return
-            };            
-            
-            try {
-                //setError("");
-                console.log("Contract geladen!");
-                console.log("electionId geladen! ", electionId);
-                console.log("electionDistrictNo geladen! ", electionDistrictNo);
-                const m = await contract.getModus();
+                if (contractInstance) {
+                    //console.log("Contract geladen!", contractInstance);
+                } else {
+                    console.log("Contract nicht geladen!");
+                }
+                const m = await contractInstance.getModus();
                 if (m) {
                     const modusNumber = Number(m);
                     setModus(modusNumber);
                     
                     if (modusNumber === 1) {
-                        const candidatesList = await contract.getCandidates(electionId, electionDistrictNo);
-                        const partiesList = await contract.getParties(electionId);
+                        const candidatesList = await contractInstance.getCandidates(electionId, settings?.election_district);
+                        const partiesList = await contractInstance.getParties(electionId);
 
                         setCandidates(candidatesList);
                         setParties(partiesList);
                     } else if (modusNumber === 2) {
-                        const proposalList = await contract.getProposals(electionId);
+                        const proposalList = await contractInstance.getProposals(electionId);
                         setProposals(proposalList);
                     }     
                 } else {
                     throw new Error("Modus nicht bekannt!");    
                 }
                 
-            } catch (error) {
-                console.error("Fehler beim Laden der Contract-Daten:", error);
-                //setError(`Fehler: ${error}`);
+            } catch (err) {
+                console.error('Contract initialization error:', err);
+            } finally {
+                setIsLoading(false);
             }
-        }
-        
-        fetchData();
-    }, [contract]);
-            /*
+        };
 
-            */
-    // HTML Content generieren - KORRIGIERT (nicht in render cycle)
+        initializeContract();
+    }, [settings, provider]);
     
     useEffect(() => {
         if (!texts) {
@@ -260,9 +177,11 @@ export default function Start() {
                 ))}
             </div>
         );
-        console.log("Modus: ", modus)
+        //console.log("Modus: ", modus)
         setHtmlContent(htmlBundestagswahl);
     }, [texts, candidates, parties, proposals]);
+
+    const navigate = useNavigate();
 
     // Navigation Functions - FIX mit Dynamic Import
     const goToVote = async () => {
@@ -272,7 +191,7 @@ export default function Start() {
                 await tauriAPI.invoke('navigate_to', { path: '/vote' });
             } else {
                 // Fallback für Browser
-                window.location.hash = '/vote';
+                navigate("/vote");
             }
         } catch (err) {
             console.error('Navigation error:', err);
@@ -286,7 +205,7 @@ export default function Start() {
                 await tauriAPI.invoke('navigate_to', { path: '/results' });
             } else {
                 // Fallback für Browser
-                window.location.hash = '/results';
+                navigate("/results");
             }
         } catch (err) {
             console.error('Navigation error:', err);
@@ -300,7 +219,7 @@ export default function Start() {
                 await tauriAPI.invoke('navigate_to', { path: '/extras/settings' });
             } else {
                 // Fallback für Browser
-                window.location.hash = '/extras/settings';
+                navigate("/extras/settings");
             }
         } catch (err) {
             console.error('Navigation error:', err);
@@ -313,6 +232,7 @@ export default function Start() {
             <div className="flex flex-col items-center gap-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 <p>Lade Wahlsystem...</p>
+                <p>{status}</p>
             </div>
         );
     }
@@ -331,45 +251,47 @@ export default function Start() {
                 </button>
             </div>
         );
-    }
-    
-    //if (htmlContent) return <p>Load texts ...</p>; 
+    } 
 
     // Main UI
     const mainUI = (
         <div className="flex flex-col items-center gap-6">
-
-            
             {settings && (
                 <div className="text-center text-gray-600">
                     <p>Wahlbezirk: {settings.election_district}</p>
-                    <p>Verbunden mit Blockchain? Settings sind da.</p>
+                    <p>{status}</p>
                 </div>
             )}
 
             <div className="flex flex-col gap-4 w-full max-w-md">
-                <button
-                    onClick={goToVote}
-                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    disabled={!contract}
-                >
+                {status !== "Die Wahl ist geschlossen."  ? (
+                    <button
+                        onClick={goToVote}
+                        className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        disabled={!contract}
+                    >
                     🗳️ Wählen
-                </button>
+                </button>) : ("")}
 
-                <button
-                    onClick={goToResults}
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    disabled={!contract}
-                >
-                    📊 Ergebnisse anzeigen
-                </button>
-
+                {status === "Die Wahl ist geschlossen."  ? (
+                    <button
+                        onClick={goToResults}
+                        className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        disabled={!contract}
+                    >
+                        📊 Ergebnisse anzeigen
+                    </button>
+                    ) : ("")
+                }
+                
                 <button
                     onClick={goToSettings}
                     className="w-full px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                 >
                     ⚙️ Einstellungen
                 </button>
+                
+                
             </div>
 
             {contract && (

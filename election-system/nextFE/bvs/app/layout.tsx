@@ -1,7 +1,6 @@
 // app/layout.tsx
 "use client";
 import Link from "next/link";
-import type { Metadata } from "next";
 import LanguageSwitcher from "@components/LanguageSwitcher";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
