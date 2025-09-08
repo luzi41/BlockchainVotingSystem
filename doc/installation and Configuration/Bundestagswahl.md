@@ -106,19 +106,30 @@ Please do not use the public key from this guide and choose a different key pair
 
 # 7 Install and start frontend-UI
 
-Install: 
+## 7.1 Install: 
 
-     cd frontend && $npm install
+    cd election-system/nextFE/bvs 
+    $npm install
 
-copy ABI to the frontend:
+## 7.2 copy ABI to the frontend:
 
-     cp  -R ../artifacts src/  
+    cp  -R ../../artifacts public/
 
-Start frontend:
+## 7.3 compile Desktop-App (dev)
 
-     npm start
+    cargo tauri dev
+
+## 7.4 compile Desktop-App (prod)
+
+    cargo tauri build
+
+# 8 Running Desktop-App
+
+    ./src-tauri/target/release/bundle/appimage/BVS_X.XX.XX_amd64.AppImage
      
-# 8 Test
+# 9 Test
+
+    npm run dev 
 
 - Open the React frontend in your browser (http://localhost:3002)
 - Connect MetaMask

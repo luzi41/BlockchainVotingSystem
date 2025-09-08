@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useEffect, ReactElement } from "react";
 import { useElectionStatus } from "./hooks/useElectionStatus";
 import { Contract } from "ethers";
@@ -143,7 +144,7 @@ export default function Start({
                 <ul className="lists-default">
                 {candidates.map((candidate, index) => (
                     <li key={index}>
-                        <a href={candidate.url} target="_blank" rel="noreferrer">{candidate.name}</a>, {candidate.partei}
+                        <Link href={candidate.url} rel="noreferrer">{candidate.name}</Link>, {candidate.partei}
                     </li>
                 ))}
                 </ul>
@@ -151,7 +152,7 @@ export default function Start({
                 <ul className="lists-default">
                 {parties.map((party, index) => (
                     <li key={index}>
-                        <a href={party.url} target="_blank" rel="noreferrer">{party.name}</a> – {party.shortname}
+                        <Link href={party.url} rel="noreferrer">{party.name}</Link> – {party.shortname}
                     </li>
                 ))}
                 </ul>
@@ -162,7 +163,7 @@ export default function Start({
             <div>
                 {proposals.map((candidate, index) => (
                     <div key={index}>
-                        <p>{candidate.name} - <a href={candidate.url} target="_blank" rel="noreferrer">{texts.details}</a> {candidate.partei}</p>
+                        <p>{candidate.name} - <Link href={candidate.url} rel="noreferrer">{texts.details}</Link> {candidate.partei}</p>
                         <div>{candidate.text}</div>
                     </div>
                 ))}
