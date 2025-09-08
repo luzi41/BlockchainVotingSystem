@@ -6,6 +6,7 @@ import forge from "node-forge";
 import Image from "next/image";
 //import { invoke } from "@tauri-apps/api/core";
 import { useElectionStatus } from "./hooks/useElectionStatus";
+import { useAppSettings } from "./hooks/useAppSettings";
 import { loadTexts } from "./utils/loadTexts";
 import scanner from "@public/scan-59.png";
 import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
@@ -38,34 +39,14 @@ export interface AppSettings {
   language: string;
 }
 
-// Verbesserte Tauri-Erkennung für V2
-const checkIsTauri = (): boolean => {
-  if (typeof window === "undefined") return false;
-  
-  // Wichtig: Erst prüfen ob invoke überhaupt verfügbar ist
-  if (!invoke) return false;
-  
-  // Methode 1: __TAURI__ global check
-  if ("__TAURI__" in window) return true;
-  
-  // Methode 2: Tauri-spezifische APIs prüfen
-  try {
-    // @ts-ignore - Tauri globals
-    if (window.__TAURI_INTERNALS__) return true;
-  } catch {}
-  
-  // Methode 3: User Agent prüfen - NUR wenn invoke verfügbar ist
-  if (navigator.userAgent.includes('Tauri')) return true;
-  
-  return false;
-};
-
 export default function VoteForm({  electionDistrict, availableDistricts = [], }: VoteFormProps) {
+  const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+    electionDistrict,
+    "de"
+  );   
   const { provider, address, electionId } = useElectionStatus();
-
   const [abi, setAbi] = useState<any[]>([]);
   const [modus, setModus] = useState<number>(1);
-  const [error, setError] = useState<string>("");
   const [tokenInput, setTokenInput] = useState<string>("");
   const [privateKey, setPrivateKey] = useState<string>("");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -82,108 +63,30 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const [errorAbi, setErrorAbi] = useState<string | null>(null);
   const [errorTexts, setErrorTexts] = useState<string | null>(null);
   const [errorSettings, setErrorSettings] = useState<string | null>(null);
-  const [settings, setSettings] = useState<AppSettings | null>(null);
-  const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState("de");
   const [status, setStatus] = useState<string>("");
-  const [isTauri, setIsTauri] = useState<boolean | null>(null); // null = noch nicht ermittelt
   const [localLanguage, setLocalLanguage] = useState<string>("en");
 
-    // Async Tauri-Test durch invoke-Aufruf
-  const testTauriConnection = async (): Promise<boolean> => {
-    try {
-      // Prüfe erst, ob invoke überhaupt verfügbar ist
-      if (!invoke || typeof invoke !== 'function') {
-        return false;
-      }
-      
-      // Teste mit einem einfachen invoke-Aufruf
-      await invoke("get_all_settings");
-      return true;
-    } catch (error) {
-      console.log("Tauri invoke test failed:", error);
-      return false;
+
+    // -------- Initiales Laden
+    useEffect(() => {
+    if (settings) {
+        loadTexts("voteForm-texts", settings.language).then(setTexts);
+        setLoadingTexts(false);
     }
-  };
-
-   // -------- Initiales Laden
-  useEffect(() => {
-    let cancelled = false;
-
-    async function init() {
-      try {
-        let tauriDetected = checkIsTauri();
-
-        // Falls der erste Check negativ war, aber invoke verfügbar ist -> async testen
-        if (!tauriDetected && invoke) {
-          try {
-            tauriDetected = await testTauriConnection();
-          } catch (error) {
-            console.log("Async Tauri test failed:", error);
-            tauriDetected = false;
-          }
-        }
-
-        let s: AppSettings;
-
-        if (tauriDetected && invoke) {
-          setIsTauri(true);
-          console.log("Tauri-Modus: Lade Settings aus Rust");
-
-          s = await invoke("get_all_settings") as AppSettings;
-        } else {
-          console.log("Web-Modus: Verwende Fallback-Settings");
-
-          s = {
-            language: localLanguage || process.env.NEXT_PUBLIC_LANG || "de",
-            election_district:
-              process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
-              "1",
-            rpc_url: process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
-            contract_address:
-              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-              "0x0000000000000000000000000000000000000000",
-          };
-        }
-
-        // FE-only Defaults
-        if (!cancelled) {
-          //setLocalLanguage(process.env.NEXT_PUBLIC_LANGUAGE || "de");
-          setPrivateKey(process.env.NEXT_PUBLIC_PRIVATE_KEY || "");
-          
-          // State-Update für Settings und Texte in EINEM Schritt
-          setSettings(s);
-          console.log("Settings:", s);
-          setElectionDistrictNo(s.election_district);
-          const t = await loadTexts("voteForm-texts", s.language);
-          setTexts(t);
-        }
-      } catch (err) {
-        console.error("❌ Fehler beim Initialisieren der Settings:", err);
-        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-          setLoadingTexts(false);
-          setLoadingSettings(false);
-        }
-      }
-    }
-    //fetchTexts()
-    init();
-    
-  }, [electionDistrictNo]);
+    }, [settings]);
 
   // Vertragsdaten laden
   useEffect(() => {
-    if (!provider || !address || !electionId || !electionDistrictNo) {
+    if (!provider || !address || !electionId ) {
       console.log("!provider || !address || !electionId || !electionDistrictNo");
+      
       return
     };
 
     async function fetchData() {
       try {
-        console.log("Jetzt provider && address && electionId && electionDistrictNo");
+        console.log("Jetzt provider && address && electionId && electionDistrictNo", settings?.election_district);
 
         // ABI von statischer Datei laden (statt API Route)
         const abiResponse = await fetch('/contracts/Bundestagswahl.sol/Bundestagswahl.json');
@@ -203,7 +106,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
         setModus(Number(m));
 
         if (Number(m) === 1) {
-          const cand: Candidate[] = await ctr.getCandidates(electionId, electionDistrictNo);
+          const cand: Candidate[] = await ctr.getCandidates(electionId, settings?.election_district);
           const part: Party[] = await ctr.getParties(electionId);
           setCandidates(cand);
           setParties(part);
@@ -242,18 +145,18 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
           electionDistrictNo
         );
         await tx.wait();
-        setError("✅ Erfolgreich! Transaction: " + tx.hash);
+        //setError("✅ Erfolgreich! Transaction: " + tx.hash);
       } else if (modus === 2) {
         const publicKey = await ctr.getPublicKey();
         const encrypted = await encryptVote(selectedAnswer || "", publicKey);
         const tx = await ctr.castEncryptedVote(electionId, encrypted, tokenInput);
         await tx.wait();
-        setError("✅ Erfolgreich! Transaction: " + tx.hash);
+        //setError("✅ Erfolgreich! Transaction: " + tx.hash);
       }
       
     } catch (err: unknown) {
-      if (err instanceof Error) setError("❌ Fehler: " + err.message);
-      else setError("❌ Unbekannter Fehler!");
+      //if (err instanceof Error) setError("❌ Fehler: " + err.message);
+      //else setError("❌ Unbekannter Fehler!");
     } finally {
       //setLoading(false);
     }
@@ -266,7 +169,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   if (loadingTexts) {
     return <p className="text-gray-500">⏳ Texte werden geladen ...</p>;
   }
-
+  /*
   if (errorAbi || errorTexts || loadingSettings) {
     return (
       <div className="p-4 bg-red-100 text-red-700 rounded-lg">
@@ -278,7 +181,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
       </div>
     );
   }  
-
+  */
   if (texts) return (
     <div>
       <div className="row">
@@ -310,9 +213,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
                 </option>
               ))}
             </select>
-          ) : (
-            <p>{electionDistrictNo}</p>
-          )}
+          ) : (<p>{settings?.election_district}</p>)}
         </div>
       </div>
 

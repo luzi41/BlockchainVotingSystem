@@ -67,7 +67,6 @@ async fn load_settings_from_file() -> AppSettings {
     AppSettings::default()
 }
 
-
 async fn save_settings_to_file(settings: &AppSettings) -> Result<(), String> {
     let path = settings_file_path();
     let parent = path.parent().unwrap_or(Path::new("."));

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Contract } from "ethers";
 import Link from "next/link";
 import { useElectionStatus } from "./hooks/useElectionStatus";
+import { useAppSettings } from "./hooks/useAppSettings";
 import { ResultsTexts } from "./types/ResultsTypes";
 import { loadTexts } from "./utils/loadTexts";
 
@@ -204,7 +205,11 @@ function TotalResults({ texts, parties, aggregated }: { texts: ResultsTexts; par
 
 /* ---------- Hauptkomponente (ohne setHtml) ---------- */
 
-function Results() {
+export default function Results() {
+  const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+    "1",
+    "de"
+  );     
   const { provider, address, electionId } = useElectionStatus();
 
   const [modus, setModus] = useState<number>(1);
@@ -219,115 +224,24 @@ function Results() {
   const [texts, setTexts] = useState<ResultsTexts | null>(null);
   const [loadingTexts, setLoadingTexts] = useState<boolean>(true);
   const [loadingResults, setLoadingResults] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isTauri, setIsTauri] = useState<boolean | null>(null); // null = noch nicht ermittelt
-  const [settings, setSettings] = useState<AppSettings | null>(null);
-  const [localLanguage, setLocalLanguage] = useState<string>("en");
-  const [loading, setLoading] = useState(true);
-
-    // Async Tauri-Test durch invoke-Aufruf
-  const testTauriConnection = async (): Promise<boolean> => {
-    try {
-      // Prüfe erst, ob invoke überhaupt verfügbar ist
-      if (!invoke || typeof invoke !== 'function') {
-        return false;
-      }
-      
-      // Teste mit einem einfachen invoke-Aufruf
-      await invoke("get_all_settings");
-      return true;
-    } catch (error) {
-      console.log("Tauri invoke test failed:", error);
-      return false;
-    }
-  };
 
   // -------- Initiales Laden
   useEffect(() => {
-    let cancelled = false;
-
-    async function init() {
-      try {
-        // Erweiterte Tauri-Erkennung
-        let tauriDetected = checkIsTauri();
-        
-        // Falls der erste Check negativ war und invoke verfügbar ist, teste async mit invoke
-        if (!tauriDetected && invoke) {
-          try {
-            tauriDetected = await testTauriConnection();
-          } catch (error) {
-            console.log("Async Tauri test failed:", error);
-            tauriDetected = false;
-          }
-        }
-        let s: AppSettings;
-        if (tauriDetected && invoke) {
-            setIsTauri(true);
-            console.log("Tauri-Modus: Lade Settings aus Rust");
-            // Echte Settings aus Tauri (ohne generics wegen any-Type)
-            s = await invoke("get_all_settings") as AppSettings;
-            if (!cancelled) setSettings(s);
-        } else {
-          console.log("Web-Modus: Verwende Fallback-Settings");
-           // FE-only Defaults
-          s = {
-              language: process.env.NEXT_PUBLIC_LANG || "de",
-              election_district:
-                process.env.NEXT_PUBLIC_ELECTION_DISTRICT ||
-                "1",
-              rpc_url:
-                process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545",
-              contract_address:
-                process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-                "0x0000000000000000000000000000000000000000",
-          };
-        }
-        
-      if (!cancelled) {
-        // State-Update für Settings und Texte in EINEM Schritt
-        setSettings(s);
-        //console.log("Settings:", s);
-        const t = await loadTexts("results-texts", s.language);
-        setTexts(t);
-        setLoadingTexts(false);
-      }
-
-
-      } catch (err) {
-        console.error("❌ Fehler beim Initialisieren der Settings:", err);
-        if (!cancelled) setStatus("Fehler beim Laden der Einstellungen.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    init();
-    return () => {
-      cancelled = true;
-    };
-  }, []);  
+  if (settings) {
+      
+      //setElectionDistrictNo(settings.election_district);
+      loadTexts("voteForm-texts", settings.language).then(setTexts);
+      setLoadingTexts(false);
+  }
+  }, [settings]);
 
   useEffect(() => {
     if (!provider || !address || !electionId) return;
 
     let mounted = true;
-    setError(null);
+    //setError(null);
 
     const loadAll = async () => {
-      /*
-      setLoadingTexts(true);
-      try {
-        const _texts = await loadTexts("results-texts");
-        if (!mounted) return;
-        if (_texts) setTexts(_texts);
-        else setError("Keine Texte gefunden");
-      } catch (err: any) {
-        console.error("Fehler beim Laden der Texte:", err);
-        if (mounted) setError("Fehler beim Laden der Texte");
-      } finally {
-        if (mounted) setLoadingTexts(false);
-      }
-      */
 
       // Now fetch blockchain results
       setLoadingResults(true);
@@ -375,7 +289,6 @@ function Results() {
               const msg = "278 Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!";
               if (mounted) {
                 setStatus(msg);
-                setError(msg);
               }
               throw new Error(msg);
             }
@@ -396,7 +309,7 @@ function Results() {
             const proposalList = await contract.getProposals(electionId);
             if (!proposalList || proposalList.length === 0) {
               const msg = texts?.errorProposals ?? "Keine Vorschläge";
-              if (mounted) setError(msg);
+              //if (mounted) setError(msg);
               throw new Error(msg);
             }
             const rawResult = await contract.getVotingResult(electionId);
@@ -418,7 +331,7 @@ function Results() {
         }
       } catch (err: any) {
         console.error("Fehler beim Laden der Ergebnisse:", err);
-        if (mounted) setError(err?.message ?? String(err));
+        //if (mounted) setError(err?.message ?? String(err));
       } finally {
         if (mounted) setLoadingResults(false);
       }
@@ -486,4 +399,4 @@ Results.cache = {
   resultsParties: {},
 };
 
-export default Results;
+

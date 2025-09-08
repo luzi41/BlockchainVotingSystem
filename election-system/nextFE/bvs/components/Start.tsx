@@ -21,14 +21,7 @@ interface SettingsProps {
   electionDistrict: string;
   availableDistricts?: string[];
 }
-/*
-// Muss den Rust-Struct-Namen/Feldnamen 1:1 spiegeln
-export interface AppSettings {
-  election_district: string;
-  rpc_url: string;
-  //contract_address: string;
-}
-*/
+
 const isTauri =
   typeof window !== "undefined" && "__TAURI__" in window; // sicherer Check fürs FE
 
@@ -74,9 +67,9 @@ export default function Start({
 
     // -------- Initiales Laden
     useEffect(() => {
-    if (settings) {
-        loadTexts("start-texts", settings.language).then(setTexts);
-    }
+        if (settings) {
+            loadTexts("start-texts", settings.language).then(setTexts);
+        }
     }, [settings]);
 
     // Smart Contract Setup
@@ -181,8 +174,13 @@ export default function Start({
         setHtmlContent(htmlBundestagswahl);
     }, [texts, candidates, parties, proposals]);
 
-    const navigate = useNavigate();
-
+    const navigate = useNavigate(); 
+    /*
+    const goToVote = () => navigate("/vote");
+    const goToResults = () => navigate("/results");
+    const goToSettings = () => navigate("/extras/settings");    
+    */
+    
     // Navigation Functions - FIX mit Dynamic Import
     const goToVote = async () => {
         try {
@@ -225,7 +223,7 @@ export default function Start({
             console.error('Navigation error:', err);
         }
     };
-
+    
     // Loading State
     if (isLoading) {
         return (
@@ -254,6 +252,7 @@ export default function Start({
     } 
 
     // Main UI
+    /*
     const mainUI = (
         <div className="flex flex-col items-center gap-6">
             {settings && (
@@ -300,16 +299,16 @@ export default function Start({
                 </div>
             )}
         </div>
-         
+        
     );
-
+    */
     return (
         <div>
             <h1 className="text-3xl font-bold text-center">
                 Blockchain Voting System
             </h1>
             {htmlContent}
-            {mainUI}
+           
         </div>
     );
 }
