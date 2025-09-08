@@ -6,8 +6,8 @@
   "errorElectronSettingsRpcURL": "No settings (_rpcURL)",
   "errorFetchData": "Error fetch data",
   "titleRegistration": "Register",
-  "textRegistration": "Sie können auf der Rückseite Ihrer Wahlbenachrichtigung ankreuzen, dass Sie an der Online-Wahl teilnehmen möchten...",
-  "titleCandidates": "Wer steht zur Wahl - KandidatInnen in Ihrem Wahlkreis",
-  "titleParties": "Die Parteien und ihre Wahlprogramme",
-  "loadContract": "Lade Vertrag ..."
+  "textRegistration": "You can check the box on the back of your voting notification to indicate that you would like to participate in the online election...",
+  "titleCandidates": "Who is running for election - candidates in your constituency",
+  "titleParties": "The parties and their election manifestos",
+  "loadContract": "Load contract..."
 }

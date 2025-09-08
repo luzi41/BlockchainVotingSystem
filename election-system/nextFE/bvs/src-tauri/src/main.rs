@@ -13,15 +13,17 @@ struct AppSettings {
     rpc_url: String,
     contract_address: String,
     language: String,
+    private_key: String,
 }
 
 impl Default for AppSettings {
     fn default() -> Self {
         AppSettings {
-            election_district: "default-district".into(),
+            election_district: "1".into(),
             rpc_url: "http://127.0.0.1:8545".into(),
             contract_address: "0x0000000000000000000000000000000000000000".into(),
             language: "de".into(),
+            private_key: "0x0000000000000000000000000000000000000000".into(),
         }
     }
 }
@@ -43,15 +45,28 @@ async fn load_settings_from_file() -> AppSettings {
     let path = settings_file_path();
     if path.exists() {
         match fs::read_to_string(&path).await {
-            Ok(contents) => match serde_json::from_str::<AppSettings>(&contents) {
-                Ok(parsed) => return parsed,
-                Err(e) => eprintln!("⚠️ Fehler beim Parsen der Settings: {e}"),
-            },
+            Ok(contents) => {
+                let mut parsed: AppSettings = match serde_json::from_str(&contents) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        eprintln!("⚠️ Fehler beim Parsen der Settings: {e}");
+                        return AppSettings::default();
+                    }
+                };
+
+                // Migration: falls private_key leer ist, Standardwert setzen
+                if parsed.private_key.is_empty() {
+                    parsed.private_key = "0x0000000000000000000000000000000000000000".into();
+                }
+
+                return parsed;
+            }
             Err(e) => eprintln!("⚠️ Fehler beim Lesen von {:?}: {e}", path),
         }
     }
     AppSettings::default()
 }
+
 
 async fn save_settings_to_file(settings: &AppSettings) -> Result<(), String> {
     let path = settings_file_path();

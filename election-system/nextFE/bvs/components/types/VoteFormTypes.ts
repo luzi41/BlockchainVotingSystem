@@ -1,3 +1,8 @@
+export interface ElectionDistrict {
+  name: string;
+  nummer: number;
+  publicKey: string;
+}
 export interface Candidate {
   name: string;
   partei: string;
