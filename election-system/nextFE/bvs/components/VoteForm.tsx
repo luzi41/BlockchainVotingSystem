@@ -40,7 +40,7 @@ export interface AppSettings {
 }
 
 export default function VoteForm({  electionDistrict, availableDistricts = [], }: VoteFormProps) {
-  const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+  const { settings, setSettings, isTauri, loading } = useAppSettings(
     electionDistrict,
     "de"
   );   
@@ -66,11 +66,13 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const [language, setLanguage] = useState("de");
   const [status, setStatus] = useState<string>("");
   const [localLanguage, setLocalLanguage] = useState<string>("en");
-
-
+  const [error, setError] = useState<string>("");
     // -------- Initiales Laden
     useEffect(() => {
     if (settings) {
+        setElectionDistrictNo(settings.election_district);
+        setPrivateKey(settings.private_key);
+        console.log("PrivateKey:", settings.private_key);
         loadTexts("voteForm-texts", settings.language).then(setTexts);
         setLoadingTexts(false);
     }
@@ -127,6 +129,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const vote = async () => {
     if (!privateKey || !provider) return;
     try {
+      console.log("PrivateKey:", privateKey);
       const signer = new Wallet(privateKey, provider);
       const ctr = new Contract(String(address), abi, signer);
 
@@ -145,18 +148,18 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
           electionDistrictNo
         );
         await tx.wait();
-        //setError("✅ Erfolgreich! Transaction: " + tx.hash);
+        setError("✅ Erfolgreich! Transaction: " + tx.hash);
       } else if (modus === 2) {
         const publicKey = await ctr.getPublicKey();
         const encrypted = await encryptVote(selectedAnswer || "", publicKey);
         const tx = await ctr.castEncryptedVote(electionId, encrypted, tokenInput);
         await tx.wait();
-        //setError("✅ Erfolgreich! Transaction: " + tx.hash);
+        setError("✅ Erfolgreich! Transaction: " + tx.hash);
       }
       
     } catch (err: unknown) {
-      //if (err instanceof Error) setError("❌ Fehler: " + err.message);
-      //else setError("❌ Unbekannter Fehler!");
+      if (err instanceof Error) setError("❌ Fehler: " + err.message + " electionId: " + electionId + " electionDistrict: " + electionDistrictNo);
+      else setError("❌ Unbekannter Fehler!");
     } finally {
       //setLoading(false);
     }
@@ -169,19 +172,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   if (loadingTexts) {
     return <p className="text-gray-500">⏳ Texte werden geladen ...</p>;
   }
-  /*
-  if (errorAbi || errorTexts || loadingSettings) {
-    return (
-      <div className="p-4 bg-red-100 text-red-700 rounded-lg">
-        <h3 className="font-bold">Fehler</h3>
-        <ul className="list-disc pl-5">
-          {errorAbi && <li>ABI konnte nicht geladen werden: {errorAbi}</li>}
 
-        </ul>
-      </div>
-    );
-  }  
-  */
   if (texts) return (
     <div>
       <div className="row">
