@@ -230,7 +230,7 @@ export default function Results() {
   if (settings) {
       
       //setElectionDistrictNo(settings.election_district);
-      loadTexts("voteForm-texts", settings.language).then(setTexts);
+      loadTexts("results-texts", settings.language).then(setTexts);
       setLoadingTexts(false);
   }
   }, [settings]);

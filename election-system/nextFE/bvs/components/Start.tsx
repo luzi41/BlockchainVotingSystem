@@ -38,8 +38,6 @@ export function useNavigate() {
   };
 }
 
-
-
 export default function Start({
   electionDistrict,
   availableDistricts = [],
@@ -174,13 +172,9 @@ export default function Start({
         setHtmlContent(htmlBundestagswahl);
     }, [texts, candidates, parties, proposals]);
 
-    const navigate = useNavigate(); 
+    //const navigate = useNavigate(); 
+
     /*
-    const goToVote = () => navigate("/vote");
-    const goToResults = () => navigate("/results");
-    const goToSettings = () => navigate("/extras/settings");    
-    */
-    
     // Navigation Functions - FIX mit Dynamic Import
     const goToVote = async () => {
         try {
@@ -223,7 +217,8 @@ export default function Start({
             console.error('Navigation error:', err);
         }
     };
-    
+    */
+   
     // Loading State
     if (isLoading) {
         return (
