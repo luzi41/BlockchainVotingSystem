@@ -9,15 +9,6 @@ import { useAppSettings } from "./hooks/useAppSettings";
 import { useRouter } from "next/navigation";
 
 
-// Dynamic import für Tauri API um SSR Probleme zu vermeiden
-const loadTauriAPI = async () => {
-  if (typeof window !== "undefined" && "__TAURI__" in window) {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return { invoke };
-  }
-  return null;
-};
-
 interface SettingsProps {
   electionDistrict: string;
   availableDistricts?: string[];

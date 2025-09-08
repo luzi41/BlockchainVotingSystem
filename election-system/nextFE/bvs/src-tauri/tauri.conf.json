@@ -1,6 +1,6 @@
 {
   "productName": "BVS",
-  "version": "0.30.13",
+  "version": "0.30.15",
   "identifier": "com.goettertz.bvs",
   "build": {
     "beforeBuildCommand": "npm run build",
