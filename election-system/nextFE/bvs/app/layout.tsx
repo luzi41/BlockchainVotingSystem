@@ -26,6 +26,7 @@ interface NavigationTexts {
   vote: string;
   results: string;
   extras: string;
+  help: string;
 }
 
 function Navigation({ texts }: { texts: NavigationTexts }) {
@@ -36,6 +37,7 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
     { href: "/vote", label: texts.vote },
     { href: "/results", label: texts.results },
     { href: "/extras", label: texts.extras },
+    { href: "/help", label: texts.help},
   ];
 
   return (
@@ -56,10 +58,10 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
         </li>
         <li>
           <Link
-            href="https://github.com/luzi41/BlockchainVotingSystem"
-            target="_blank"
+            href="https://github.com/luzi41/BlockchainVotingSystem/blob/main/README.md"
+            className="padding-right-5px"
           >
-            Blockchain Voting System 0.30
+            Blockchain Voting System 0.31
           </Link>
         </li>
       </ul>

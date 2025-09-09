@@ -28,13 +28,35 @@ export default function Extras() {
 
     return (
     <div>
-        <h3>Extras</h3>
-        <nav className="menu">
-            <ul className="lists-default">
-                <li><Link href="http://localhost:25000">Explorer</Link></li>
-                <li><Link href="/extras/settings">{texts.settings}</Link></li>
-            </ul>
-        </nav>
+        <h1 className="text-3xl font-bold">
+            Blockchain Voting System
+        </h1>
+        <p>&nbsp;</p>
+        <div className="col-50">
+            <h2>Extras</h2>
+            <nav className="menu">
+                <ul className="lists-default">
+                    <li><Link href="http://localhost:25000">{texts.electionExplorer}</Link></li>
+                    <li><Link href="/extras/settings">{texts.settings}</Link></li>
+                </ul>
+            </nav>
+        </div>
+        {process.env.NEXT_PUBLIC_EXTENDED && 
+        (
+            <div className="col-50">
+                <h2>Direkte Demokratie</h2>
+                <p>
+                    Sie haben hier die Möglichkeit selbst aktiv zu werden und die gesetzlich
+                    vorgesehenen Möglichkeiten direkter Demokratie zu nutzen:
+                </p>
+                <ul className="lists-default ">
+                    <li><a>Bürgerbegehren</a></li>
+                    <li><a>Volksinitiative</a></li>
+                    <li><a>Volksbegehren</a></li>
+                </ul>                
+            </div>
+            
+        )} 
     </div>
     );
 }

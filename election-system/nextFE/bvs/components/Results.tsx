@@ -222,7 +222,7 @@ export default function Results() {
   const [results2, setResults2] = useState<Record<string, number>[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [parties, setParties] = useState<any[]>([]);
-
+  const [title, setTitle] = useState("");
   const [texts, setTexts] = useState<ResultsTexts | null>(null);
   const [loadingTexts, setLoadingTexts] = useState<boolean>(true);
   const [loadingResults, setLoadingResults] = useState<boolean>(false);
@@ -263,7 +263,8 @@ export default function Results() {
         const electionStatus = await contract.getElectionStatus(electionId);
         if (!mounted) return;
         setStatus(electionStatus);
-
+        const _title = await contract.getElectionTitle(electionId);
+        setTitle(_title);      
         if (electionStatus === "Die Wahl ist geschlossen.") {
           const m = await contract.getModus();
           if (!mounted) return;
@@ -366,7 +367,10 @@ export default function Results() {
   // Main view when election is closed
   return (
     <div>
-      <h1>{texts.headline}</h1>
+      <h1 className="text-3xl font-bold text-center">
+        {title}
+      </h1>      
+      <h2>{texts.headline}</h2>
 
       <p>
         <select

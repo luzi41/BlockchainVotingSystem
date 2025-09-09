@@ -1,8 +1,10 @@
 @import "tailwindcss";
-
+h2 {
+  font-size: 1.3em;
+  font-weight: bold;
+}
 h3 {
   font-size: 1.2em;
-  font-weight: bold;
 }
 
 a {
@@ -62,7 +64,7 @@ nav.main ul li {
 nav.main ul li a {
   display: block;
   color: white;
-  padding: 14px 16px;  
+  padding-left: 14px;
   text-align: center;
   text-decoration: none;  
 }
@@ -256,6 +258,10 @@ div .border {
 #ContractAddress {
   display: inline;
   color: silver;
+}
+
+.padding-right-5px {
+  padding-right: 5px;
 }
 
 /* Results.css */

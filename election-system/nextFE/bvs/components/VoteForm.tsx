@@ -61,6 +61,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const [loadingAbi, setLoadingAbi] = useState(true);
   const [electionDistrictNo, setElectionDistrictNo] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [title, setTitle] = useState("");
     // -------- Initiales Laden
     useEffect(() => {
     if (settings) {
@@ -99,6 +100,8 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
 
         const ctr = new Contract(String(address), abi, provider);
         const m = await ctr.getModus();
+        const _title = await ctr.getElectionTitle(electionId);
+        setTitle(_title);        
         setModus(Number(m));
 
         if (Number(m) === 1) {
@@ -169,6 +172,9 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
 
   if (texts) return (
     <div>
+      <h1 className="text-3xl font-bold text-center">
+        {title}
+      </h1>
       <div className="row">
         <div className="col-50">
           <p>{texts.yourToken}</p>

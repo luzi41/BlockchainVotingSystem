@@ -59,7 +59,7 @@ export default function SettingsForm({
 
       <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
         <strong>Modus:</strong>{" "}
-        {isTauri ? "🖥️ Tauri Desktop-App" : "🌐 Web-Browser (Speichern nur lokal)"}
+        {isTauri ? "🖥️ Tauri Desktop-App" : `🌐 Web-Browser (${texts.onlyLocalSave})`}
       </div>
 
       {/* Sprache */}
