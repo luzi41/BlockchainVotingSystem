@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Contract, Wallet } from "ethers";
 import forge from "node-forge";
 import Image from "next/image";
-//import { invoke } from "@tauri-apps/api/core";
 import { useElectionStatus } from "./hooks/useElectionStatus";
 import { useAppSettings } from "./hooks/useAppSettings";
 import { loadTexts } from "./utils/loadTexts";
