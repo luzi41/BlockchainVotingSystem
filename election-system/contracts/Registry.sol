@@ -150,16 +150,19 @@ contract Registry {
         elections[electionId].votingOpen = false;
     }
 
-    function getElectionStatus(uint electionId) public view returns (string memory status) {
+    function getElectionStatus(uint electionId) public view returns (string memory status, uint code) {
         Election storage e = elections[electionId];
+        uint statusCode = 0;
         if (e.electionBegin) {
             if (e.votingOpen) {
-                return unicode"Die Wahl ist geöffnet.";
+                return (unicode"Die Wahl ist geöffnet.", statusCode);
             } else {
-                return unicode"Die Wahl ist geschlossen.";
+                statusCode = 1;
+                return (unicode"Die Wahl ist geschlossen.", statusCode);
             }
         } else {
-            return unicode"Die Wahl hat noch nicht begonnen.";
+            statusCode = 2;
+            return (unicode"Die Wahl hat noch nicht begonnen.", statusCode);
         }
     }
 

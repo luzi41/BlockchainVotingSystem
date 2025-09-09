@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-// V 0.25.3 Multi-Election Bundestagswahl
+// V 0.30.10 Multi-Election Bundestagswahl
 
 import "./Registry.sol";
 
@@ -294,7 +294,7 @@ contract Bundestagswahl is Registry {
         electionResults2[electionId].push(ElectionResult({tally: _tally, signature: _signature, timestamp: block.timestamp, electionDistrict: _wahlbezirk}));
     }
 
-    function getElectionResultsDistrict1(uint electionId, uint _electionDistrict) public view onlyAfterVoting(electionId) returns (string memory, uint, string memory, uint) {
+    function getElectionResultsDistrict1(uint electionId, uint _electionDistrict) public view onlyAfterVoting(electionId) returns (string memory tally, uint electionDistrict, string memory signature, uint timestamp) {
         ElectionResult[] storage results = electionResults1[electionId];
         for (uint i = 0; i < results.length; i++) {
             if (results[i].electionDistrict == _electionDistrict) {
@@ -303,7 +303,7 @@ contract Bundestagswahl is Registry {
         }
     }
 
-    function getElectionResultsDistrict2(uint electionId, uint _electionDistrict) public view onlyAfterVoting(electionId) returns (string memory, uint, string memory, uint) {
+    function getElectionResultsDistrict2(uint electionId, uint _electionDistrict) public view onlyAfterVoting(electionId) returns (string memory tally, uint electionDistrict, string memory signature, uint timestamp) {
         ElectionResult[] storage results = electionResults2[electionId];
         for (uint i = 0; i < results.length; i++) {
             if (results[i].electionDistrict == _electionDistrict) {
@@ -311,4 +311,5 @@ contract Bundestagswahl is Registry {
             }
         }
     }
+
 }

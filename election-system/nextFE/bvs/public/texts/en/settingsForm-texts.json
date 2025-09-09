@@ -1,0 +1,8 @@
+{
+    "settings": "Settings",
+    "language": "Language",
+    "privateKey" : "Private Key",
+    "electionDistrict": "Election District",
+    "rpcServer" : "RPC-Server",
+    "save": "Save"
+}

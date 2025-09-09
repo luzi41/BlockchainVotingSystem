@@ -15,8 +15,6 @@ bvs.png
 node_modules/
 */node_modules/*
 keys/
-election-system/frontend/src/artifacts
-election-system/frontend/src/results
 
 # Hardhat files
 election-system/cache
@@ -44,13 +42,8 @@ election-system/contracs/Tally.sol
 election-system/ignition/deployments/chain-31337
 
 # testing
-election-system/frontend/coverage
-election-system/frontend/npm-debug.log*
 
 # production
-election-system/frontend/build
-election-system/frontend/cache
-election-system/frontend/npm-debug.log*
 
 # Logs
 logs
@@ -67,15 +60,20 @@ election-system/api*.json
 /cache
 election-system/api/deployment-address.txt
 election-system/api/*json
-election-system/frontend/package-lock.json
-election-system/frontend/.env
-election-system/frontend/.env.local
-election-system/frontend/.env.production
-election-system/frontend/.env.development
-election-system/frontend/.env.test
 .vscode
 
 election-system/hardhat.config.js
 election-system/admin-ui/src/reportWebVitals.js
-election-system/frontend/src/artifacts/index.text
-/election-system/frontend/public/contracts/*.json
+election-system/admin-ui/.next/cache/*
+election-system/admin-ui/.next/server/chunks/*
+election-system/nextFE/bvs/public/contracts/*
+election-system/nextFE/bvs/dist/*
+
+election-system/nextFE/bvs/package-lock.json
+election-system/nextFE/.next/trace
+*lock.json
+election-system/frontend.zip
+
+release*
+election-system/nextFE/bvs/electron.zip
+*.lock

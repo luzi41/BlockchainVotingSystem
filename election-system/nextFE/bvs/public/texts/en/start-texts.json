@@ -1,0 +1,13 @@
+{
+  "viewDistricts": "Election districts",
+  "description" : "description of the election",
+  "title" : "Title of the election",
+  "details": "Details",
+  "errorElectronSettingsRpcURL": "No settings (_rpcURL)",
+  "errorFetchData": "Error fetch data",
+  "titleRegistration": "Register",
+  "textRegistration": "You can check the box on the back of your voting notification to indicate that you would like to participate in the online election...",
+  "titleCandidates": "Who is running for election - candidates in your constituency",
+  "titleParties": "The parties and their election manifestos",
+  "loadContract": "Load contract..."
+}

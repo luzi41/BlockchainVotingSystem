@@ -1,0 +1,22 @@
+{
+  "resultsText": "The results will follow after decryption and release by the election officer.",
+  "headline": "Election results",
+  "selectView": "Select view",
+  "viewDistricts": "constituencies",
+  "viewTotal": "Total",
+  "party" : "Party",
+  "firstVotes": "First vote",
+  "secondVotes": "Second vote",
+  "totalParties": "Parties overall",
+  "answer": "Answer",
+  "votes": "Votes",
+  "title" : "Title of election",
+  "details": "Details",
+  "errorElectronSettingsRpcURL": "No settings (_rpcURL)",
+  "errorFetchData": "Error fetch data",
+  "errorLoadModule": "Error load module",
+  "errorProposals": "Error load proposals",
+  "errorNetwork": "Network error",
+  "errorContractAddress": "SmartContract-Address not defined.",
+  "loadContract": "Load contract ..."
+}
