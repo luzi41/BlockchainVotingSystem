@@ -2,10 +2,13 @@
 "use client";
 import Link from "next/link";
 import LanguageSwitcher from "@components/LanguageSwitcher";
+import { LanguageProvider, useLanguage } from "@components/contexts/LanguageContext";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAppSettings } from "@components/hooks/useAppSettings";
+import { loadTexts } from "@components/utils/loadTexts";
 
 // Fonts
 const geistSans = Geist({
@@ -18,14 +21,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-function Navigation() {
+interface NavigationTexts {
+  informationAboutTheElection: string;
+  vote: string;
+  results: string;
+  extras: string;
+}
+
+function Navigation({ texts }: { texts: NavigationTexts }) {
   const pathname = usePathname();
 
   const links = [
-    { href: "/", label: "Informationen zur Wahl" },
-    { href: "/vote", label: "Abstimmen" },
-    { href: "/results", label: "Ergebnisse" },
-    { href: "/extras", label: "Extras" },
+    { href: "/", label: texts.informationAboutTheElection },
+    { href: "/vote", label: texts.vote },
+    { href: "/results", label: texts.results },
+    { href: "/extras", label: texts.extras },
   ];
 
   return (
@@ -57,13 +67,22 @@ function Navigation() {
   );
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+// ---------- Innerer Content mit LanguageContext
+function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const [contractAddress, setContractAddress] = useState("Lade...");
+  const { language } = useLanguage(); // ✅ funktioniert jetzt, weil Provider außenrum ist
+  const [texts, setTexts] = useState<NavigationTexts | null>(null);
+  const { settings } = useAppSettings("1", "de");
 
+  // Texte laden, wenn Sprache oder Settings wechseln
   useEffect(() => {
-    // Dynamische Daten aus Tauri laden
+    if (settings) {
+      loadTexts("navigation-texts", language).then(setTexts);
+    }
+  }, [language, settings]);
+
+  // Contract-Adresse & Events laden (nur in Tauri)
+  useEffect(() => {
     if ("__TAURI__" in window) {
       import("@tauri-apps/api/core").then(({ invoke }) => {
         invoke<string>("get_contract_address")
@@ -71,31 +90,38 @@ export default function RootLayout({
           .catch(() => setContractAddress("Fehler beim Laden"));
       });
 
-      // Navigation-Eventlistener
       import("@tauri-apps/api/event").then(({ listen }) => {
         listen<string>("navigate", (event) => {
           const newPath = event.payload;
-          window.location.hash = newPath; // später Router.push()
+          window.location.hash = newPath;
         });
       });
     }
   }, []);
 
   return (
+    <>
+      {texts && <Navigation texts={texts} />}
+      {children}
+      <footer className="p-4 border-t flex justify-center items-center">
+        <span id="ContractAddress">
+          Contract: <code>{contractAddress}</code>
+        </span>
+      </footer>
+    </>
+  );
+}
+
+// ---------- RootLayout mit Provider außenrum
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navigation />
-        {children}
-        <footer
-          id="footer"
-          className="p-4 border-t flex justify-center items-center"
-        >
-          <span id="ContractAddress">
-            Contract: <code>{contractAddress}</code>
-          </span>
-        </footer>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <LanguageProvider>
+          <RootLayoutContent>{children}</RootLayoutContent>
+        </LanguageProvider>
       </body>
     </html>
   );

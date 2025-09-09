@@ -10,6 +10,7 @@ import { useAppSettings } from "./hooks/useAppSettings";
 import { loadTexts } from "./utils/loadTexts";
 import scanner from "@public/scan-59.png";
 import { Candidate, Party, Proposal, VoteFormTexts } from "./types/VoteFormTypes";
+import { useLanguage } from "./contexts/LanguageContext"; // 👈 wichtig!
 
 // Sichere Tauri API Imports mit korrekten Types
 let invoke: ((cmd: string, args?: any) => Promise<any>) | null = null;
@@ -40,6 +41,7 @@ export interface AppSettings {
 }
 
 export default function VoteForm({  electionDistrict, availableDistricts = [], }: VoteFormProps) {
+  const { language, setLanguage } = useLanguage();
   const { settings, setSettings, isTauri, loading } = useAppSettings(
     electionDistrict,
     "de"
@@ -58,14 +60,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const [texts, setTexts] = useState<VoteFormTexts | null>(null);
   const [loadingTexts, setLoadingTexts] = useState(true);
   const [loadingAbi, setLoadingAbi] = useState(true);
-  const [loadingSettings, setLoadingSettings] = useState(true);
   const [electionDistrictNo, setElectionDistrictNo] = useState<string>("");
-  const [errorAbi, setErrorAbi] = useState<string | null>(null);
-  const [errorTexts, setErrorTexts] = useState<string | null>(null);
-  const [errorSettings, setErrorSettings] = useState<string | null>(null);
-  const [language, setLanguage] = useState("de");
-  const [status, setStatus] = useState<string>("");
-  const [localLanguage, setLocalLanguage] = useState<string>("en");
   const [error, setError] = useState<string>("");
     // -------- Initiales Laden
     useEffect(() => {
@@ -73,10 +68,10 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
         setElectionDistrictNo(settings.election_district);
         setPrivateKey(settings.private_key);
         console.log("PrivateKey:", settings.private_key);
-        loadTexts("voteForm-texts", settings.language).then(setTexts);
+        loadTexts("voteForm-texts", language).then(setTexts);
         setLoadingTexts(false);
     }
-    }, [settings]);
+    }, [language, settings]);
 
   // Vertragsdaten laden
   useEffect(() => {

@@ -132,7 +132,6 @@ Please do not use the public key from this guide and choose a different key pair
     npm run dev 
 
 - Open the React frontend in your browser (http://localhost:3002)
-- Connect MetaMask
 - goto /voteForm
 - Select candidate & vote
 
@@ -141,8 +140,6 @@ Please do not use the public key from this guide and choose a different key pair
     curl -X POST http://localhost:3001/1/endVoting
 
 ## 8.2 Counting the results
-
-election-system/scripts$
 
     curl -X POST http://localhost:3001/1/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "1"}' &&
     curl -X POST http://localhost:3001/1/storeElectionResult -H "Content-Type: application/json" -d '{"wahlbezirk" : "2"}' &&

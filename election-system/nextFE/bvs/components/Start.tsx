@@ -7,7 +7,7 @@ import { loadTexts } from "./utils/loadTexts";
 import { StartTexts, Candidate, Party } from "./types/StartTypes";
 import { useAppSettings } from "./hooks/useAppSettings";
 import { useRouter } from "next/navigation";
-
+import { useLanguage } from "./contexts/LanguageContext"; // 👈 wichtig!
 
 interface SettingsProps {
   electionDistrict: string;
@@ -34,10 +34,12 @@ export default function Start({
   electionDistrict,
   availableDistricts = [],
 }: SettingsProps) {
-  const { settings, setSettings, isTauri, loading, error } = useAppSettings(
-    electionDistrict,
-    "de"
-  );    
+    const { language, setLanguage } = useLanguage();
+    const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+        electionDistrict,
+        "de"
+    );
+
     interface TextContent {
         titleRegistration: string;
         textRegistration: string;
@@ -58,9 +60,9 @@ export default function Start({
     // -------- Initiales Laden
     useEffect(() => {
         if (settings) {
-            loadTexts("start-texts", settings.language).then(setTexts);
+            loadTexts("start-texts", language).then(setTexts);
         }
-    }, [settings]);
+    }, [language, settings]);
 
     // Smart Contract Setup
     useEffect(() => {

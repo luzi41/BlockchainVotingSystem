@@ -6,6 +6,7 @@ import { useElectionStatus } from "./hooks/useElectionStatus";
 import { useAppSettings } from "./hooks/useAppSettings";
 import { ResultsTexts } from "./types/ResultsTypes";
 import { loadTexts } from "./utils/loadTexts";
+import { useLanguage } from "./contexts/LanguageContext"; // 👈 wichtig!
 
 interface ResultsProps {
   electionDistrict: string;
@@ -206,7 +207,8 @@ function TotalResults({ texts, parties, aggregated }: { texts: ResultsTexts; par
 /* ---------- Hauptkomponente (ohne setHtml) ---------- */
 
 export default function Results() {
-  const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+  const { language, setLanguage } = useLanguage();
+  const { settings, error } = useAppSettings(
     "1",
     "de"
   );     
@@ -230,10 +232,10 @@ export default function Results() {
   if (settings) {
       
       //setElectionDistrictNo(settings.election_district);
-      loadTexts("results-texts", settings.language).then(setTexts);
+      loadTexts("results-texts", language).then(setTexts);
       setLoadingTexts(false);
   }
-  }, [settings]);
+  }, [language, settings]);
 
   useEffect(() => {
     if (!provider || !address || !electionId) return;

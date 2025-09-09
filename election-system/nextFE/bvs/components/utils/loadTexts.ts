@@ -1,6 +1,4 @@
 // components/utils/loadTexts.ts
-//import { VoteFormTexts } from "@components/types/VoteFormTypes";
-//import { StartTexts } from "@components/types/StartTypes";
 
 const FALLBACK_TEXTS = {
   yourToken: "Your token",
@@ -9,7 +7,8 @@ const FALLBACK_TEXTS = {
   firstVote: "First vote",
   secondVote: "Second vote",
   survey: "Survey",
-  btnSend: "Send"
+  btnSend: "Send",
+  settings: "Settings",
 };
 
 /**
@@ -33,10 +32,10 @@ export async function loadTexts(
 
   for (const l of candidates) {
     const url = `/texts/${l}/${ns}.json`;
-    //console.log("Texte benutzt: ", url);
+    
     try {
       const res = await fetch(url, { cache: "force-cache" });
-      //const res = await fetch(url);
+      
       if (res.ok) {
         const data = (await res.json());
         return data;
