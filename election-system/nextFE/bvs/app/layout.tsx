@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAppSettings } from "@components/hooks/useAppSettings";
 import { loadTexts } from "@components/utils/loadTexts";
-
+import { useElectionStatus } from "@components/hooks/useElectionStatus";
 // Fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,10 +69,12 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
 
 // ---------- Innerer Content mit LanguageContext
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
-  const [contractAddress, setContractAddress] = useState("Lade...");
+  const { provider, address, electionId } = useElectionStatus();
+  const [contractAddress, setContractAddress] = useState("");
   const { language } = useLanguage(); // ✅ funktioniert jetzt, weil Provider außenrum ist
   const [texts, setTexts] = useState<NavigationTexts | null>(null);
   const { settings } = useAppSettings("1", "de");
+  
 
   // Texte laden, wenn Sprache oder Settings wechseln
   useEffect(() => {
@@ -83,21 +85,12 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   // Contract-Adresse & Events laden (nur in Tauri)
   useEffect(() => {
-    if ("__TAURI__" in window) {
-      import("@tauri-apps/api/core").then(({ invoke }) => {
-        invoke<string>("get_contract_address")
-          .then(setContractAddress)
-          .catch(() => setContractAddress("Fehler beim Laden"));
-      });
+    if (!provider || !address || !electionId ) {
+      return
+    };
 
-      import("@tauri-apps/api/event").then(({ listen }) => {
-        listen<string>("navigate", (event) => {
-          const newPath = event.payload;
-          window.location.hash = newPath;
-        });
-      });
-    }
-  }, []);
+    setContractAddress(address);
+  }, [address]);
 
   return (
     <>
@@ -105,7 +98,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       {children}
       <footer className="p-4 border-t flex justify-center items-center">
         <span id="ContractAddress">
-          Contract: <code>{contractAddress}</code>
+          Contract: <code>{address}</code>
         </span>
       </footer>
     </>
