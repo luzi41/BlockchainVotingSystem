@@ -36,8 +36,10 @@ export default function Extras() {
             <h2>Extras</h2>
             <nav className="menu">
                 <ul className="lists-default">
+                    <li><Link href="/extras/settings">{texts.settings}</Link></li>                    
                     <li><Link href="http://localhost:25000">{texts.electionExplorer}</Link></li>
-                    <li><Link href="/extras/settings">{texts.settings}</Link></li>
+                    <li>{texts.ownElection}</li>
+                    <li>{texts.ownNodes}</li>
                 </ul>
             </nav>
         </div>
@@ -45,17 +47,12 @@ export default function Extras() {
         (
             <div className="col-50">
                 <h2>Direkte Demokratie</h2>
-                <p>
-                    Sie haben hier die Möglichkeit selbst aktiv zu werden und die gesetzlich
-                    vorgesehenen Möglichkeiten direkter Demokratie zu nutzen:
-                </p>
+                <p>{texts.activeYourself}:</p>
                 <ul className="lists-default ">
-                    <li><a>Bürgerbegehren</a></li>
-                    <li><a>Volksinitiative</a></li>
-                    <li><a>Volksbegehren</a></li>
+                    <li><Link href="./buergerbegehren">{texts.citizensInitiative}</Link></li>
+                    <li><Link href="./referendum">{texts.referendum}</Link></li>
                 </ul>                
             </div>
-            
         )} 
     </div>
     );

@@ -9,5 +9,8 @@
   "textRegistration": "You can check the box on the back of your voting notification to indicate that you would like to participate in the online election...",
   "titleCandidates": "Who is running for election - candidates in your constituency",
   "titleParties": "The parties and their election manifestos",
-  "loadContract": "Load contract..."
+  "loadContract": "Load contract...",
+  "generalElectionInfo": "General Election Information",
+  "officialWebsite": "Official Website",
+  "faqOnlineElection": "FAQ: How works Online-Voting"
 }

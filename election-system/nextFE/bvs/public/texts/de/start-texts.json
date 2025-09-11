@@ -3,11 +3,13 @@
   "description" : "Beschreibung der Wahl",
   "title" : "Titel der Wahl",
   "details": "Details",
-  "errorElectronSettingsRpcURL": "Fehlende Einstellungen (_rpcURL) im Electron Store",
   "errorFetchData": "Fehler beim Abrufen der Daten",
   "titleRegistration": "Registrieren für die Online-Wahl",
   "textRegistration": "Sie können auf der Rückseite Ihrer Wahlbenachrichtigung ankreuzen, dass Sie an der Online-Wahl teilnehmen möchten...",
   "titleCandidates": "Wer steht zur Wahl - KandidatInnen in Ihrem Wahlkreis",
   "titleParties": "Die Parteien und ihre Wahlprogramme",
-  "loadContract": "Lade Vertrag ..."
+  "loadContract": "Lade Vertrag ...",
+  "generalElectionInfo": "Allgemeine Informationen zu dieser Wahl",
+  "officialWebsite": "Offizielle Website",
+  "faqOnlineElection": "FAQ: Wie funktioniert die Online-Wahl"
 }

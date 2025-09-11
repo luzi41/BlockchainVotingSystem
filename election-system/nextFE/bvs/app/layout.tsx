@@ -58,10 +58,10 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
         </li>
         <li>
           <Link
+            className="padding-right-15px"
             href="https://github.com/luzi41/BlockchainVotingSystem/blob/main/README.md"
-            className="padding-right-5px"
           >
-            Blockchain Voting System 0.31
+            Blockchain Voting System 0.31.1
           </Link>
         </li>
       </ul>

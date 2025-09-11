@@ -4,6 +4,8 @@ h2 {
   font-weight: bold;
 }
 h3 {
+  padding-top: 15px;
+  padding-bottom: 5px;
   font-size: 1.2em;
 }
 
@@ -46,6 +48,7 @@ nav.main {
   margin: 0;
   border: 0;
   width: 100%;
+  padding: 0;
 }
 
 nav.main ul {
@@ -118,6 +121,13 @@ ul.lists-default li {
   list-style-type: disc;
   padding-left: 0px;
   margin: 25px;
+}
+
+ul.lists-texts li { 
+  list-style-type: disc;
+  padding-left: 0px;
+  margin: 25px;
+  line-height: 1;
 }
 
 #root {
@@ -262,6 +272,10 @@ div .border {
 
 .padding-right-5px {
   padding-right: 5px;
+}
+
+.padding-right-15px {
+  padding-right: 15px;
 }
 
 /* Results.css */

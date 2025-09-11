@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Contract, Wallet } from "ethers";
 import forge from "node-forge";
@@ -45,7 +45,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
     electionDistrict,
     "de"
   );   
-  const { provider, address, electionId } = useElectionStatus();
+  const { provider, address, electionId, status } = useElectionStatus();
   const [abi, setAbi] = useState<any[]>([]);
   const [modus, setModus] = useState<number>(1);
   const [tokenInput, setTokenInput] = useState<string>("");
@@ -62,6 +62,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
   const [electionDistrictNo, setElectionDistrictNo] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [title, setTitle] = useState("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
     // -------- Initiales Laden
     useEffect(() => {
     if (settings) {
@@ -117,6 +118,7 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
         console.error("Fehler beim Abrufen der Daten:", err);
       } finally {
         setLoadingAbi(false);
+        setIsLoading(false);
       }
     }
 
@@ -157,10 +159,25 @@ export default function VoteForm({  electionDistrict, availableDistricts = [], }
     } catch (err: unknown) {
       if (err instanceof Error) setError("❌ Fehler: " + err.message + " electionId: " + electionId + " electionDistrict: " + electionDistrictNo);
       else setError("❌ Unbekannter Fehler!");
-    } finally {
-      //setLoading(false);
-    }
+    } 
   };
+
+  if (isLoading) {
+      return (
+          <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p>Lade Wahlsystem...</p>
+                <p>{status}</p>
+              
+              {!provider && (
+              <div>
+                  <p><Link href= "/extras/settings/">Check Settings</Link></p>
+                  <p><Link href= "/help">Help</Link></p>
+              </div>
+              )}
+          </div>
+      );
+  }  
 
   // if (loadingTexts || loadingAbi || loadingSettings) return <p>Load data ...</p>;
   if (loadingAbi ) {

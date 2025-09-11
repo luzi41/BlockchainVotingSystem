@@ -58,7 +58,6 @@ export default function Start({
     const [htmlContent, setHtmlContent] = useState<ReactElement | null>(null); 
     const [title, setTitle] = useState("");
 
-    //console.log("Fehler 59", status);
     // -------- Initiales Laden
     useEffect(() => {
         if (settings) {
@@ -135,9 +134,14 @@ export default function Start({
         
         let htmlBundestagswahl =   (
             <div id="content">
+                <h3>Allgemeine Informationen zu dieser Wahl</h3>
+                <ul>
+                    <li className="lists-texts"><a href="https://www.bundestag.de/parlament/bundestagswahl">Offizielle Website</a></li>
+                </ul>
+                <h3>FAQ: Wie funktioniert die Online-Wahl</h3>
                 <h3 id="titleRegistration">{texts.titleRegistration}</h3>
                 <div id="textRegistration">{texts.textRegistration}</div>
-                <h3 id="titleCandidates">{texts.titleCandidates}</h3>
+                <h3 id="titleCandidates">{texts.titleCandidates} {settings?.election_district}</h3>
                 <ul className="lists-default">
                 {candidates.map((candidate, index) => (
                     <li key={index}>
