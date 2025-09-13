@@ -212,20 +212,18 @@ export default function Results() {
     "1",
     "de"
   );     
-  const { provider, address, electionId } = useElectionStatus();
-
+  const { provider, address, electionId, status } = useElectionStatus();
   const [modus, setModus] = useState<number>(1);
-  const [status, setStatus] = useState<string>("");
   const [displayMode, setDisplayMode] = useState<"districts" | "total" | "none">("total");
-
   const [results1, setResults1] = useState<Record<string, number>[]>([]);
   const [results2, setResults2] = useState<Record<string, number>[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [parties, setParties] = useState<any[]>([]);
-
+  const [title, setTitle] = useState("");
   const [texts, setTexts] = useState<ResultsTexts | null>(null);
   const [loadingTexts, setLoadingTexts] = useState<boolean>(true);
   const [loadingResults, setLoadingResults] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // -------- Initiales Laden
   useEffect(() => {
@@ -259,14 +257,15 @@ export default function Results() {
         
         if (!address) throw new Error("Contract address is null or undefined.");
         const contract = new Contract(String(address), abi, provider);
-
         const electionStatus = await contract.getElectionStatus(electionId);
         if (!mounted) return;
-        setStatus(electionStatus);
-
+        //setStatus(electionStatus);
+        const _title = await contract.getElectionTitle(electionId);
+        setTitle(_title);      
         if (electionStatus === "Die Wahl ist geschlossen.") {
           const m = await contract.getModus();
           if (!mounted) return;
+
           setModus(Number(m));
 
           if (Number(m) === 1) {
@@ -290,7 +289,7 @@ export default function Results() {
             if (!hasAny) {
               const msg = "278 Keine Ergebnisse oder Ergebnisse noch nicht freigegeben!";
               if (mounted) {
-                setStatus(msg);
+                //setStatus(msg);
               }
               throw new Error(msg);
             }
@@ -305,37 +304,35 @@ export default function Results() {
               setResults1(_results1);
               setResults2(_results2);
               setDisplayMode("total");
-            }
-          } else {
-            // Proposal mode
-            const proposalList = await contract.getProposals(electionId);
-            if (!proposalList || proposalList.length === 0) {
-              const msg = texts?.errorProposals ?? "Keine Vorschläge";
-              //if (mounted) setError(msg);
-              throw new Error(msg);
-            }
-            const rawResult = await contract.getVotingResult(electionId);
-            const result = JSON.parse(rawResult.tally ?? "{}");
-            const voteNumber = await contract.getNumberOfVotes(electionId);
+            } else {
+              // Proposal mode
+              const proposalList = await contract.getProposals(electionId);
+              if (!proposalList || proposalList.length === 0) {
+                const msg = texts?.errorProposals ?? "Keine Vorschläge";
+                //if (mounted) setError(msg);
+                throw new Error(msg);
+              }
+              const rawResult = await contract.getVotingResult(electionId);
+              const result = JSON.parse(rawResult.tally ?? "{}");
+              const voteNumber = await contract.getNumberOfVotes(electionId);
 
-            // store proposal results in Results.cache or local state as needed
-            Results.cache.resultsParties = result;
-            Results.cache.parties = proposalList;
+              // store proposal results in Results.cache or local state as needed
+              Results.cache.resultsParties = result;
+              Results.cache.parties = proposalList;
 
-            if (mounted) {
-              setDisplayMode("total");
-              setParties(proposalList);
+              if (mounted) {
+                setDisplayMode("total");
+                setParties(proposalList);
+              }
             }
           }
-          if (mounted) setStatus("Die Wahl ist geschlossen.");
-        } else {
-          // Not closed — keep status message
         }
       } catch (err: any) {
         console.error("Fehler beim Laden der Ergebnisse:", err);
         //if (mounted) setError(err?.message ?? String(err));
       } finally {
         if (mounted) setLoadingResults(false);
+        setIsLoading(false);
       }
     };
 
@@ -348,11 +345,33 @@ export default function Results() {
   }, [provider, address, electionId]);
 
   // Rendering
+    if (!texts) return <p>Error loading texts.</p>;
+
+      // Loading State
+    //if (!loadingTexts && !loadingResults) setIsLoading(false);
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p>Lade Wahlsystem...</p>
+                 <p>{status}</p>
+                
+                {!provider && (
+                <div>
+                    <p><Link href= "/extras/settings/">Check Settings</Link></p>
+                    <p><Link href= "/help">Help</Link></p>
+                </div>
+                )}
+            </div>
+        );
+    }
+  /*
   if (!provider || !address || !electionId) return <p>Bitte Wallet/Contract verbinden …</p>;
   if (loadingTexts || loadingResults) return <p>⏳ Lade Ergebnisse …</p>;
   if (error) return <div className="error">Fehler: {error}</div>;
-  if (!texts) return <p>Keine Texte vorhanden.</p>;
-
+  
+  */
+  
   // If the election is not yet closed
   if (status !== "Die Wahl ist geschlossen.") {
     return (
@@ -366,7 +385,10 @@ export default function Results() {
   // Main view when election is closed
   return (
     <div>
-      <h1>{texts.headline}</h1>
+      <h1 className="text-3xl font-bold text-center">
+        {title}
+      </h1>      
+      <h2>{texts.headline}</h2>
 
       <p>
         <select

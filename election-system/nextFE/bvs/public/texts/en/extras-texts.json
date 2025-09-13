@@ -1,3 +1,9 @@
 {
-    "settings": "Settings"
+    "settings": "Settings",
+    "electionExplorer": "Election Explorer",
+    "ownElection": "Organize your own elections with BVS",
+    "ownNodes": "Operate your own nodes",
+    "citizensInitiative": "Citizens' initiative",
+    "referendum": "Referendum",
+    "activeYourself": "You have the opportunity to become active yourself and use the legally provided possibilities of direct democracy"
 }

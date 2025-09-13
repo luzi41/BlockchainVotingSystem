@@ -57,7 +57,7 @@ Please do not use the public key from this guide and choose a different key pair
         "shortnames":["CDU","SPD","FDP","GRUENE","LINKE"],
         "colors":["#fff","#fff","#8e44ad","#fff","#fff"],
         "bgcolors":["#000","#FF0000","#f1c40f","#27ae60","#c01c28"],
-        "urls":["https://www.cdu.de","https://www.spd.de","https://www.fdp.de","https://www.gruene.de","https://www.linke.de"]
+        "urls":["https://www.cdu.de","https://www.spd.de","https://www.fdp.de","https://www.gruene.de","https://www.die-linke.de"]
     }'
 
 

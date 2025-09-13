@@ -4,5 +4,6 @@
     "privateKey" : "Private Key",
     "electionDistrict": "Election District",
     "rpcServer" : "RPC-Server",
-    "save": "Save"
+    "save": "Save",
+    "onlyLocalSave": "Save locally only"
 }

@@ -28,13 +28,32 @@ export default function Extras() {
 
     return (
     <div>
-        <h3>Extras</h3>
-        <nav className="menu">
-            <ul className="lists-default">
-                <li><Link href="http://localhost:25000">Explorer</Link></li>
-                <li><Link href="/extras/settings">{texts.settings}</Link></li>
-            </ul>
-        </nav>
+        <h1 className="text-3xl font-bold">
+            Blockchain Voting System
+        </h1>
+        <p>&nbsp;</p>
+        <div className="col-50">
+            <h2>Extras</h2>
+            <nav className="menu">
+                <ul className="lists-default">
+                    <li><Link href="/extras/settings">{texts.settings}</Link></li>                    
+                    <li><Link href="http://localhost:25000">{texts.electionExplorer}</Link></li>
+                    <li>{texts.ownElection}</li>
+                    <li>{texts.ownNodes}</li>
+                </ul>
+            </nav>
+        </div>
+        {process.env.NEXT_PUBLIC_EXTENDED && 
+        (
+            <div className="col-50">
+                <h2>{texts.directDemocracy}</h2>
+                <p>{texts.activeYourself}:</p>
+                <ul className="lists-default ">
+                    <li><Link href="./buergerbegehren">{texts.citizensInitiative}</Link></li>
+                    <li><Link href="./referendum">{texts.referendum}</Link></li>
+                </ul>                
+            </div>
+        )} 
     </div>
     );
 }

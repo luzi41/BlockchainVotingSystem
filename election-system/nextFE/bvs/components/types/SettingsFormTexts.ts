@@ -13,4 +13,5 @@ export interface SettingsFormTexts {
   survey: string;
   btnSend: string;
   contractAddress: string;
+  onlyLocalSave: string;
 }

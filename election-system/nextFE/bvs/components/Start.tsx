@@ -35,7 +35,7 @@ export default function Start({
   availableDistricts = [],
 }: SettingsProps) {
     const { language, setLanguage } = useLanguage();
-    const { settings, setSettings, isTauri, loading, error } = useAppSettings(
+    const { settings, setSettings, isTauri, loading } = useAppSettings(
         electionDistrict,
         "de"
     );
@@ -47,7 +47,7 @@ export default function Start({
         titleParties: string;
         details: string;
     }    
-    const { provider, address, electionId, status } = useElectionStatus();  // 👈 Hook nutzen
+    const { provider, address, electionId, status, error } = useElectionStatus();  // 👈 Hook nutzen
     const [parties, setParties] = useState<Party[]>([]);
     const [contract, setContract] = useState<Contract | null>(null);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -55,7 +55,8 @@ export default function Start({
     const [isLoading, setIsLoading] = useState(true);
     const [texts, setTexts] = useState<TextContent | null>(null);
     const [modus, setModus] = useState(0);
-    const [htmlContent, setHtmlContent] = useState<ReactElement | null>(null);   
+    const [htmlContent, setHtmlContent] = useState<ReactElement | null>(null); 
+    const [title, setTitle] = useState("");
 
     // -------- Initiales Laden
     useEffect(() => {
@@ -98,6 +99,8 @@ export default function Start({
                 if (m) {
                     const modusNumber = Number(m);
                     setModus(modusNumber);
+                    const _title = await contractInstance.getElectionTitle(electionId);
+                    setTitle(_title);
                     
                     if (modusNumber === 1) {
                         const candidatesList = await contractInstance.getCandidates(electionId, settings?.election_district);
@@ -131,9 +134,14 @@ export default function Start({
         
         let htmlBundestagswahl =   (
             <div id="content">
+                <h3>Allgemeine Informationen zu dieser Wahl</h3>
+                <ul>
+                    <li className="lists-texts"><a href="https://www.bundestag.de/parlament/bundestagswahl">Offizielle Website</a></li>
+                </ul>
+                <h3>FAQ: Wie funktioniert die Online-Wahl</h3>
                 <h3 id="titleRegistration">{texts.titleRegistration}</h3>
                 <div id="textRegistration">{texts.textRegistration}</div>
-                <h3 id="titleCandidates">{texts.titleCandidates}</h3>
+                <h3 id="titleCandidates">{texts.titleCandidates} {settings?.election_district}</h3>
                 <ul className="lists-default">
                 {candidates.map((candidate, index) => (
                     <li key={index}>
@@ -166,60 +174,20 @@ export default function Start({
         setHtmlContent(htmlBundestagswahl);
     }, [texts, candidates, parties, proposals]);
 
-    //const navigate = useNavigate(); 
-
-    /*
-    // Navigation Functions - FIX mit Dynamic Import
-    const goToVote = async () => {
-        try {
-            const tauriAPI = await loadTauriAPI();
-            if (tauriAPI) {
-                await tauriAPI.invoke('navigate_to', { path: '/vote' });
-            } else {
-                // Fallback für Browser
-                navigate("/vote");
-            }
-        } catch (err) {
-            console.error('Navigation error:', err);
-        }
-    };
-
-    const goToResults = async () => {
-        try {
-            const tauriAPI = await loadTauriAPI();
-            if (tauriAPI) {
-                await tauriAPI.invoke('navigate_to', { path: '/results' });
-            } else {
-                // Fallback für Browser
-                navigate("/results");
-            }
-        } catch (err) {
-            console.error('Navigation error:', err);
-        }
-    };
-
-    const goToSettings = async () => {
-        try {
-            const tauriAPI = await loadTauriAPI();
-            if (tauriAPI) {
-                await tauriAPI.invoke('navigate_to', { path: '/extras/settings' });
-            } else {
-                // Fallback für Browser
-                navigate("/extras/settings");
-            }
-        } catch (err) {
-            console.error('Navigation error:', err);
-        }
-    };
-    */
-   
     // Loading State
     if (isLoading) {
         return (
             <div className="flex flex-col items-center gap-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 <p>Lade Wahlsystem...</p>
-                <p>{status}</p>
+                 <p>{status}</p>
+                
+                {!provider && (
+                <div>
+                    <p><Link href= "/extras/settings/">Check Settings</Link></p>
+                    <p><Link href= "/help">Help</Link></p>
+                </div>
+                )}
             </div>
         );
     }
@@ -240,61 +208,10 @@ export default function Start({
         );
     } 
 
-    // Main UI
-    /*
-    const mainUI = (
-        <div className="flex flex-col items-center gap-6">
-            {settings && (
-                <div className="text-center text-gray-600">
-                    <p>Wahlbezirk: {settings.election_district}</p>
-                    <p>{status}</p>
-                </div>
-            )}
-
-            <div className="flex flex-col gap-4 w-full max-w-md">
-                {status !== "Die Wahl ist geschlossen."  ? (
-                    <button
-                        onClick={goToVote}
-                        className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                        disabled={!contract}
-                    >
-                    🗳️ Wählen
-                </button>) : ("")}
-
-                {status === "Die Wahl ist geschlossen."  ? (
-                    <button
-                        onClick={goToResults}
-                        className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        disabled={!contract}
-                    >
-                        📊 Ergebnisse anzeigen
-                    </button>
-                    ) : ("")
-                }
-                
-                <button
-                    onClick={goToSettings}
-                    className="w-full px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                    ⚙️ Einstellungen
-                </button>
-                
-                
-            </div>
-
-            {contract && (
-                <div className="text-sm text-green-600 mt-4">
-                    ✅ Smart Contract ist vorhanden.
-                </div>
-            )}
-        </div>
-        
-    );
-    */
     return (
         <div>
             <h1 className="text-3xl font-bold text-center">
-                Blockchain Voting System
+                {title}
             </h1>
             {htmlContent}
            

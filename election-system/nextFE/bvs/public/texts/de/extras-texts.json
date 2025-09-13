@@ -1,3 +1,9 @@
 {
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "electionExplorer": "Wahl Explorer",
+    "ownElection": "Eigene Wahlen oder Umfragen mit BVS organisieren",
+    "ownNodes": "Eigener Knoten / Wallet",
+    "citizensInitiative": "Bürgerbegehren",
+    "referendum": "Volksbegehren",
+    "activeYourself": "Sie haben die Möglichkeit, selbst aktiv zu werden und die gesetzlich vorgesehenen Möglichkeiten direkter Demokratie zu nutzen"
 }
