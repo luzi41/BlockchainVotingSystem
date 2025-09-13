@@ -12,8 +12,6 @@ bvs.png
 *bak
 
 # dependencies
-node_modules/
-*/node_modules/*
 keys/
 
 # Hardhat files
