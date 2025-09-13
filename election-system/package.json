@@ -1,6 +1,6 @@
 {
   "name": "election-system",
-  "version": "1.0.0",
+  "version": "0.1",
   "description": "Blockchain Voting System (BVS)",
   "main": "index.js",
   "scripts": {

@@ -46,7 +46,7 @@ export default function Extras() {
         {process.env.NEXT_PUBLIC_EXTENDED && 
         (
             <div className="col-50">
-                <h2>Direkte Demokratie</h2>
+                <h2>{texts.directDemocracy}</h2>
                 <p>{texts.activeYourself}:</p>
                 <ul className="lists-default ">
                     <li><Link href="./buergerbegehren">{texts.citizensInitiative}</Link></li>
