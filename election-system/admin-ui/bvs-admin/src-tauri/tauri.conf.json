@@ -2,19 +2,21 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "bvs-admin",
   "version": "0.1.0",
-  "identifier": "com.goettertz.bvs-admin",
+  "identifier": "com.tauri.dev",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "frontendDist": "../out",
     "devUrl": "http://localhost:3003",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../out"
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [
       {
-        "title": "bvs-admin",
+        "title": "BVS-Administration",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
       }
     ],
     "security": {
