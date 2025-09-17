@@ -1,13 +1,15 @@
 "use client"
-import type { Metadata } from "next";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import LanguageSwitcher from "@components/LanguageSwitcher";
 import { usePathname } from "next/navigation";
-//import { useEffect, useState } from "react";
-//import { useAppSettings } from "@components/hooks/useAppSettings";
+import { useEffect, useState } from "react";
+import { useAppSettings } from "@components/hooks/useAppSettings";
 import { loadTexts } from "@components/utils/loadTexts";
+import { useLanguage, LanguageProvider } from "@components/contexts/LanguageContext";
+
 //import { useElectionStatus } from "@components/hooks/useElectionStatus";
 
 
@@ -33,11 +35,8 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
   const pathname = usePathname();
 
   const links = [
-    { href: "/", label: texts.informationAboutTheElection },
-    { href: "/vote", label: texts.vote },
-    { href: "/results", label: texts.results },
-    { href: "/extras", label: texts.extras },
-    { href: "/help", label: texts.help},
+    { href: "/", label: "Start" },
+
   ];
 
   return (
@@ -61,7 +60,7 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
             className="padding-right-15px"
             href="https://github.com/luzi41/BlockchainVotingSystem/blob/main/README.md"
           >
-            Blockchain Voting System 0.31.1
+            Blockchain Voting Admin 0.50.3
           </Link>
         </li>
       </ul>
@@ -69,7 +68,38 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
   );
 }
 
+// ---------- Innerer Content mit LanguageContext
+function RootLayoutContent({ children }: { children: React.ReactNode }) {
+  //const { provider, address, electionId } = useElectionStatus();
+  const [contractAddress, setContractAddress] = useState("");
+  const { language } = useLanguage(); 
+  const [texts, setTexts] = useState<NavigationTexts | null>(null);
+  const { settings } = useAppSettings("1", "de");
+  
 
+  // Texte laden, wenn Sprache oder Settings wechseln
+  useEffect(() => {
+    if (settings) {
+      loadTexts("navigation-texts", language).then(setTexts);
+    }
+  }, [language, settings]);
+/*
+  // Contract-Adresse & Events laden (nur in Tauri)
+  useEffect(() => {
+    if (!provider || !address || !electionId ) {
+      return
+    };
+
+    setContractAddress(address);
+  }, [address]);
+*/  
+  return (
+    <>
+      {texts && <Navigation texts={texts} />}
+      {children}
+    </>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -77,11 +107,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="de">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <LanguageProvider>
+          <RootLayoutContent>{children}</RootLayoutContent>
+        </LanguageProvider>
       </body>
     </html>
   );
