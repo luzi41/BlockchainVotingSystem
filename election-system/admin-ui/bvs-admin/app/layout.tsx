@@ -10,9 +10,6 @@ import { useAppSettings } from "@components/hooks/useAppSettings";
 import { loadTexts } from "@components/utils/loadTexts";
 import { useLanguage, LanguageProvider } from "@components/contexts/LanguageContext";
 
-//import { useElectionStatus } from "@components/hooks/useElectionStatus";
-
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,19 +21,22 @@ const geistMono = Geist_Mono({
 });
 
 interface NavigationTexts {
-  informationAboutTheElection: string;
-  vote: string;
-  results: string;
-  extras: string;
+  start: string;
+  elections: string;
+  users: string;
   help: string;
+  about: string;
 }
 
 function Navigation({ texts }: { texts: NavigationTexts }) {
   const pathname = usePathname();
 
   const links = [
-    { href: "/", label: "Start" },
-
+    { href: "/", label: texts.start },
+    { href: "/elections", label: texts.elections },
+    { href: "/users", label: texts.users },
+    { href: "/help", label: texts.help },
+    { href: "/about", label: texts.about },
   ];
 
   return (
@@ -83,16 +83,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       loadTexts("navigation-texts", language).then(setTexts);
     }
   }, [language, settings]);
-/*
-  // Contract-Adresse & Events laden (nur in Tauri)
-  useEffect(() => {
-    if (!provider || !address || !electionId ) {
-      return
-    };
-
-    setContractAddress(address);
-  }, [address]);
-*/  
+ 
   return (
     <>
       {texts && <Navigation texts={texts} />}
@@ -114,6 +105,9 @@ export default function RootLayout({
         <LanguageProvider>
           <RootLayoutContent>{children}</RootLayoutContent>
         </LanguageProvider>
+        <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+          Status Datenbank
+        </footer>        
       </body>
     </html>
   );
