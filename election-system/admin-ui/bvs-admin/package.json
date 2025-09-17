@@ -1,6 +1,6 @@
 {
   "name": "bvs-admin",
-  "version": "0.1.0",
+  "version": "0.50.6",
   "private": true,
   "scripts": {
     "dev": "PORT=3003 next dev --turbopack",
