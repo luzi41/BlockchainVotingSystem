@@ -13,6 +13,7 @@ export default function LanguageSwitcher() {
   const [availableLanguages, setAvailableLanguages] = useState<LanguageDef[]>([]);
 
   useEffect(() => {
+    
     // Lade Liste aus public/languages.json
     fetch("/languages.json")
       .then((res) => res.json())
@@ -25,6 +26,7 @@ export default function LanguageSwitcher() {
           { code: "en", label: "EN" },
         ]);
       });
+      
   }, []);
 
   return (
