@@ -42,6 +42,10 @@ Functions:
 - Display of the ballot paper
 - Voting and encryption Confirmation (anonymized)
 
+Additional
+- Admin UI
+- Voters registration website
+
 ## B. Backend
 
 - Microservice architecture, containerized (e.g. Docker/Kubernetes)
@@ -92,9 +96,11 @@ Functions:
 - Results publicly viewable via a dashboard (verified via blockchain)
 
 
-# 4. Installation development version of BVS
+# 4. Installation dev version of BVS
 
-go to: [doc/installation and configuration](./doc/installation%20and%20Configuration)
+- Election client: [doc/installation and configuration](./doc/installation%20and%20Configuration)
+- Admin UI: work in progress
+- Voters registration: work in progress
 
 
 # 5. Todo

@@ -38,13 +38,10 @@ export default function Home({
     );
 
     interface TextContent {
-        /*
-        titleRegistration: string;
-        textRegistration: string;
-        titleCandidates: string;
-        titleParties: string;
-        details: string;
-        */
+        newElectionOrSurvey: string;
+        editElectionOrSurvey: string;
+        usersRolesAdministration: string;
+        help: string;
     }    
 
     const [isLoading, setIsLoading] = useState(true);
@@ -57,21 +54,23 @@ export default function Home({
         //if (settings) {
             loadTexts("home-texts", language).then(setTexts);
         //}
-    }, [language, settings]);        
+    }, [language, settings]);
 
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h2>Blockchain Voting Admin</h2>  
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">New election or survey</li>
-          <li className="mb-2 tracking-[-.01em]">Edit election or survey</li>
-          <li className="mb-2 tracking-[-.01em]">User/Roles Administration</li>
-          <li className="mb-2 tracking-[-.01em]">Help</li>
-        </ol>
+    if (!texts) return;
 
-      </main>
+    return (
+        <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+        <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+            <h2>Blockchain Voting Admin</h2>  
+            <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
+            <li className="mb-2 tracking-[-.01em]">{texts.newElectionOrSurvey}</li>
+            <li className="mb-2 tracking-[-.01em]">{texts.editElectionOrSurvey}</li>
+            <li className="mb-2 tracking-[-.01em]">{texts.usersRolesAdministration}</li>
+            <li className="mb-2 tracking-[-.01em]">{texts.help}</li>
+            </ol>
 
-    </div>
-  );
+        </main>
+
+        </div>
+    );
 }
