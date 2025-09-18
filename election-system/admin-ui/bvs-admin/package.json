@@ -1,6 +1,6 @@
 {
   "name": "bvs-admin",
-  "version": "0.50.6",
+  "version": "0.50.10",
   "private": true,
   "scripts": {
     "dev": "PORT=3003 next dev --turbopack",
@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^6.16.2",
     "@prisma/client": "^6.16.1",
     "next": "^15.5.3",
     "react": "19.1.0",
