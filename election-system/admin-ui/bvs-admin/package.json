@@ -1,6 +1,6 @@
 {
   "name": "bvs-admin",
-  "version": "0.50.11",
+  "version": "0.50.12",
   "private": true,
   "scripts": {
     "dev": "PORT=3003 next dev --turbopack",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^6.16.2",
     "@prisma/client": "^6.16.2",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.5.3",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
@@ -26,6 +27,7 @@
     "@tailwindcss/postcss": "^4",
     "@tauri-apps/api": "^2.8.0",
     "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

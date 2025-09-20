@@ -2,10 +2,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "./contexts/LanguageContext"; // 👈 wichtig!
+import { loadTexts } from "./utils/loadTexts";
+import { useAppSettings } from "./hooks/useAppSettings";
 
-export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+interface SettingsProps {
+    electionDistrict: string;
+    availableDistricts?: string[];
+}
+
+export default function UsersPage({
+    electionDistrict,
+    availableDistricts = [],
+}: SettingsProps) {
+
+    interface TextContent {
+        users: string;
+        loading: string;
+        noEmail: string;
+    }
+
+    const { language, setLanguage } = useLanguage();
+    const { settings, setSettings, isTauri, loading } = useAppSettings(
+        electionDistrict,
+        "de"
+    );    
+    const [users, setUsers] = useState<any[]>([]);
+    const [texts, setTexts] = useState<TextContent | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // -------- Initiales Laden
+    useEffect(() => {
+        //if (settings) {
+            loadTexts("users-texts", language).then(setTexts);
+        //}
+    }, [language, settings]);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -17,26 +48,27 @@ export default function UsersPage() {
       } catch (error) {
         console.error("Konnte Benutzer nicht laden:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
     fetchUsers();
   }, []);
+    if (!texts) return;
 
-  return (
+    return (
     <div>
-      <h2>Benutzer</h2>
-      {loading ? (
-        <div>Lade...</div>
-      ) : (
+        <h2>{texts.users}</h2>
+        {loading ? (
+        <div>{texts.loading}</div>
+        ) : (
         <ul>
-          {users.map((u) => (
+            {users.map((u) => (
             <li key={u.id}>
-              {u.username} ({u.email ?? "keine Email"})
+                {u.username} ({u.email ?? texts.noEmail})
             </li>
-          ))}
+            ))}
         </ul>
-      )}
+        )}
     </div>
-  );
+    );
 }

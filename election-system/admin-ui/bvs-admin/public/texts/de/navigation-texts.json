@@ -3,5 +3,7 @@
     "elections": "Wahlen",
     "users": "Benutzer",
     "help": "Hilfe",
-    "about": "Über..."
+    "about": "Über...",
+    "login": "LogIn",
+    "logout": "LogOut"
 }

@@ -105,4 +105,6 @@ Additional
 
 # 5. Todo
 
+- Seperate AdminUI, Voting client and registration service from one repository to different repositories
 - Election templates: different kinds of elections and surveys (V 1.0)
+

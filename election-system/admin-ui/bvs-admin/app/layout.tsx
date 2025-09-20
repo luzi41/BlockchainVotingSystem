@@ -25,7 +25,7 @@ interface NavigationTexts {
   elections: string;
   users: string;
   help: string;
-  about: string;
+  login: string;
 }
 
 function Navigation({ texts }: { texts: NavigationTexts }) {
@@ -36,7 +36,7 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
     { href: "/elections", label: texts.elections },
     { href: "/users", label: texts.users },
     { href: "/help", label: texts.help },
-    { href: "/about", label: texts.about },
+    { href: "/login", label: texts.login },
   ];
 
   return (
@@ -60,7 +60,7 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
             className="padding-right-15px"
             href="https://github.com/luzi41/BlockchainVotingSystem/blob/main/README.md"
           >
-            Blockchain Voting Admin 0.50.11
+            Blockchain Voting Admin 0.50.12
           </Link>
         </li>
       </ul>
@@ -106,7 +106,7 @@ export default function RootLayout({
           <RootLayoutContent>{children}</RootLayoutContent>
         </LanguageProvider>
         <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-          Status Datenbank
+          Status | Impressum
         </footer>        
       </body>
     </html>

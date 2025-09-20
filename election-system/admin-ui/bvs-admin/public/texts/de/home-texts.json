@@ -2,5 +2,7 @@
     "newElectionOrSurvey":      "Neue Wahl oder Umfrage anlegen",
     "editElectionOrSurvey":     "Wahl oder Umfrage bearbeiten",
     "usersRolesAdministration": "Benutzer und Rollen verwalten",
-    "help":                     "Hilfe" 
+    "help":                     "Hilfe",
+    "login":                    "LogIn",
+    "logout":                   "LogOut"
 }
