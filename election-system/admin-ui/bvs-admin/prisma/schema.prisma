@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -15,12 +8,114 @@ datasource db {
 }
 
 model users {
-  id              Int      @id @default(autoincrement())
-  username        String
-  password_hash   String
-  twofa_secret    String
-  role            String
-  created_at      DateTime @default(now())
-  updated_at      DateTime @default(now())
-  email           String   @unique
+  id            Int          @id @default(autoincrement())
+  username      String       @unique(map: "username") @db.VarChar(100)
+  password_hash String       @db.VarChar(255)
+  role          users_role
+  email         String?      @unique(map: "email") @db.VarChar(255)
+  twofa_secret  String?      @db.VarChar(64)
+  created_at    DateTime?    @default(now()) @db.Timestamp(0)
+  updated_at    DateTime?    @default(now()) @db.Timestamp(0)
+  audit_logs    audit_logs[]
+  elections     elections[]
+}
+
+model audit_logs {
+  id         Int       @id @default(autoincrement())
+  user_id    Int?
+  action     String    @db.VarChar(255)
+  entity     String?   @db.VarChar(100)
+  entity_id  Int?
+  details    String?   @db.Text
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  users      users?    @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "audit_logs_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model candidates {
+  id          Int       @id @default(autoincrement())
+  election_id Int
+  party_id    Int?
+  district_id Int
+  name        String    @db.VarChar(255)
+  bio         String?   @db.Text
+  photo_url   String?   @db.VarChar(255)
+  created_at  DateTime? @default(now()) @db.Timestamp(0)
+  elections   elections @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "candidates_ibfk_1")
+  parties     parties?  @relation(fields: [party_id], references: [id], onUpdate: Restrict, map: "candidates_ibfk_2")
+  districts   districts @relation(fields: [district_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "candidates_ibfk_3")
+
+  @@index([district_id], map: "district_id")
+  @@index([election_id], map: "election_id")
+  @@index([party_id], map: "party_id")
+}
+
+model districts {
+  id          Int          @id @default(autoincrement())
+  election_id Int
+  name        String       @db.VarChar(255)
+  description String?      @db.Text
+  created_at  DateTime?    @default(now()) @db.Timestamp(0)
+  candidates  candidates[]
+  elections   elections    @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "districts_ibfk_1")
+  voters      voters[]
+
+  @@index([election_id], map: "election_id")
+}
+
+model elections {
+  id               Int               @id @default(autoincrement())
+  title            String            @db.VarChar(255)
+  description      String?           @db.Text
+  start_date       DateTime?         @db.DateTime(0)
+  end_date         DateTime?         @db.DateTime(0)
+  status           elections_status? @default(DRAFT)
+  contract_address String?           @db.VarChar(255)
+  created_by       Int?
+  created_at       DateTime?         @default(now()) @db.Timestamp(0)
+  candidates       candidates[]
+  districts        districts[]
+  users            users?            @relation(fields: [created_by], references: [id], onUpdate: Restrict, map: "elections_ibfk_1")
+  voters           voters[]
+
+  @@index([created_by], map: "created_by")
+}
+
+model parties {
+  id           Int          @id @default(autoincrement())
+  name         String       @db.VarChar(255)
+  abbreviation String?      @db.VarChar(50)
+  logo_url     String?      @db.VarChar(255)
+  created_at   DateTime?    @default(now()) @db.Timestamp(0)
+  candidates   candidates[]
+}
+
+model voters {
+  id             Int        @id @default(autoincrement())
+  election_id    Int
+  district_id    Int?
+  voter_id       String     @db.VarChar(100)
+  name           String?    @db.VarChar(255)
+  public_key     String?    @db.Text
+  data_encrypted String?    @db.Text
+  is_verified    Boolean?   @default(false)
+  created_at     DateTime?  @default(now()) @db.Timestamp(0)
+  elections      elections  @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "voters_ibfk_1")
+  districts      districts? @relation(fields: [district_id], references: [id], onUpdate: Restrict, map: "voters_ibfk_2")
+
+  @@unique([election_id, voter_id], map: "election_id")
+  @@index([district_id], map: "district_id")
+}
+
+enum users_role {
+  SUPERADMIN
+  WAHLLEITER
+  MITARBEITER
+}
+
+enum elections_status {
+  DRAFT
+  ACTIVE
+  CLOSED
 }

@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id            BigInt       @id @default(autoincrement())
+  username      String       @unique(map: "username") @db.VarChar(100)
+  password_hash String       @db.VarChar(255)
+  role          users_role
+  email         String?      @unique(map: "email") @db.VarChar(255)
+  twofa_secret  String?      @db.VarChar(64)
+  created_at    DateTime?    @default(now()) @db.Timestamp(0)
+  updated_at    DateTime?    @default(now()) @db.Timestamp(0)
+  audit_logs    audit_logs[]
+  elections     elections[]
+}
+
+model audit_logs {
+  id         BigInt    @id @default(autoincrement())
+  user_id    BigInt?
+  action     String    @db.VarChar(255)
+  entity     String?   @db.VarChar(100)
+  entity_id  BigInt?
+  details    String?   @db.Text
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  users      users?    @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "audit_logs_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model candidates {
+  id          BigInt    @id @default(autoincrement())
+  election_id BigInt
+  party_id    BigInt?
+  district_id BigInt
+  name        String    @db.VarChar(255)
+  bio         String?   @db.Text
+  photo_url   String?   @db.VarChar(255)
+  created_at  DateTime? @default(now()) @db.Timestamp(0)
+  elections   elections @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "candidates_ibfk_1")
+  parties     parties?  @relation(fields: [party_id], references: [id], onUpdate: Restrict, map: "candidates_ibfk_2")
+  districts   districts @relation(fields: [district_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "candidates_ibfk_3")
+
+  @@index([district_id], map: "district_id")
+  @@index([election_id], map: "election_id")
+  @@index([party_id], map: "party_id")
+}
+
+model districts {
+  id          BigInt       @id @default(autoincrement())
+  election_id BigInt
+  name        String       @db.VarChar(255)
+  description String?      @db.Text
+  created_at  DateTime?    @default(now()) @db.Timestamp(0)
+  candidates  candidates[]
+  elections   elections    @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "districts_ibfk_1")
+  voters      voters[]
+
+  @@index([election_id], map: "election_id")
+}
+
+model elections {
+  id               BigInt            @id @default(autoincrement())
+  title            String            @db.VarChar(255)
+  description      String?           @db.Text
+  start_date       DateTime?         @db.DateTime(0)
+  end_date         DateTime?         @db.DateTime(0)
+  status           elections_status? @default(DRAFT)
+  contract_address String?           @db.VarChar(255)
+  created_by       BigInt?
+  created_at       DateTime?         @default(now()) @db.Timestamp(0)
+  candidates       candidates[]
+  districts        districts[]
+  users            users?            @relation(fields: [created_by], references: [id], onUpdate: Restrict, map: "elections_ibfk_1")
+  voters           voters[]
+
+  @@index([created_by], map: "created_by")
+}
+
+model parties {
+  id           BigInt       @id @default(autoincrement())
+  name         String       @db.VarChar(255)
+  abbreviation String?      @db.VarChar(50)
+  logo_url     String?      @db.VarChar(255)
+  created_at   DateTime?    @default(now()) @db.Timestamp(0)
+  candidates   candidates[]
+}
+
+model voters {
+  id             BigInt     @id @default(autoincrement())
+  election_id    BigInt
+  district_id    BigInt?
+  voter_id       String     @db.VarChar(100)
+  name           String?    @db.VarChar(255)
+  public_key     String?    @db.Text
+  data_encrypted String?    @db.Text
+  is_verified    Boolean?   @default(false)
+  created_at     DateTime?  @default(now()) @db.Timestamp(0)
+  elections      elections  @relation(fields: [election_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "voters_ibfk_1")
+  districts      districts? @relation(fields: [district_id], references: [id], onUpdate: Restrict, map: "voters_ibfk_2")
+
+  @@unique([election_id, voter_id], map: "election_id")
+  @@index([district_id], map: "district_id")
+}
+
+enum users_role {
+  SUPERADMIN
+  WAHLLEITER
+  MITARBEITER
+}
+
+enum elections_status {
+  DRAFT
+  ACTIVE
+  CLOSED
+}

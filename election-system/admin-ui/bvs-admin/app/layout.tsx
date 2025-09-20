@@ -60,7 +60,7 @@ function Navigation({ texts }: { texts: NavigationTexts }) {
             className="padding-right-15px"
             href="https://github.com/luzi41/BlockchainVotingSystem/blob/main/README.md"
           >
-            Blockchain Voting Admin 0.50.3
+            Blockchain Voting Admin 0.50.11
           </Link>
         </li>
       </ul>

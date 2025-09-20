@@ -1,31 +1,41 @@
 {
   "name": "bvs-admin",
-  "version": "0.50.10",
+  "version": "0.50.11",
   "private": true,
   "scripts": {
     "dev": "PORT=3003 next dev --turbopack",
     "build": "next build --turbopack",
     "start": "PORT=3003 next start",
-    "lint": "eslint"
+    "generate": "prisma generate",
+    "lint": "eslint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^6.16.2",
-    "@prisma/client": "^6.16.1",
+    "@prisma/client": "^6.16.2",
     "next": "^15.5.3",
+    "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0"
+  },
+  "prisma": {
+    "seed": "ts-node --esm prisma/seed.ts"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@tauri-apps/api": "^2.8.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "bcrypt": "^5.1.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "prisma": "^6.16.1",
+    "prisma": "^6.16.2",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.1",
+    "tsx": "^4.20.5",
     "typescript": "^5"
   }
 }
