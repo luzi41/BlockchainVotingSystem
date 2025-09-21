@@ -1,9 +1,0 @@
-{
-    "settings": "Einstellungen",
-    "language": "Sprache",
-    "privateKey" : "Privater Schlüssel",
-    "electionDistrict": "Wahlkreis",
-    "rpcServer" : "RPC-Server",
-    "save": "Speichern",
-    "onlyLocalSave": "Speichern nur lokal"
-}
