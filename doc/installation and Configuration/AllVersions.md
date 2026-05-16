@@ -34,6 +34,14 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
         blockperiodseconds=2
         epochlength=30000
         requesttimeoutseconds=10
+
+### create validator keys
+
+### check files
+
+### create docker-compose
+
+### adjust validator key paths
     
 ## 3 SmartContract and Frontend
 
