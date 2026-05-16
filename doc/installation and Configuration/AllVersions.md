@@ -7,16 +7,19 @@
 - curl command line
 - MetaMask Browser Extension (only Web)
 
-## 2 Quorum blockchain network
+## 2 Besu blockchain network
 
-To create the tutorial docker-compose files and artifacts, run:
-  
-      npx quorum-dev-quickstart
-  
-Follow the prompts displayed to run GoQuorum and logging with ELK. Enter n for Codefi Orchestrate and y for private transactions.
-To start the network, go to the installation directory (quorum-test-network if you used the default value) and run:
+To create the tutorial docker-compose files and artifact, we create the Beso blockchain service as docker containers.
 
-    ./run.sh
+  </>bash
+  mkdir besu-network
+  mkdir -p \
+    networkFiles \
+    data/
+  
+### Create QBFT config
+
+  networkFiles/config.toml
     
 ## 3 SmartContract and Frontend
 
