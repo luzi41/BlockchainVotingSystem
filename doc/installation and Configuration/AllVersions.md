@@ -20,28 +20,24 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
   
 ### Create QBFT config
 
-  networkFiles/config.toml
+### create validator keys and genesis
 
-      genesis-file="genesis.json"
+### check result
 
-        [ethereum]
-        network-id=1337
-
-        [genesis]
-        chainId=1337
-
-        [qbft]
-        blockperiodseconds=2
-        epochlength=30000
-        requesttimeoutseconds=10
-
-### create validator keys
-
-### check files
+### show validator folders
 
 ### create docker-compose
 
 ### adjust validator key paths
+
+### first testing one validator
+
+### starting the network
+
+### check
+
+### checking logs
+
     
 ## 3 SmartContract and Frontend
 
