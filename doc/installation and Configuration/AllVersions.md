@@ -38,7 +38,20 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
 
 ### checking logs
 
-    
+### expand docker-compose
+
+### important: replace key paths
+
+### stopping validator1
+
+### start all validators
+
+### check
+
+### check logs
+
+### testing rpc
+
 ## 3 SmartContract and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
