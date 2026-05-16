@@ -21,6 +21,19 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
 ### Create QBFT config
 
   networkFiles/config.toml
+
+      genesis-file="genesis.json"
+
+        [ethereum]
+        network-id=1337
+
+        [genesis]
+        chainId=1337
+
+        [qbft]
+        blockperiodseconds=2
+        epochlength=30000
+        requesttimeoutseconds=10
     
 ## 3 SmartContract and Frontend
 
