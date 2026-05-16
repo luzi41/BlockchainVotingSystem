@@ -11,9 +11,10 @@
 
 To create the tutorial docker-compose files and artifact, we create the Beso blockchain service as docker containers.
 
-  </>bash
-  mkdir besu-network
-  mkdir -p \
+    </>bash
+    
+    mkdir besu-network
+    mkdir -p \
     networkFiles \
     data/
   
