@@ -20,6 +20,39 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
   
 ### Create QBFT config
 
+networkFiles/config.json
+    
+    </>JSON
+    {
+      "genesis": {
+        "config": {
+          "chainId": 1337,
+          "berlinBlock": 0,
+          "qbft": {
+            "blockperiodseconds": 2,
+            "epochlength": 30000,
+            "requesttimeoutseconds": 10
+          }
+        },
+        "nonce": "0x0",
+        "timestamp": "0x58ee40ba",
+        "gasLimit": "0x1fffffffffffff",
+        "difficulty": "0x1",
+        "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+        "coinbase": "0x0000000000000000000000000000000000000000",
+        "alloc": {},
+        "number": "0x0",
+        "gasUsed": "0x0",
+        "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "blockchain": {
+        "nodes": {
+          "generate": true,
+          "count": 4
+        }
+      }
+    }
+
 ### create validator keys and genesis
 
 ### check result
