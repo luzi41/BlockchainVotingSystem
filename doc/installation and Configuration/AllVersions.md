@@ -132,6 +132,8 @@ This you have to replace with the correct folder names (from networkFiles/genera
         </> Bash
         docker ps
 
+Now, validator1 should be running.
+
 ### checking logs
 
 ### expand docker-compose
