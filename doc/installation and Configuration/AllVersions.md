@@ -255,15 +255,69 @@ with the correct folder names.
 If validator1 is still running:
 
         </> Bash
+        
         docker compose down
 
 ### 2.13 Start all validators
 
-### check
+        </> Bash
+        
+        docker compose up -d
 
-### check logs
+### 2.14 Check
 
-### testing rpc
+        </> Bash
+        
+        docker ps
+
+Jyou should see:
+        
+        validator1
+        validator2
+        validator3
+        validator4
+
+### 2.15 Check logs
+
+        </> Bash
+
+        docker compose logs -f
+
+You should see:
+
+        Imported #1
+        Imported #2
+        Imported #3
+        imported #4
+
+### 2.16 Testing rpc
+
+Validator1:
+
+        </> Bash
+        
+        curl -X POST http://localhost:8545 \
+        -H "Content-Type: application/json" \
+        --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+
+Validator2:
+
+        </> Bash
+        
+        curl -X POST http://localhost:8546 \
+        -H "Content-Type: application/json" \
+        --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+
+All should show the same block height.
+
+#### 2.17 Result
+
+✅ 4 Validators
+✅ QBFT Consensus
+✅ persistent Validator-Keys
+✅ produktion near strukture
+✅ stabie Besu-Netzwerk
+✅ ARM-Mac compatible
 
 ## 3 SmartContract and Frontend
 
