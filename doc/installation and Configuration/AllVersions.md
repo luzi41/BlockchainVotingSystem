@@ -84,15 +84,53 @@ Example:
         0xb7...
         0xc9...
 
-### create docker-compose
+### first testing one validator: create docker-compose
 
-### adjust validator key paths
+File: docker-compose.yml
 
-### first testing one validator
+Content:
 
-### starting the network
+    </>YAML
+    services:
+    
+      validator1:
+        image: hyperledger/besu:24.5.2
+        platform: linux/amd64
+        container_name: validator1
+        volumes:
+          - ./networkFiles/generated/genesis.json:/config/genesis.json
+          - ./networkFiles/generated/keys/0x8f...:/opt/besu/keys
+          - ./data/validator1:/data
+        command: >
+          --genesis-file=/config/genesis.json
+          --data-path=/data
+          --node-private-key-file=/opt/besu/keys/key
+          --rpc-http-enabled
+          --rpc-http-api=ETH,NET,QBFT,WEB3
+          --host-allowlist=*
+          --rpc-http-cors-origins=all
+          --rpc-http-port=8545
+          --p2p-port=30303
+        ports:
+          - "8545:8545"
+          - "30303:30303"
+
+### Important: adjust validator key path
+
+This you have to replace with the correct folder names (from networkFiles/generated/keys)
+
+        </>YAML
+        0x8f...
+
+### Starting network
+
+        </> Bash
+        docker compose up -d
 
 ### check
+
+        </> Bash
+        docker ps
 
 ### checking logs
 
