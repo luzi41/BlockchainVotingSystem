@@ -74,6 +74,15 @@ Now the generator works correctly
 
         </>bash
         ls networkFiles/generated/keys
+        
+you get 4 folders
+
+Example:
+
+        0x8f...
+        0xa2...
+        0xb7...
+        0xc9...
 
 ### create docker-compose
 
