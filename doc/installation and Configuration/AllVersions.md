@@ -145,9 +145,116 @@ You should see:
 
 ### expand docker-compose
 
-### important: replace key paths
+        </>bash
+        ls networkFiles/generated/keys
+
+You have to replace the key paths with the corrrect folder names.
+
+    services:
+    
+      validator1:
+        image: hyperledger/besu:24.5.2
+        platform: linux/amd64
+        container_name: validator1
+        volumes:
+          - ./networkFiles/generated/genesis.json:/config/genesis.json
+          - ./networkFiles/generated/keys/0x111...:/opt/besu/keys
+          - ./data/validator1:/data
+        command: >
+          --genesis-file=/config/genesis.json
+          --data-path=/data
+          --node-private-key-file=/opt/besu/keys/key
+          --rpc-http-enabled
+          --rpc-http-api=ETH,NET,QBFT,WEB3
+          --host-allowlist=*
+          --rpc-http-cors-origins=all
+          --rpc-http-port=8545
+          --p2p-port=30303
+        ports:
+          - "8545:8545"
+          - "30303:30303"
+    
+      validator2:
+        image: hyperledger/besu:24.5.2
+        platform: linux/amd64
+        container_name: validator2
+        volumes:
+          - ./networkFiles/generated/genesis.json:/config/genesis.json
+          - ./networkFiles/generated/keys/0x222...:/opt/besu/keys
+          - ./data/validator2:/data
+        command: >
+          --genesis-file=/config/genesis.json
+          --data-path=/data
+          --node-private-key-file=/opt/besu/keys/key
+          --p2p-port=30304
+          --rpc-http-enabled
+          --rpc-http-api=ETH,NET,QBFT,WEB3
+          --host-allowlist=*
+          --rpc-http-cors-origins=all
+          --rpc-http-port=8546
+        ports:
+          - "8546:8546"
+          - "30304:30304"
+    
+      validator3:
+        image: hyperledger/besu:24.5.2
+        platform: linux/amd64
+        container_name: validator3
+        volumes:
+          - ./networkFiles/generated/genesis.json:/config/genesis.json
+          - ./networkFiles/generated/keys/0x333...:/opt/besu/keys
+          - ./data/validator3:/data
+        command: >
+          --genesis-file=/config/genesis.json
+          --data-path=/data
+          --node-private-key-file=/opt/besu/keys/key
+          --p2p-port=30305
+          --rpc-http-enabled
+          --rpc-http-api=ETH,NET,QBFT,WEB3
+          --host-allowlist=*
+          --rpc-http-cors-origins=all
+          --rpc-http-port=8547
+        ports:
+          - "8547:8547"
+          - "30305:30305"
+    
+      validator4:
+        image: hyperledger/besu:24.5.2
+        platform: linux/amd64
+        container_name: validator4
+        volumes:
+          - ./networkFiles/generated/genesis.json:/config/genesis.json
+          - ./networkFiles/generated/keys/0x444...:/opt/besu/keys
+          - ./data/validator4:/data
+        command: >
+          --genesis-file=/config/genesis.json
+          --data-path=/data
+          --node-private-key-file=/opt/besu/keys/key
+          --p2p-port=30306
+          --rpc-http-enabled
+          --rpc-http-api=ETH,NET,QBFT,WEB3
+          --host-allowlist=*
+          --rpc-http-cors-origins=all
+          --rpc-http-port=8548
+        ports:
+          - "8548:8548"
+          - "30306:30306"
+
+Replace
+
+        0x111...
+        0x222...
+        0x333...
+        0x444...
+
+with the correct folder names.
 
 ### stopping validator1
+
+If validator1 is still running:
+
+        </> Bash
+        docker compose down
 
 ### start all validators
 
