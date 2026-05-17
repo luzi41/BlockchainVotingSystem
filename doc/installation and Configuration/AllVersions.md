@@ -55,9 +55,25 @@ networkFiles/config.json
 
 ### create validator keys and genesis
 
-### check result
+Now the generator works correctly
+
+        </>bash
+        docker run --rm \
+        -v $(pwd)/networkFiles:/config \
+        hyperledger/besu:24.5.2 \
+        operator generate-blockchain-config \
+        --config-file=/config/config.json \
+        --to=/config/generated
+
+### check results
+
+        </>bash
+        ls networkFiles/generated
 
 ### show validator folders
+
+        </>bash
+        ls networkFiles/generated/keys
 
 ### create docker-compose
 
