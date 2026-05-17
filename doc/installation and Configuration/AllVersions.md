@@ -313,10 +313,15 @@ All should show the same block height.
 #### 2.17 Result
 
 ✅ 4 Validators
+
 ✅ QBFT Consensus
+
 ✅ persistent Validator-Keys
+
 ✅ produktion near strukture
+
 ✅ stabie Besu-Netzwerk
+
 ✅ ARM-Mac compatible
 
 ## 3 SmartContract and Frontend
