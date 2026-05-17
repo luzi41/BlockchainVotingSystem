@@ -9,6 +9,7 @@
 
 ## 2 Besu blockchain network
 
+### 2.1 Create folders
 To create the tutorial docker-compose files and artifact, we create the Beso blockchain service as docker containers.
 
     </>bash
@@ -18,7 +19,7 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
     networkFiles \
     data/
   
-### Create QBFT config
+### 2.2 Create QBFT config
 
 networkFiles/config.json
     
@@ -53,7 +54,7 @@ networkFiles/config.json
       }
     }
 
-### create validator keys and genesis
+### 2.3 Create validator keys and genesis
 
 Now the generator works correctly
 
@@ -65,12 +66,12 @@ Now the generator works correctly
         --config-file=/config/config.json \
         --to=/config/generated
 
-### check results
+### 2.4 Check results
 
         </>bash
         ls networkFiles/generated
 
-### show validator folders
+### 2.5 Show validator folders
 
         </>bash
         ls networkFiles/generated/keys
@@ -84,7 +85,7 @@ Example:
         0xb7...
         0xc9...
 
-### first testing one validator: create docker-compose
+### 2.6 First testing one validator: create docker-compose
 
 File: docker-compose.yml
 
@@ -115,26 +116,26 @@ Content:
           - "8545:8545"
           - "30303:30303"
 
-### Important: adjust validator key path
+### 2.7 Important: adjust validator key path
 
 This you have to replace with the correct folder names (from networkFiles/generated/keys)
 
         </>YAML
         0x8f...
 
-### Starting network
+### 2.8 Starting network
 
         </> Bash
         docker compose up -d
 
-### check
+### 2.9 Check
 
         </> Bash
         docker ps
 
 Now, validator1 should be running.
 
-### checking logs
+### 2.10 Checking logs
 
         </> Bash
         docker compose logs -f validator1
@@ -143,7 +144,7 @@ You should see:
 
         Imported #1
 
-### expand docker-compose
+### 2.11 Expand docker-compose
 
         </>bash
         ls networkFiles/generated/keys
@@ -249,14 +250,14 @@ Replace
 
 with the correct folder names.
 
-### stopping validator1
+### 2.12 Stopping validator1
 
 If validator1 is still running:
 
         </> Bash
         docker compose down
 
-### start all validators
+### 2.13 Start all validators
 
 ### check
 
