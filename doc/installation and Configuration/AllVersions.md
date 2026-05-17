@@ -136,6 +136,13 @@ Now, validator1 should be running.
 
 ### checking logs
 
+        </> Bash
+        docker compose logs -f validator1
+
+You should see:
+
+        Imported #1
+
 ### expand docker-compose
 
 ### important: replace key paths
