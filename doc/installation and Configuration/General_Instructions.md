@@ -8,6 +8,7 @@
 - MetaMask Browser Extension (only Web)
 
 ## 2 Besu blockchain network
+See [install and configure Hyperledger Besu Network] (https://github.com/luzi41/BlockchainVotingSystem/doc/installation and Configuration/HyperledgerBesu.md)
 
 ## 3 SmartContract and Frontend
 
