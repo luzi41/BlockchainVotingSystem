@@ -327,7 +327,8 @@ All should show the same block height.
 ### 2.18
 When the docker-container with 4 validator nodes are running correctly, we should expand the configuration files to add a bootnode.
 Currently, nodes likely discover each other only via internal Docker discovery or initial peer connections.
-
+#### 2.18.1 What's missing
+##### 1. Bootnode
 For:
 
 - restarts
@@ -349,7 +350,17 @@ Better:
 
 - Validators → Consensus only
 - Separate RPC node → Frontend/API/Hardhat
+##### 2. Validators expose RPC publicly.
+Currently, every validator has:
 
+        --rpc-http-enabled
+
+This is not ideal.
+
+A better approach:
+
+Validators → Consensus only
+Separate RPC node → Frontend/API/Hardhat
 ## 3 SmartContract and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
