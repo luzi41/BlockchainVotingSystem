@@ -485,3 +485,26 @@ Später eher:
 
 #### Most important next step
 Before we proceed, we now need the actual Enode IDs of the validators.
+
+        docker logs validator1
+
+or
+
+        curl -X POST --data '{"jsonrpc":"2.0","method":"admin_nodeInfo","params":[],"id":1}' \
+        http://localhost:8545
+
+Then we can:
+
+Correctly configure the bootnode
+Build `static-nodes.json`
+Seamlessly integrate the RPC node
+Stabilize the network
+
+After that, your network will be ready for:
+
+- Hardhat
+- Registry Deployment
+- Election Factory
+- Blockscout
+- API Integration
+- Tauri/Desktop App
