@@ -260,7 +260,7 @@ If validator1 is still running:
         
         docker ps
 
-Jyou should see:
+You should see:
         
         validator1
         validator2
@@ -395,9 +395,6 @@ should not be directly coupled to Validator1 later on.
         │
         └── logs/
 
-### 18.3
-What I would specifically recommend
-
 #### Step 1 -- Add bootnode
 New service (At beginning in docker-compose.yml):
         bootnode:
@@ -462,7 +459,7 @@ Then:
 
 NOT directly to validators.
 
-#### Step 4 — Secure Validators
+#### Step 4 — Secure validators
 
 Validators should eventually:
 
@@ -482,7 +479,7 @@ Later on, however:
             driver: bridge
 
 #### Most important next step
-Before we proceed, we now need the actual Enode IDs of the validators.
+Before we proceed, we now need the actual enode IDs of the validators.
 
         docker logs validator1
 
