@@ -383,6 +383,53 @@ Your:
 
 should not be directly coupled to Validator1 later on.
 
+#### 2.18.2 Target structure
+
+        besu-network/
+        ├── docker-compose.yml
+        ├── config/
+        │   ├── genesis.json
+        │   ├── static-nodes.json
+        │   └── permissions_config.toml
+        │
+        ├── data/
+        │  ├── validator1/
+        │  ├── validator2/
+        │  ├── validator3/
+        │  ├── validator4/
+        │  ├── rpc-node/
+        │  └── bootnode/
+        │
+        ├── networkFiles/
+        │   └── generated/
+        │
+        └── logs/
+
+#### 2.18.3
+What I would specifically recommend
+
+##### Step 1 -- Add bootnode
+New service (At beginning in docker-compose.yml):
+        bootnode:
+          image: hyperledger/besu:24.5.2
+          container_name: bootnode
+        
+          volumes:
+            - ./networkFiles/generated/genesis.json:/config/genesis.json
+            - ./networkFiles/generated/keys/bootnode:/opt/besu/keys
+            - ./data/bootnode:/data
+        
+          command: >
+            --genesis-file=/config/genesis.json
+            --data-path=/data
+            --node-private-key-file=/opt/besu/keys/key
+            --p2p-host=bootnode
+            --p2p-port=30301
+            --rpc-http-enabled=false
+        
+          ports:
+            - "30301:30301"
+
 ## 3 SmartContract and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
