@@ -420,3 +420,68 @@ New service (At beginning in docker-compose.yml):
           ports:
             - "30301:30301"
 
+#### Step 2 -- static-nodes.json erzeugen
+        [
+          "enode://....@bootnode:30301",
+          "enode://....@validator1:30303",
+          "enode://....@validator2:30304",
+          "enode://....@validator3:30305",
+          "enode://....@validator4:30306"
+        ]
+We then mount this file into all nodes.
+
+#### Step 3 -- Add a Dedicated RPC Node
+Very important for the election platform.
+        rpcnode:
+          image: hyperledger/besu:24.5.2
+          container_name: rpcnode
+        
+          volumes:
+            - ./networkFiles/generated/genesis.json:/config/genesis.json
+            - ./data/rpc-node:/data
+        
+          command: >
+            --genesis-file=/config/genesis.json
+            --data-path=/data
+            --rpc-http-enabled
+            --rpc-http-api=ETH,NET,QBFT,WEB3,TXPOOL
+            --host-allowlist=*
+            --rpc-http-cors-origins=all
+            --rpc-http-host=0.0.0.0
+            --rpc-http-port=8545
+            --bootnodes=enode://...
+        
+          ports:
+            - "8545:8545"
+
+Then:
+
+- Hardhat → rpcnode
+- Frontend → rpcnode
+- API → rpcnode
+
+NOT directly to validators.
+
+#### Step 4 — Secure Validators
+
+Validatoren sollten später:
+
+- kein öffentliches RPC
+- keine offenen APIs
+
+haben.
+
+Für Entwicklung kannst du es erstmal lassen.
+
+Später eher:
+
+        --rpc-http-enabled=false
+
+#### Step 5 — Define Docker Network
+
+        networks:
+          besu-net:
+            driver: bridge
+
+#### Most important next step
+Before we proceed, we now need the actual Enode IDs of the validators.
