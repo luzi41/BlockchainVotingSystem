@@ -464,16 +464,14 @@ NOT directly to validators.
 
 #### Step 4 — Secure Validators
 
-Validatoren sollten später:
+Validators should eventually:
 
-- kein öffentliches RPC
-- keine offenen APIs
+- have no public RPC
+- have no open APIs
 
-haben.
+For development purposes, you can leave them enabled for now.
 
-Für Entwicklung kannst du es erstmal lassen.
-
-Später eher:
+Later on, however:
 
         --rpc-http-enabled=false
 
