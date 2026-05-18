@@ -350,6 +350,7 @@ Better:
 
 - Validators → Consensus only
 - Separate RPC node → Frontend/API/Hardhat
+- 
 ##### 2. Validators expose RPC publicly.
 Currently, every validator has:
 
@@ -361,6 +362,27 @@ A better approach:
 
 Validators → Consensus only
 Separate RPC node → Frontend/API/Hardhat
+
+##### 3. No static-nodes.json
+Currently, the network relies solely on Discovery.
+
+For private networks, the following is more stable:
+
+        config/static-nodes.json
+
+##### 4.No seperate docker network
+We should define that explicitly
+
+##### 5. No RPC Gateway
+Your:
+
+- Tauri Frontend
+- Next.js
+- Hardhat
+- API
+
+should not be directly coupled to Validator1 later on.
+
 ## 3 SmartContract and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
