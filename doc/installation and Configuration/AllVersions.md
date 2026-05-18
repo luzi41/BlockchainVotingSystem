@@ -324,6 +324,32 @@ All should show the same block height.
 
 ✅ ARM-Mac compatible
 
+### 2.18
+When the docker-container with 4 validator nodes are running correctly, we should expand the configuration files to add a bootnode.
+Currently, nodes likely discover each other only via internal Docker discovery or initial peer connections.
+
+For:
+
+- restarts
+- scaling
+- multiple hosts
+- stable peer discovery
+
+you should have at least one dedicated bootnode.
+
+Validators Expose RPC Publicly
+
+Currently, every validator has:
+
+        --rpc-http-enabled
+
+This is not ideal.
+
+Better:
+
+- Validators → Consensus only
+- Separate RPC node → Frontend/API/Hardhat
+
 ## 3 SmartContract and Frontend
 
 git clone https://github.com/luzi41/BlockchainVotingSystem.git
