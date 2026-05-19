@@ -479,7 +479,7 @@ Later on, however:
             driver: bridge
 
 #### Most important next step
-Before we proceed, we now need the actual enode IDs of the validators.
+Before we proceed, we now need the actual enode IDs of the validators. To do this, of course, the correct enode IDs can be found in the respective logs. E.g.:
 
         docker logs validator1
 
@@ -490,10 +490,10 @@ or
 
 Then we can:
 
-Correctly configure the bootnode
-Build `static-nodes.json`
-Seamlessly integrate the RPC node
-Stabilize the network
+- Correctly configure the bootnode
+- Build `static-nodes.json`
+- Seamlessly integrate the RPC node
+- Stabilize the network
 
 After that, your network will be ready for:
 
