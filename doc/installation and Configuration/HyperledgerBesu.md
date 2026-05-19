@@ -395,6 +395,8 @@ should not be directly coupled to Validator1 later on.
         │
         └── logs/
 
+Extending the docker-compose.yml file:
+
 #### Step 1 -- Add bootnode
 New service (At beginning in docker-compose.yml):
         bootnode:
