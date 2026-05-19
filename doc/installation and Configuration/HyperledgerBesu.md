@@ -395,10 +395,10 @@ should not be directly coupled to Validator1 later on.
         │
         └── logs/
 
-Extending the docker-compose.yml file:
-
-#### Step 1 -- Add bootnode
+### 18.3 Extending the docker-compose.yml file:
+#### Step 1 --  Add bootnode
 New service (At beginning in docker-compose.yml):
+
         bootnode:
           image: hyperledger/besu:24.5.2
           container_name: bootnode
@@ -419,7 +419,12 @@ New service (At beginning in docker-compose.yml):
           ports:
             - "30301:30301"
 
-#### Step 2 -- static-nodes.json erzeugen
+Test:
+        docker compose down -v 
+        rm -rf data/*
+        docker-compose up -d
+
+#### Step 2 -- Create config/static-nodes.json
         [
           "enode://....@bootnode:30301",
           "enode://....@validator1:30303",
@@ -428,9 +433,11 @@ New service (At beginning in docker-compose.yml):
           "enode://....@validator4:30306"
         ]
 We then mount this file into all nodes.
+If everything works correctly ...
 
-#### Step 3 -- Add a Dedicated RPC Node
+#### Step 3 -- Add a Dedicated RPC Node to the docker.compose.yml
 Very important for the election platform.
+
         rpcnode:
           image: hyperledger/besu:24.5.2
           container_name: rpcnode
@@ -452,7 +459,6 @@ Very important for the election platform.
         
           ports:
             - "8545:8545"
-
 Then:
 
 - Hardhat → rpcnode
@@ -474,7 +480,7 @@ Later on, however:
 
         --rpc-http-enabled=false
 
-#### Step 5 — Define Docker Network
+#### Step 4 — Define Docker Network
 
         networks:
           besu-net:
@@ -490,18 +496,5 @@ or
         curl -X POST --data '{"jsonrpc":"2.0","method":"admin_nodeInfo","params":[],"id":1}' \
         http://localhost:8545
 
-Then we can:
 
-- Correctly configure the bootnode
-- Build `static-nodes.json`
-- Seamlessly integrate the RPC node
-- Stabilize the network
 
-After that, your network will be ready for:
-
-- Hardhat
-- Registry Deployment
-- Election Factory
-- Blockscout
-- API Integration
-- Tauri/Desktop App
