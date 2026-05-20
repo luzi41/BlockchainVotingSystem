@@ -373,7 +373,7 @@ Your:
 
 should not be directly coupled to Validator1 later on.
 
-### 18.2 Target structure
+Target structure
 
         besu-network/
         ├── docker-compose.yml
@@ -395,8 +395,9 @@ should not be directly coupled to Validator1 later on.
         │
         └── logs/
 
-### 18.3 Extending the docker-compose.yml file:
-#### Step 1 --  Add bootnode
+
+### 18.2 Extending the network
+#### Step 1 --  Add bootnode to docker-compose.yml file:
 New service (At beginning in docker-compose.yml):
 
         bootnode:
@@ -419,10 +420,6 @@ New service (At beginning in docker-compose.yml):
           ports:
             - "30301:30301"
 
-Test:
-        docker compose down -v 
-        rm -rf data/*
-        docker-compose up -d
 
 #### Step 2 -- Create config/static-nodes.json
         [
@@ -433,7 +430,23 @@ Test:
           "enode://....@validator4:30306"
         ]
 We then mount this file into all nodes.
-If everything works correctly ...
+
+        docker compose down -v 
+        rm -rf data/*
+        docker-compose up -d
+        
+Replace the 4 dots with the reals enodeIDs you get from
+        
+        docker logs validator1 | grep enode
+        docker logs validator2 | grep enode
+        ...
+        docker logs bootnode | grep enode
+
+Test again:
+
+        docker compose down -v 
+        rm -rf data/*
+        docker-compose up -d
 
 #### Step 3 -- Add a Dedicated RPC Node to the docker.compose.yml
 Very important for the election platform.
@@ -466,6 +479,12 @@ Then:
 - API → rpcnode
 
 NOT directly to validators.
+
+Test again:
+
+        docker compose down -v 
+        rm -rf data/*
+        docker-compose up -d
 
 #### Step 4 — Secure validators
 
