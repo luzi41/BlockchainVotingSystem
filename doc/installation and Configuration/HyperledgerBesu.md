@@ -83,9 +83,9 @@ Example:
 
 File: docker-compose.yml
 
-Content:
+</>YAML
 
-    </>YAML
+
     services:
     
       validator1:
@@ -119,7 +119,8 @@ This you have to replace with the correct folder names (from networkFiles/genera
 
 ## 8 Starting network
 
-        </> Bash
+</> Bash
+
         docker compose up -d
 
 ## 9 Check
