@@ -2,7 +2,7 @@
 ## 1 Create folders
 To create the tutorial docker-compose files and artifact, we create the Beso blockchain service as docker containers.
 
-    </>bash
+</>bash
     
     mkdir besu-network
     mkdir -p \
@@ -12,8 +12,9 @@ To create the tutorial docker-compose files and artifact, we create the Beso blo
 ## 2 Create QBFT config
 
 networkFiles/config.json
-    
-    </>JSON
+
+</>JSON
+
     {
       "genesis": {
         "config": {
@@ -39,7 +40,7 @@ networkFiles/config.json
       "blockchain": {
         "nodes": {
           "generate": true,
-          "count": 4
+          "count": 6
         }
       }
     }
@@ -48,7 +49,8 @@ networkFiles/config.json
 
 Now the generator works correctly
 
-        </>bash
+</>bash
+
         docker run --rm \
         -v $(pwd)/networkFiles:/config \
         hyperledger/besu:24.5.2 \
@@ -57,13 +59,13 @@ Now the generator works correctly
         --to=/config/generated
 
 ## 4 Check results
+</>bash
 
-        </>bash
         ls networkFiles/generated
 
 ## 5 Show validator folders
-
-        </>bash
+</>bash
+        
         ls networkFiles/generated/keys
         
 you get 4 folders
@@ -74,6 +76,8 @@ Example:
         0xa2...
         0xb7...
         0xc9...
+        0xd1...
+        0x9a...
 
 ## 6 First testing one validator: create docker-compose
 
