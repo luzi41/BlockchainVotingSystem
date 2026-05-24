@@ -68,7 +68,7 @@ Now the generator works correctly
         
         ls networkFiles/generated/keys
         
-you get 4 folders
+you get 6 folders
 
 Example:
 
@@ -125,14 +125,16 @@ This you have to replace with the correct folder names (from networkFiles/genera
 
 ## 9 Check
 
-        </> Bash
+</> Bash
+        
         docker ps
 
 Now, validator1 should be running.
 
 ## 10 Checking logs
 
-        </> Bash
+</> Bash
+        
         docker compose logs -f validator1
 
 You should see:
