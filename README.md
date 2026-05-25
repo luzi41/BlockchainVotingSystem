@@ -99,3 +99,6 @@ go to: [doc/installation and configuration](./doc/installation%20and%20Configura
 
 - Election templates: different kinds of elections and surveys (V 1.0)
 - Change blockchain from Quorum to [Hyperledger Besu](https://besu.hyperledger.org), because the Quorum Project will not be continued.
+
+# 6. Future Planning
+For the next phase of the project, the plan is to initially test several private surveys at the local level—surveys that do not entail high security requirements and for which voter authentication is not critical. The aim of this approach is to establish and continuously improve user-friendliness. Furthermore, this process is intended to gradually build a reliable blockchain infrastructure, serving as a foundation for future elections and petitions at the political level.
