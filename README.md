@@ -98,3 +98,4 @@ go to: [doc/installation and configuration](./doc/installation%20and%20Configura
 # 5. Todo
 
 - Election templates: different kinds of elections and surveys (V 1.0)
+- Change blockchain from Quorum to [Hyperledger Besu](https://besu.hyperledger.org), because the Quorum Project will not be continued.
