@@ -335,19 +335,6 @@ For:
 
 you should have at least one dedicated bootnode.
 
-Validators Expose RPC Publicly
-
-Currently, every validator has:
-
-        --rpc-http-enabled
-
-This is not ideal.
-
-Better:
-
-- Validators → Consensus only
-- Separate RPC node → Frontend/API/Hardhat
-- 
 ### 2.  Validators expose RPC publicly.
 Currently, every validator has:
 
