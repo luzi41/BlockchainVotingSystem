@@ -135,7 +135,7 @@ Now, validator1 should be running.
 
 </> Bash
         
-        docker compose logs -f validator1
+        ./networkFiles % docker compose logs -f validator1
 
 You should see:
 
