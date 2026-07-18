@@ -121,7 +121,7 @@ This you have to replace with the correct folder names (from networkFiles/genera
 
 </> Bash
 
-        docker compose up -d
+        ./networkFiles % docker compose up -d
 
 ## 9 Check
 
